@@ -162,21 +162,22 @@ export default function LandingPage() {
           style={{ background: "radial-gradient(60% 60% at 30% 0%, var(--ezd-bg-hover), transparent 70%)" }}
         />
 
-        <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:gap-10">
-          {/* ---------- Left: copy ---------- */}
-          <div className="text-center lg:text-left">
+        <div className="mx-auto flex w-full max-w-[1000px] flex-col items-start gap-14">
+          {/* ---------- Hero copy ---------- */}
+          <div className="w-full max-w-3xl text-left">
             <Reveal delay={60}>
               <h1
                 className="font-semibold"
                 style={{
-                  fontFamily: HERO,
-                  fontSize: "clamp(32px, 4.2vw, 54px)",
-                  lineHeight: 1.04,
-                  letterSpacing: "-0.035em",
+                  fontFamily: DISPLAY,
+                  fontSize: "clamp(40px, 7vw, 84px)",
+                  lineHeight: 0.98,
+                  letterSpacing: "-0.04em",
                   color: "var(--ezd-fg-strong)",
                 }}
               >
-                AI presentations in seconds.
+                AI presentations<br />
+                in <span style={{ fontFamily: HERO, letterSpacing: "-0.02em" }}>seconds.</span>
                 <span className="sr-only">
                   {" "}EXdeck is a free AI PPT maker that turns your text into an
                   editable PowerPoint presentation with one-click PPTX and PDF export.
@@ -186,7 +187,7 @@ export default function LandingPage() {
 
             <Reveal delay={120}>
               <p
-                className="mx-auto mt-5 max-w-lg text-[15.5px] leading-relaxed sm:text-[16.5px] lg:mx-0"
+                className="mt-6 max-w-xl text-[16px] leading-relaxed sm:text-[18px]"
                 style={{ color: "var(--ezd-fg-muted)" }}
               >
                 Type a brief, pick a template, and get a fully designed deck with real charts and speaker notes. 
@@ -195,42 +196,45 @@ export default function LandingPage() {
             </Reveal>
 
             <Reveal delay={180}>
-              <div className="mt-8 flex justify-center lg:justify-start">
+              <div className="mt-9 flex flex-wrap items-center gap-3">
                 <button
                   onClick={onGetStarted}
-                  className="group inline-flex items-center gap-2 rounded-full px-8 py-3.5 text-[15px] font-semibold transition hover:opacity-90"
-                  style={{ background: "var(--ezd-button-strong)", color: "var(--ezd-button-strong-fg)", touchAction: "manipulation", minHeight: "44px" }}
+                  className="group inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-[15px] font-semibold transition hover:opacity-90"
+                  style={{ background: "var(--ezd-button-strong)", color: "var(--ezd-button-strong-fg)", touchAction: "manipulation", minHeight: "48px" }}
                 >
-                  Start for free
+                  Get started for free
                   <ArrowRight size={16} className="transition group-hover:translate-x-0.5" />
                 </button>
-              </div>
-            </Reveal>
-
-            <Reveal delay={240}>
-              <div
-                className="mt-6 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-[13.5px] font-medium lg:justify-start"
-                style={{ color: "var(--ezd-fg-muted)" }}
-              >
-                <span>Free to start</span>
-                <Dot />
-                <span>No credit card</span>
-                <Dot />
-                <span>Real .pptx &amp; .pdf export</span>
+                <a
+                  href="#how"
+                  className="inline-flex items-center rounded-full border px-7 py-3.5 text-[15px] font-semibold transition hover:opacity-80"
+                  style={{ borderColor: "var(--ezd-fg-strong)", color: "var(--ezd-fg-strong)", minHeight: "48px" }}
+                >
+                  See how it works
+                </a>
+                <span className="ml-1 text-[13px] font-medium" style={{ color: "var(--ezd-fg-muted)" }}>
+                  Free &middot; No card &middot; Real .pptx &amp; .pdf
+                </span>
               </div>
             </Reveal>
           </div>
 
-          {/* ---------- Right: product demo video ---------- */}
-          <Reveal delay={300} className="lg:justify-self-end">
-            <div className="relative w-full" style={{ maxWidth: "680px" }}>
+          {/* ---------- Product screenshot (browser window) ---------- */}
+          <Reveal delay={300} className="w-full">
+            <div className="relative w-full">
               <div 
-                className="relative rounded-2xl border-2 p-3"
-                style={{ 
-                  borderColor: "var(--ezd-fg-strong)",
+                className="relative overflow-hidden rounded-t-2xl border shadow-2xl"
+                style={{
+                  borderColor: "var(--ezd-hairline)",
                   background: "var(--ezd-bg-card)"
                 }}
               >
+                <div className="flex items-center gap-2 border-b px-4 py-3" style={{ borderColor: "var(--ezd-hairline)", background: "var(--ezd-bg-hover)" }}>
+                  <span className="h-3 w-3 rounded-full" style={{ background: "#ff5f57" }} />
+                  <span className="h-3 w-3 rounded-full" style={{ background: "#febc2e" }} />
+                  <span className="h-3 w-3 rounded-full" style={{ background: "#28c840" }} />
+                  <span className="mx-auto pr-6 text-[12.5px] font-medium" style={{ color: "var(--ezd-fg-muted)" }}>EXdeck</span>
+                </div>
                 <video
                   src="/preview0.mp4"
                   autoPlay
@@ -248,13 +252,6 @@ export default function LandingPage() {
                   style={{ display: "block", opacity: 1, objectFit: "contain" }}
                 />
               </div>
-              <a
-                href="#how"
-                className="mt-4 block text-center text-[13px] transition hover:text-white"
-                style={{ color: "var(--ezd-fg-muted)" }}
-              >
-                See how it works →
-              </a>
             </div>
           </Reveal>
         </div>
