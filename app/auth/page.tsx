@@ -31,7 +31,10 @@ export default function AuthPage() {
 function AuthInner() {
   const router = useRouter();
   const params = useSearchParams();
-  const redirect = params.get("redirect") || "/app";
+  const rawRedirect = params.get("redirect") || "/app";
+  // Open-redirect guard: only allow internal paths — must start with a single
+  // "/" and not "//" or "/\" (which browsers resolve to an external origin).
+  const redirect = /^\/(?![/\\])/.test(rawRedirect) ? rawRedirect : "/app";
 
   const [mode, setMode] = useState<"login" | "signup">("login");
   const [showEmail, setShowEmail] = useState(false);

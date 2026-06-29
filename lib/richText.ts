@@ -130,6 +130,53 @@ function walk(node: Node) {
   }
 }
 
+/**
+ * Sanitize block/document HTML for safe rendering. Unlike sanitizeRichHtml
+ * (a strict INLINE allow-list), this PRESERVES document structure — headings,
+ * lists, links, tables, etc. — and only removes script-execution vectors:
+ * dangerous elements, every on* event-handler attribute, and
+ * javascript:/vbscript:/data: URLs (data: is allowed only for inline images).
+ * Client-only; on the server it returns plain text.
+ */
+const DANGEROUS_DOC_TAGS = new Set([
+  "script", "style", "iframe", "object", "embed", "link", "meta", "base", "form", "noscript", "svg",
+]);
+export function sanitizeDocHtml(html: string): string {
+  if (!html) return "";
+  if (typeof window === "undefined" || typeof document === "undefined") {
+    return stripHtml(html);
+  }
+  const tpl = document.createElement("template");
+  tpl.innerHTML = html;
+  const walkDoc = (node: Node) => {
+    for (const child of Array.from(node.childNodes)) {
+      if (child.nodeType === Node.ELEMENT_NODE) {
+        const el = child as HTMLElement;
+        const tag = el.tagName.toLowerCase();
+        if (DANGEROUS_DOC_TAGS.has(tag)) { el.parentNode?.removeChild(el); continue; }
+        for (const attr of Array.from(el.attributes)) {
+          const name = attr.name.toLowerCase();
+          const val = (attr.value || "").trim();
+          if (name.startsWith("on")) { el.removeAttribute(attr.name); continue; }
+          if ((name === "href" || name === "src" || name === "xlink:href" || name === "formaction") &&
+              /^\s*(javascript|vbscript|data)\s*:/i.test(val) &&
+              !(name === "src" && /^\s*data:image\//i.test(val))) {
+            el.removeAttribute(attr.name);
+          }
+          if (name === "style" && /(expression\s*\(|javascript\s*:|vbscript\s*:)/i.test(val)) {
+            el.removeAttribute(attr.name);
+          }
+        }
+        walkDoc(el);
+      } else if (child.nodeType === Node.COMMENT_NODE) {
+        child.parentNode?.removeChild(child);
+      }
+    }
+  };
+  walkDoc(tpl.content);
+  return tpl.innerHTML;
+}
+
 /* ----------------------- whole-element formatting ------------------------ */
 
 /**

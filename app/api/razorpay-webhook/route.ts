@@ -15,7 +15,15 @@ export async function POST(req: NextRequest) {
   const raw = await req.text();
   const sig = req.headers.get("x-razorpay-signature");
 
-  if (WEBHOOK_SECRET) {
+  if (!WEBHOOK_SECRET) {
+    // Fail CLOSED: without the secret we cannot verify authenticity, and an
+    // unverified webhook would let anyone grant any plan to any uid via the
+    // notes body. Reject until RAZORPAY_WEBHOOK_SECRET is configured.
+    // eslint-disable-next-line no-console
+    console.error("[razorpay-webhook] RAZORPAY_WEBHOOK_SECRET is not set — rejecting webhook (fail closed).");
+    return NextResponse.json({ error: "webhook not configured" }, { status: 503 });
+  }
+  {
     const expected = hmacHex(WEBHOOK_SECRET, raw);
     if (!sig || !safeEqual(expected, sig)) {
       return NextResponse.json({ error: "invalid signature" }, { status: 401 });

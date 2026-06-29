@@ -4,6 +4,7 @@ import { ChevronUp, ChevronDown, Trash2, Plus, X, GripVertical, Image as ImageIc
 import type { ExDoc, DocBlock } from "@/lib/docTypes";
 import { A4 } from "@/lib/docTypes";
 import { getDocFont } from "@/lib/docFonts";
+import { sanitizeDocHtml } from "@/lib/richText";
 import { renderChartSvg } from "@/lib/charts";
 
 /**
@@ -414,17 +415,17 @@ function Edit({ tag, html, onCommit, onFocus, editable, style, ph }: {
 }) {
   const ref = useRef<HTMLElement>(null);
   const Tag = tag as any;
-  if (!editable) return <Tag style={style} dangerouslySetInnerHTML={{ __html: html || "" }} />;
+  if (!editable) return <Tag style={style} dangerouslySetInnerHTML={{ __html: sanitizeDocHtml(html || "") }} />;
   return (
     <Tag
       ref={ref}
       contentEditable
       suppressContentEditableWarning
       onFocus={onFocus}
-      onBlur={() => onCommit((ref.current as HTMLElement)?.innerHTML || "")}
+      onBlur={() => onCommit(sanitizeDocHtml((ref.current as HTMLElement)?.innerHTML || ""))}
       data-ph={ph}
       style={{ outline: "none", ...style }}
-      dangerouslySetInnerHTML={{ __html: html || "" }}
+      dangerouslySetInnerHTML={{ __html: sanitizeDocHtml(html || "") }}
     />
   );
 }

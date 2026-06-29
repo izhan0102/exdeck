@@ -39,7 +39,9 @@ export default function VerifyEmailPage() {
 function Inner() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirect = searchParams?.get("redirect") || "/app";
+  const rawRedirect = searchParams?.get("redirect") || "/app";
+  // Open-redirect guard: internal paths only (no //external or /\ tricks).
+  const redirect = /^\/(?![/\\])/.test(rawRedirect) ? rawRedirect : "/app";
 
   const [user, setUser] = useState<AppUser | null>(null);
   const [authReady, setAuthReady] = useState(false);
