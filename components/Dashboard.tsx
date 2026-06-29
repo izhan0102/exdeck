@@ -3,7 +3,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import {
   AlertTriangle, ArrowRight, Clock, Copy, FileText, Home, LayoutGrid,
-  LogOut, MoreVertical, Pencil, Plus, Search, Share2, Sparkles, Trash2, Wand2, X, Zap, Lock, Contact, Settings, MonitorPlay, Loader2, ArrowLeftRight, Table, Brain,
+  LogOut, MoreVertical, Pencil, Plus, Search, Share2, Sparkles, Trash2, Wand2, X, Zap, Lock, Contact, Settings, MonitorPlay, Loader2, ArrowLeftRight, Table, Brain, GraduationCap,
 } from "lucide-react";
 import { type AppUser, getIdToken } from "@/lib/auth";
 import {
@@ -350,11 +350,11 @@ export default function Dashboard({
               onClick={() => window.location.assign("/diagram")}
             />
             <CreateCard
-              icon={<Contact size={22} />}
-              title="Make a resume"
-              desc="Build a polished, ATS-friendly resume from templates — fill in your details, auto-fit to one page, and export a clean PDF. Free for everyone."
-              cta="New resume"
-              onClick={onNewResume}
+              icon={<GraduationCap size={22} />}
+              title="Make flashcards"
+              desc="Turn any topic or your notes into flippable study flashcards plus an auto-graded quiz — study, shuffle, and export to PDF or Anki. Free."
+              cta="Open flashcards"
+              onClick={() => window.location.assign("/flashcards")}
             />
             <CreateCard
               icon={<MonitorPlay size={22} />}
@@ -370,15 +370,20 @@ export default function Dashboard({
               cta="Open converters"
               onClick={() => window.location.assign("/converter")}
             />
-            <div className="lg:col-start-2 sm:col-span-2 lg:col-span-1">
-              <CreateCard
-                icon={<Brain size={22} />}
-                title="Analyse documents"
-                desc="Upload any files — Word, Excel, PPT, PDF, code, images — pick how deep to go, and get a clear analysis per document plus a cross-document synthesis. Ask follow-up questions too."
-                cta="Open analyser"
-                onClick={() => window.location.assign("/analyse")}
-              />
-            </div>
+            <CreateCard
+              icon={<Brain size={22} />}
+              title="Analyse documents"
+              desc="Upload any files — Word, Excel, PPT, PDF, code, images — pick how deep to go, and get a clear analysis per document plus a cross-document synthesis. Ask follow-up questions too."
+              cta="Open analyser"
+              onClick={() => window.location.assign("/analyse")}
+            />
+            <CreateCard
+              icon={<Contact size={22} />}
+              title="Make a resume"
+              desc="Build a polished, ATS-friendly resume from templates — fill in your details, auto-fit to one page, and export a clean PDF. Free for everyone."
+              cta="New resume"
+              onClick={onNewResume}
+            />
           </div>
         </div>
 

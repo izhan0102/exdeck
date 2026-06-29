@@ -6,7 +6,7 @@ import {
   ArrowRight, BarChart3, Check, Download, Contact, MonitorPlay,
   GitCommit, Github, Languages, LayoutTemplate, LogOut, MessageSquare,
   Play, Presentation, Shapes, Sparkles, Star, Wand2, FileText, X,
-  Table, ArrowLeftRight, Brain,
+  Table, ArrowLeftRight, Brain, GraduationCap,
 } from "lucide-react";
 import Logo from "@/components/Logo";
 import ThemeToggle from "@/components/ThemeToggle";
@@ -330,6 +330,15 @@ export default function LandingPage() {
             <div className="text-center">
               <div className="text-[13px] font-semibold" style={{ color: "var(--ezd-fg-strong)" }}>Converters</div>
               <div className="mt-0.5 text-[11px]" style={{ color: "var(--ezd-fg-quiet)" }}>Free file tools</div>
+            </div>
+          </Link>
+          <Link href="/flashcards" className="group flex flex-col items-center gap-3 rounded-2xl border p-6 transition hover:border-white/25" style={{ borderColor: "var(--ezd-hairline)", background: "var(--ezd-bg-card)" }}>
+            <div className="grid h-12 w-12 place-items-center rounded-xl border transition group-hover:scale-105" style={{ borderColor: "var(--ezd-hairline)", background: "var(--ezd-bg-hover)", color: "var(--ezd-fg-strong)" }}>
+              <GraduationCap size={20} />
+            </div>
+            <div className="text-center">
+              <div className="text-[13px] font-semibold" style={{ color: "var(--ezd-fg-strong)" }}>Flashcards</div>
+              <div className="mt-0.5 text-[11px]" style={{ color: "var(--ezd-fg-quiet)" }}>Study &amp; quiz</div>
             </div>
           </Link>
         </div>
