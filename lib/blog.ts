@@ -545,6 +545,201 @@ BLOG_POSTS.push(
   },
 );
 
+BLOG_POSTS.push(
+  {
+    slug: "how-to-prepare-for-a-job-interview",
+    title: "How to Prepare for a Job Interview: A Step-by-Step Checklist",
+    description:
+      "A practical, step-by-step way to prepare for any job interview — research, stories, practice, and logistics — so you walk in calm and ready.",
+    h1: "How to Prepare for a Job Interview",
+    datePublished: "2026-06-28",
+    readMins: 6,
+    lede:
+      "Most interview nerves come from one thing: not feeling ready. Preparation fixes that. Here's a reliable checklist that takes you from the job description to walking in confident — no cramming required.",
+    sections: [
+      {
+        h: "1. Research the company and the role",
+        p: [
+          "Read the job description twice and underline the responsibilities and skills it repeats — those are what they'll probe. Then learn enough about the company to speak to why you want to work there specifically.",
+        ],
+        list: [
+          "The product: use it if you can, and form an opinion.",
+          "Recent news, funding, or launches you can reference.",
+          "The team or interviewer on LinkedIn, so you know who you're talking to.",
+          "The company's values — many interviews score you against them.",
+        ],
+      },
+      {
+        h: "2. Turn your experience into stories",
+        p: [
+          "Interviewers remember stories, not adjectives. For each key skill in the job description, prepare one concrete story with a result. Structure each as Situation, Task, Action, Result (the STAR method) so it stays tight and lands the impact.",
+          "Aim for six to eight flexible stories — leadership, conflict, failure, a big win, a tight deadline — that you can adapt to most questions.",
+        ],
+      },
+      {
+        h: "3. Practice out loud — not in your head",
+        p: [
+          "Rehearsing silently feels productive but hides the rambling, the filler words, and the answers that fall apart when spoken. Practice answering real questions out loud and, ideally, get feedback. A mock interview that scores your answers and shows a model response is the fastest way to find and fix weak spots before they cost you the real thing.",
+        ],
+      },
+      {
+        h: "4. Prepare questions to ask them",
+        p: [
+          "\"Do you have any questions for us?\" is part of the interview, not the end of it. Have three to five thoughtful questions ready.",
+        ],
+        list: [
+          "What does success look like in the first 90 days?",
+          "What's the biggest challenge facing the team right now?",
+          "How is performance reviewed and rewarded here?",
+        ],
+      },
+      {
+        h: "5. Handle the logistics",
+        list: [
+          "Test your camera, mic, and link the day before for remote interviews.",
+          "Have your resume, the job description, and your notes open or on paper.",
+          "Plan to arrive (or log in) five minutes early, not fifteen.",
+          "Prepare a glass of water and a quiet, well-lit space.",
+        ],
+      },
+    ],
+    howTo: {
+      name: "How to prepare for a job interview",
+      description: "A step-by-step routine to prepare for any job interview and walk in confident.",
+      steps: [
+        { name: "Research", text: "Study the job description, the company, its values, and your interviewer." },
+        { name: "Build your stories", text: "Prepare 6-8 STAR stories mapped to the skills the role needs." },
+        { name: "Practice out loud", text: "Rehearse real questions aloud and get feedback — a mock interview is ideal." },
+        { name: "Prepare questions", text: "Have 3-5 thoughtful questions ready to ask them." },
+        { name: "Sort logistics", text: "Test your setup, gather your notes, and plan to be early." },
+      ],
+    },
+    faq: [
+      { q: "How long should I prepare for an interview?", a: "For most roles, a focused few hours over two or three days beats one long cram session. Spread it across research, story-building, and out-loud practice." },
+      { q: "What's the best way to practice?", a: "Practice answering real questions out loud and get feedback. An AI mock interview gives you realistic questions, a score on each answer, and a model answer — without needing a partner." },
+    ],
+    cta: { label: "Try a free AI mock interview", href: "/interview" },
+    related: [],
+  },
+  {
+    slug: "star-method-interview-answers",
+    title: "The STAR Method: How to Answer Behavioral Interview Questions",
+    description:
+      "Behavioral questions like 'tell me about a time…' are won with the STAR method. Here's how to use it, with a worked example and common mistakes.",
+    h1: "The STAR Method for Behavioral Interviews",
+    datePublished: "2026-06-29",
+    readMins: 5,
+    lede:
+      "\"Tell me about a time you…\" questions trip people up because they ramble. The STAR method gives every answer a clear shape — so you sound structured, specific, and results-driven.",
+    sections: [
+      {
+        h: "What STAR stands for",
+        list: [
+          "Situation — set the scene in one or two sentences.",
+          "Task — what you were responsible for, and the challenge.",
+          "Action — what YOU did, step by step (use \"I\", not \"we\").",
+          "Result — the outcome, ideally with a number or clear impact.",
+        ],
+      },
+      {
+        h: "Why interviewers love it",
+        p: [
+          "Behavioral interviews are built on the idea that past behavior predicts future behavior. STAR answers give the interviewer exactly what they're scoring: a real situation, your specific actions, and a measurable result. It also keeps you from rambling, which is the most common way good candidates lose points.",
+        ],
+      },
+      {
+        h: "A worked example",
+        p: [
+          "Question: \"Tell me about a time you handled a conflict on your team.\"",
+          "Situation: Two engineers disagreed on an architecture choice and the project stalled for a week. Task: As tech lead, I had to unblock the team without picking a side blindly. Action: I ran a 30-minute session where each wrote down trade-offs, we scored them against our actual requirements, and we agreed on a small spike to test the riskier option. Result: We chose the data-backed approach, shipped two days later, and the two now pair regularly.",
+        ],
+      },
+      {
+        h: "Common STAR mistakes",
+        list: [
+          "Spending 80% on the Situation and rushing the Action — flip that ratio.",
+          "Saying \"we\" so much the interviewer can't tell what you did.",
+          "Ending with no result — always close the loop with an outcome.",
+          "Picking a story that doesn't actually match the question asked.",
+        ],
+      },
+      {
+        h: "Practice makes it automatic",
+        p: [
+          "STAR feels mechanical until you've said a few answers out loud — then it becomes the natural shape of your stories. Run through real behavioral questions and get feedback on structure and impact so it's second nature on the day.",
+        ],
+      },
+    ],
+    faq: [
+      { q: "When should I use the STAR method?", a: "For any behavioral question — anything that starts with 'tell me about a time', 'give me an example', or 'describe a situation'. It's not needed for factual or technical questions." },
+      { q: "How long should a STAR answer be?", a: "About 90 seconds to two minutes. Keep Situation and Task short, spend most of the time on your Action, and always finish with the Result." },
+    ],
+    cta: { label: "Practice STAR answers in a mock interview", href: "/interview" },
+    related: [],
+  },
+  {
+    slug: "common-interview-questions-and-answers",
+    title: "15 Common Interview Questions and How to Answer Them",
+    description:
+      "The interview questions you'll almost certainly be asked — and a clear, honest way to answer each one without sounding rehearsed.",
+    h1: "Common Interview Questions and How to Answer Them",
+    datePublished: "2026-06-30",
+    readMins: 7,
+    lede:
+      "Some questions show up in nearly every interview. Knowing them in advance means you answer with intention instead of improvising. Here's how to handle the most common ones.",
+    sections: [
+      {
+        h: "\"Tell me about yourself\"",
+        p: [
+          "This is not your life story — it's a 60-second pitch. Use present, past, future: what you do now, the experience that got you here, and why this role is the logical next step. Tie the ending to the job you're interviewing for.",
+        ],
+      },
+      {
+        h: "\"Why do you want this job?\"",
+        p: [
+          "Show you understand the role and the company, and connect it to something specific about you — a skill you want to use, a problem you want to work on, a mission you believe in. Generic enthusiasm reads as no enthusiasm.",
+        ],
+      },
+      {
+        h: "\"What's your greatest weakness?\"",
+        p: [
+          "Name a real one, then show what you're doing about it. The point isn't the weakness — it's evidence of self-awareness and growth. Avoid the fake 'I work too hard' answer; interviewers see straight through it.",
+        ],
+      },
+      {
+        h: "\"Tell me about a time you failed\"",
+        p: [
+          "Pick a genuine failure with a clear lesson, own your part without blaming others, and finish with what you changed afterward. Use STAR to keep it tight, and make the Result the lesson and the improvement.",
+        ],
+      },
+      {
+        h: "More questions to rehearse",
+        list: [
+          "Why are you leaving your current role?",
+          "Where do you see yourself in five years?",
+          "Tell me about a time you led without authority.",
+          "How do you handle tight deadlines or competing priorities?",
+          "Describe a time you disagreed with your manager.",
+          "What are you looking for in your next role?",
+          "Why should we hire you?",
+        ],
+      },
+      {
+        h: "The best way to practice these",
+        p: [
+          "Reading answers isn't the same as saying them. Run these questions in a realistic mock interview, answer out loud, and get a score plus a model answer for each — so the real interview feels like a repeat, not a first attempt.",
+        ],
+      },
+    ],
+    faq: [
+      { q: "How do I answer 'tell me about yourself'?", a: "Give a 60-second present-past-future pitch: what you do now, the experience that led here, and why this role is the next step — ending on the specific job you're interviewing for." },
+      { q: "What questions are asked in almost every interview?", a: "'Tell me about yourself', 'why this job', 'greatest weakness', 'a time you failed', and 'why should we hire you' show up in most interviews. Rehearse those first." },
+    ],
+    cta: { label: "Rehearse these in a free mock interview", href: "/interview" },
+    related: [],
+  },
+);
+
 export function getBlogPost(slug: string): BlogPost | undefined {
   return BLOG_POSTS.find((p) => p.slug === slug);
 }

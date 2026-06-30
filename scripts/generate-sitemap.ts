@@ -58,6 +58,7 @@ function build(): string {
   entries.push(urlEntry("/spreadsheet", 0.9, "weekly", now));
   entries.push(urlEntry("/analyse", 1.0, "weekly", now));
   entries.push(urlEntry("/flashcards", 1.0, "weekly", now));
+  entries.push(urlEntry("/interview", 1.0, "weekly", now));
   entries.push(urlEntry("/converter", 0.9, "weekly", now));
   for (const c of CONVERTERS) {
     entries.push(urlEntry(`/converter/${c.slug}`, 0.8, "monthly", now));

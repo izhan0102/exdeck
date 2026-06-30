@@ -108,13 +108,13 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
         <ContentSections sections={post.sections} />
 
         <div className="mt-12 rounded-2xl border border-white/10 bg-gradient-to-br from-white/[0.06] to-transparent p-6">
-          <h2 className="text-[18px] font-semibold text-white">Build one now, free</h2>
-          <p className="mt-2 text-[14px] leading-relaxed text-white/70">{CTA_NOTE}</p>
+          <h2 className="text-[18px] font-semibold text-white">{post.cta ? "Try it for yourself" : "Build one now, free"}</h2>
+          <p className="mt-2 text-[14px] leading-relaxed text-white/70">{post.cta ? "Jump straight in — it's free to start, no setup." : CTA_NOTE}</p>
           <Link
-            href="/app"
+            href={post.cta?.href || "/app"}
             className="mt-4 inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-[14px] font-semibold text-black transition hover:bg-white/90"
           >
-            Open the editor <ArrowRight size={15} />
+            {post.cta?.label || "Open the editor"} <ArrowRight size={15} />
           </Link>
         </div>
 

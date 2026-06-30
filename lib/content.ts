@@ -39,6 +39,8 @@ export type BlogPost = {
   faq?: QA[];
   /** When set, a HowTo schema is emitted from these steps. */
   howTo?: { name: string; description: string; steps: { name: string; text: string }[] };
+  /** Optional custom call-to-action (defaults to the editor). */
+  cta?: { label: string; href: string };
   related: string[];
 };
 

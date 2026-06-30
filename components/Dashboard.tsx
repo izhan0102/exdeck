@@ -3,7 +3,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import {
   AlertTriangle, ArrowRight, Clock, Copy, FileText, Home, LayoutGrid,
-  LogOut, MoreVertical, Pencil, Plus, Search, Share2, Sparkles, Trash2, Wand2, X, Zap, Lock, Contact, Settings, MonitorPlay, Loader2, ArrowLeftRight, Table, Brain, GraduationCap,
+  LogOut, MoreVertical, Pencil, Plus, Search, Share2, Sparkles, Trash2, Wand2, X, Zap, Lock, Contact, Settings, MonitorPlay, Loader2, ArrowLeftRight, Table, Brain, GraduationCap, Mic,
 } from "lucide-react";
 import { type AppUser, getIdToken } from "@/lib/auth";
 import {
@@ -355,6 +355,13 @@ export default function Dashboard({
               desc="Turn any topic or your notes into flippable study flashcards plus an auto-graded quiz — study, shuffle, and export to PDF or Anki. Free."
               cta="Open flashcards"
               onClick={() => window.location.assign("/flashcards")}
+            />
+            <CreateCard
+              icon={<Mic size={22} />}
+              title="Mock interview"
+              desc="Practice a realistic AI interview for any role — scored feedback, a model answer for every question, and a final performance report. Free."
+              cta="Start interview"
+              onClick={() => window.location.assign("/interview")}
             />
             <CreateCard
               icon={<MonitorPlay size={22} />}
