@@ -1316,6 +1316,7 @@ function FaqItem({ q, a }: { q: string; a: string }) {
 /* ----------------------- Footer ----------------------- */
 
 function Footer() {
+   const [isHovered, setIsHovered] = useState(false);
   return (
     <footer className="relative z-10 border-t" style={{ borderColor: "var(--ezd-divider)" }}>
       <div className="mx-auto max-w-6xl px-5 py-12 sm:px-6">
@@ -1438,6 +1439,28 @@ function Footer() {
           </a>{" "}
           in Bengaluru
         </span>
+        <button
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+          style={{
+            position: "fixed",
+            bottom: "20px",
+            right: "20px",
+            padding: "10px 15px",
+            borderRadius: "50%",
+            border: "none",
+            backgroundColor: isHovered ? "#555" : "var(--ezd-fg-muted)",
+            transform: isHovered ? "scale(1.1)" : "scale(1)",
+            transition: "all 0.3s ease",
+            color: "white",
+            cursor: "pointer",
+            fontSize:"12px",
+            zIndex: 1000,
+            }}
+          >
+          ↑
+          </button>
       </div>
     </footer>
   );
