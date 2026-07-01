@@ -8,6 +8,7 @@ export const metadata: Metadata = {
   title: "AI Presentation Maker | Create PowerPoint Slides in Seconds - EXdeck",
   description: "Free AI presentation maker that turns your brief into fully designed PowerPoint slides. Real charts, speaker notes, 45 themes, and instant .pptx export. No design skills needed.",
   keywords: ["ai presentation maker", "ai ppt maker", "powerpoint generator", "presentation creator", "slide maker", "free ppt maker", "ai slides"],
+  alternates: { canonical: "/presentations" },
   openGraph: {
     title: "AI Presentation Maker - Create Slides in Seconds",
     description: "Turn a brief into a fully designed presentation with AI. Real charts, speaker notes, and instant PowerPoint export.",

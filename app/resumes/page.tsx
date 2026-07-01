@@ -7,6 +7,7 @@ export const metadata: Metadata = {
   title: "AI Resume Builder | Create ATS-Friendly Resumes in Minutes - EXdeck",
   description: "Free AI resume builder with 6 professional templates. Auto-fit to one page, ATS-friendly formatting, and clean PDF export. Build your resume in minutes, not hours.",
   keywords: ["ai resume builder", "resume maker", "cv builder", "resume generator", "ats resume", "free resume builder", "professional resume"],
+  alternates: { canonical: "/resumes" },
   openGraph: {
     title: "AI Resume Builder - Create Professional Resumes Fast",
     description: "Build ATS-friendly resumes with AI. 6 templates, auto-fit to one page, and instant PDF export. Free for everyone.",
