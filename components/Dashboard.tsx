@@ -2,8 +2,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import {
-  AlertTriangle, ArrowRight, Clock, Copy, FileText, Home, LayoutGrid,
-  LogOut, MoreVertical, Pencil, Plus, Search, Share2, Sparkles, Trash2, Wand2, X, Zap, Lock, Contact, Settings, MonitorPlay, Loader2, ArrowLeftRight, Table, Brain, GraduationCap, Mic,
+  AlertTriangle, ArrowRight, Clock, Copy, FileText, Home,
+  LogOut, MoreVertical, Pencil, Search, Share2, Sparkles, Trash2, Wand2, X, Zap, Contact, Settings,
 } from "lucide-react";
 import { type AppUser, getIdToken } from "@/lib/auth";
 import {
@@ -152,14 +152,6 @@ export default function Dashboard({
   // Resume maker is free for everyone.
   const onNewResume = () => { window.location.assign("/resume"); };
 
-  const recentDeck = useMemo(() => {
-    const top = decks[0];
-    if (!top) return null;
-    const ageHours = (Date.now() - (top.updatedAt || 0)) / 36e5;
-    if (ageHours > 24 * 7) return null;
-    return top;
-  }, [decks]);
-
   const visibleDecks = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return decks;
@@ -169,14 +161,6 @@ export default function Dashboard({
   }, [decks, query]);
 
   const hasQuery = query.trim().length > 0;
-  // Continue card only shows when not searching; the grid then excludes that
-  // deck so it never appears twice (#6).
-  const showContinue = !!recentDeck && !hasQuery;
-  const gridSource = showContinue
-    ? visibleDecks.filter((d) => d.id !== recentDeck!.id)
-    : visibleDecks;
-  // When searching, show ALL matches; otherwise a recent preview of 9 (#3).
-  const gridDecks = hasQuery ? gridSource : gridSource.slice(0, 9);
 
   // Most-recently-edited item across decks, docs, and resumes — drives the
   // "Continue working" card for returning users.
@@ -194,6 +178,18 @@ export default function Dashboard({
     cands.sort((a, b) => b.updatedAt - a.updatedAt);
     return cands[0];
   }, [decks, docs, resumes]);
+
+  // Decks shown on the dashboard: when searching, every match; otherwise a
+  // recent preview of up to 8. The deck shown in "Continue working" is deduped
+  // out ONLY when other decks remain, so a single deck never blanks the grid.
+  const deckGrid = useMemo(() => {
+    if (hasQuery) return visibleDecks;
+    const list =
+      continueItem?.kind === "deck" && decks.length > 1
+        ? decks.filter((d) => d.id !== continueItem.id)
+        : decks;
+    return list.slice(0, 8);
+  }, [decks, visibleDecks, hasQuery, continueItem]);
 
   return (
     <div className="min-h-screen lg:pl-[264px]">
@@ -292,11 +288,11 @@ export default function Dashboard({
           </div>
         </div>
 
-        {/* ---------- Centered create options ---------- */}
-        <div className="flex min-h-[68vh] flex-col items-center justify-center">
-          <div className="mb-9 text-center">
+        {/* ---------- Dashboard content ---------- */}
+        <div className="mx-auto w-full max-w-6xl">
+          <header className="mb-8">
             <h1
-              className="text-[26px] font-semibold tracking-tight md:text-[34px]"
+              className="text-[26px] font-semibold tracking-tight md:text-[32px]"
               style={{
                 fontFamily: '"Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif',
                 letterSpacing: "-0.022em",
@@ -306,93 +302,187 @@ export default function Dashboard({
               Welcome back, {firstName(user)}
             </h1>
             <p className="mt-2 text-[13.5px]" style={{ color: "var(--ezd-fg-quiet)" }}>
-              What would you like to create today?
+              Start with a presentation — or explore the rest of the workspace below.
             </p>
-          </div>
+          </header>
 
           {continueItem && (
-            <div className="w-full max-w-4xl">
+            <div className="mb-9">
               <ContinueWorking item={continueItem} />
-              <div className="my-7 h-px w-full" style={{ background: "var(--ezd-divider)" }} />
             </div>
           )}
 
-          <ExAiWidget />
+          {/* ---------- Presentations (primary) ---------- */}
+          <SectionHead title="Presentations" />
+          <div className="mt-4 grid gap-4 lg:grid-cols-3">
+            <div className="lg:col-span-2">
+              <div
+                className="flex h-full flex-col justify-between overflow-hidden rounded-2xl border p-6 sm:p-7"
+                style={{ borderColor: "var(--ezd-divider)", background: "var(--ezd-bg-card)" }}
+              >
+                <div>
+                  <h2
+                    className="text-[21px] font-semibold sm:text-[23px]"
+                    style={{
+                      fontFamily: '"Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif',
+                      letterSpacing: "-0.02em",
+                      color: "var(--ezd-fg-strong)",
+                    }}
+                  >
+                    Create a presentation
+                  </h2>
+                  <p className="mt-2 max-w-md text-[13.5px] leading-relaxed" style={{ color: "var(--ezd-fg-muted)" }}>
+                    Turn a one-line brief into a fully designed, editable deck — real charts, themed
+                    layouts, speaker notes, and one-click export to PPTX &amp; PDF.
+                  </p>
+                </div>
+                <div className="mt-6 flex flex-wrap items-center gap-3">
+                  <button
+                    onClick={onNewDeck}
+                    disabled={limitReached}
+                    className="group inline-flex items-center gap-2 rounded-xl px-5 py-3 text-[14px] font-semibold transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+                    style={{ background: "var(--ezd-button-strong)", color: "var(--ezd-button-strong-fg)" }}
+                  >
+                    {limitReached ? "Out of credits" : "New presentation"}
+                    {!limitReached && <ArrowRight size={15} className="transition-transform group-hover:translate-x-0.5" />}
+                  </button>
+                  {onStartFromTemplate && (
+                    <button
+                      onClick={onStartFromTemplate}
+                      className="inline-flex items-center rounded-xl border px-5 py-3 text-[14px] font-semibold transition hover:opacity-80"
+                      style={{ borderColor: "var(--ezd-hairline)", background: "var(--ezd-bg-hover)", color: "var(--ezd-fg-strong)" }}
+                    >
+                      Start from a template
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
 
-          <div className="grid w-full max-w-4xl gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            <CreateCard
-              icon={<Wand2 size={22} />}
-              title="Make a presentation"
-              desc="Turn a one-line brief into a fully designed, editable slide deck — real charts, themed layouts, speaker notes, and one-click export to PPTX & PDF."
-              cta={limitReached ? "Out of credits" : "New presentation"}
-              onClick={onNewDeck}
-              disabled={limitReached}
-            />
-            <CreateCard
-              icon={<FileText size={22} />}
-              title="Make a document"
-              desc="Write a structured, Word-style document with AI — headings, data tables, charts, watermarks, and a clean multi-page PDF export."
-              cta="New document"
-              onClick={onNewDoc}
-            />
-            <CreateCard
-              icon={<Table size={22} />}
-              title="Make a spreadsheet"
-              desc="Build and edit spreadsheets with AI — say 'make a table of this data' or 'add a total column'. Live formulas, export to Excel or PDF. Free."
-              cta="Open spreadsheet"
-              onClick={() => window.location.assign("/spreadsheet")}
-            />
-            <CreateCard
-              icon={<Share2 size={22} />}
-              title="Make a diagram"
-              desc="Generate editable vector diagrams with AI — flowcharts, mind maps, timelines, ER, sequence and more. Edit the source, preview live, export SVG, PNG, or Mermaid."
-              cta="Open diagram studio"
-              onClick={() => window.location.assign("/diagram")}
-            />
-            <CreateCard
-              icon={<GraduationCap size={22} />}
-              title="Make flashcards"
-              desc="Turn any topic or your notes into flippable study flashcards plus an auto-graded quiz — study, shuffle, and export to PDF or Anki. Free."
-              cta="Open flashcards"
-              onClick={() => window.location.assign("/flashcards")}
-            />
-            <CreateCard
-              icon={<Mic size={22} />}
-              title="Mock interview"
-              desc="Practice a realistic AI interview for any role — scored feedback, a model answer for every question, and a final performance report. Free."
-              cta="Start interview"
-              onClick={() => window.location.assign("/interview")}
-            />
-            <CreateCard
-              icon={<MonitorPlay size={22} />}
-              title="Present a PDF"
-              desc="Only have the PDF, not the PowerPoint? Upload it and present every page full-screen like a real deck — arrow-key navigation, no .pptx needed. Free."
-              cta="Open presenter"
-              onClick={() => window.location.assign("/pdf-to-ppt")}
-            />
-            <CreateCard
-              icon={<ArrowLeftRight size={22} />}
-              title="Convert files"
-              desc="Free file converters — PNG/JPG/WebP, image to PDF, PDF to JPG/PNG, merge, split & organize PDFs, and OCR. Private, in your browser."
-              cta="Open converters"
-              onClick={() => window.location.assign("/converter")}
-            />
-            <CreateCard
-              icon={<Brain size={22} />}
-              title="Analyse documents"
-              desc="Upload any files — Word, Excel, PPT, PDF, code, images — pick how deep to go, and get a clear analysis per document plus a cross-document synthesis. Ask follow-up questions too."
-              cta="Open analyser"
-              onClick={() => window.location.assign("/analyse")}
-            />
-            <CreateCard
-              icon={<Contact size={22} />}
-              title="Make a resume"
-              desc="Build a polished, ATS-friendly resume from templates — fill in your details, auto-fit to one page, and export a clean PDF. Free for everyone."
-              cta="New resume"
-              onClick={onNewResume}
-            />
+            <div className="grid gap-4">
+              <PptSideTile
+                title="Your decks"
+                sub={decks.length ? `${decks.length} presentation${decks.length === 1 ? "" : "s"} saved` : "Nothing saved yet"}
+                cta="View all decks"
+                href="/app/decks"
+              />
+              <PptSideTile
+                title="Present a PDF"
+                sub="Show any PDF full-screen, like a real deck"
+                cta="Open presenter"
+                onClick={() => window.location.assign("/pdf-to-ppt")}
+              />
+            </div>
           </div>
+
+          {/* ---------- Your presentations (only when decks exist) ---------- */}
+          {(loading || decks.length > 0) && (
+            <section className="mt-12">
+              <div className="flex items-center justify-between gap-3">
+                <SectionHead
+                  title="Your presentations"
+                  count={!loading && decks.length ? decks.length : undefined}
+                />
+                {!loading && decks.length > 0 && (
+                  <div className="flex items-center gap-3">
+                    <SearchInput value={query} onChange={setQuery} />
+                    {decks.length > 8 && !hasQuery && (
+                      <Link
+                        href="/app/decks"
+                        className="hidden shrink-0 items-center gap-1 text-[12.5px] font-semibold transition hover:opacity-80 sm:inline-flex"
+                        style={{ color: "var(--ezd-fg-strong)" }}
+                      >
+                        View all <ArrowRight size={13} />
+                      </Link>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              <div className="mt-5">
+                {loading ? (
+                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                    {Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)}
+                  </div>
+                ) : deckGrid.length > 0 ? (
+                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                    {deckGrid.map((deck) => (
+                      <DeckCard
+                        key={deck.id}
+                        deck={deck}
+                        onRename={() => setRenameTarget({ id: deck.id, title: deck.title })}
+                        onDuplicate={async () => { try { await duplicateDeck(user.uid, deck.id); } catch { /* ignore */ } }}
+                        onAskDelete={() => setConfirmId(deck.id)}
+                      />
+                    ))}
+                  </div>
+                ) : hasQuery ? (
+                  <NoMatchState onClear={() => setQuery("")} />
+                ) : null}
+              </div>
+            </section>
+          )}
+
+          {/* ---------- Explore more features (no icons) ---------- */}
+          <section className="mt-14">
+            <SectionHead
+              title="Explore more features"
+              sub="The same AI workspace does more than slides — all included."
+            />
+            <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              <FeatureTile
+                title="Document maker"
+                desc="Write a structured, Word-style document — headings, tables, charts, and clean multi-page PDF export."
+                cta="New document"
+                onClick={onNewDoc}
+              />
+              <FeatureTile
+                title="Spreadsheet maker"
+                desc="Build and edit sheets from plain English with live formulas. Export to Excel or PDF."
+                cta="Open spreadsheet"
+                onClick={() => window.location.assign("/spreadsheet")}
+              />
+              <FeatureTile
+                title="Diagram studio"
+                desc="Generate editable flowcharts, mind maps, timelines and more. Export SVG, PNG, or Mermaid."
+                cta="Open diagrams"
+                onClick={() => window.location.assign("/diagram")}
+              />
+              <FeatureTile
+                title="Flashcards & quiz"
+                desc="Turn any topic or notes into flippable flashcards and an auto-graded quiz. Export to PDF or Anki."
+                cta="Open flashcards"
+                onClick={() => window.location.assign("/flashcards")}
+              />
+              <FeatureTile
+                title="Mock interview"
+                desc="Practice a realistic AI interview for any role — scored feedback and a final performance report."
+                cta="Start interview"
+                onClick={() => window.location.assign("/interview")}
+              />
+              <FeatureTile
+                title="Document analyser"
+                desc="Upload files and get a clear analysis per document plus a cross-document synthesis, with follow-ups."
+                cta="Open analyser"
+                onClick={() => window.location.assign("/analyse")}
+              />
+              <FeatureTile
+                title="File converters"
+                desc="Images, image-to-PDF, PDF-to-image, merge, split, and OCR — private, in your browser."
+                cta="Open converters"
+                onClick={() => window.location.assign("/converter")}
+              />
+              <FeatureTile
+                title="Resume builder"
+                desc="Build a polished, ATS-friendly resume from templates and export a clean, one-page PDF."
+                cta="New resume"
+                onClick={onNewResume}
+              />
+            </div>
+          </section>
         </div>
+
+        <ExAiWidget />
 
       </main>
 
@@ -445,6 +535,64 @@ export default function Dashboard({
 /* =====================================================================
  *                            Subcomponents
  * ===================================================================== */
+
+function SectionHead({ title, sub, count }: { title: string; sub?: string; count?: number }) {
+  return (
+    <div>
+      <div className="flex items-center gap-2.5">
+        <h2 className="text-[15px] font-semibold tracking-tight" style={{ color: "var(--ezd-fg-strong)" }}>{title}</h2>
+        {typeof count === "number" && (
+          <span
+            className="rounded-full border px-2 py-0.5 text-[11px] tabular-nums"
+            style={{ borderColor: "var(--ezd-hairline)", background: "var(--ezd-bg-card)", color: "var(--ezd-fg-muted)" }}
+          >
+            {count}
+          </span>
+        )}
+      </div>
+      {sub && <p className="mt-1 text-[12.5px]" style={{ color: "var(--ezd-fg-quiet)" }}>{sub}</p>}
+    </div>
+  );
+}
+
+function PptSideTile({
+  title, sub, cta, href, onClick,
+}: { title: string; sub: string; cta: string; href?: string; onClick?: () => void }) {
+  const cls = "group flex h-full flex-col justify-between rounded-2xl border p-5 text-left transition hover:-translate-y-0.5";
+  const style: React.CSSProperties = { borderColor: "var(--ezd-divider)", background: "var(--ezd-bg-card)" };
+  const inner = (
+    <>
+      <div>
+        <div className="text-[15px] font-semibold" style={{ color: "var(--ezd-fg-strong)" }}>{title}</div>
+        <div className="mt-1 text-[12.5px] leading-relaxed" style={{ color: "var(--ezd-fg-muted)" }}>{sub}</div>
+      </div>
+      <span className="mt-4 inline-flex items-center gap-1.5 text-[12.5px] font-semibold" style={{ color: "var(--ezd-fg-strong)" }}>
+        {cta} <ArrowRight size={13} className="transition-transform group-hover:translate-x-0.5" />
+      </span>
+    </>
+  );
+  if (href) return <Link href={href} className={cls} style={style}>{inner}</Link>;
+  return <button type="button" onClick={onClick} className={cls} style={style}>{inner}</button>;
+}
+
+function FeatureTile({
+  title, desc, cta, onClick,
+}: { title: string; desc: string; cta: string; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="group flex h-full flex-col items-start rounded-2xl border p-5 text-left transition hover:-translate-y-0.5"
+      style={{ borderColor: "var(--ezd-divider)", background: "var(--ezd-bg-card)" }}
+    >
+      <h3 className="text-[15px] font-semibold" style={{ color: "var(--ezd-fg-strong)" }}>{title}</h3>
+      <p className="mt-1.5 flex-1 text-[12.5px] leading-relaxed" style={{ color: "var(--ezd-fg-muted)" }}>{desc}</p>
+      <span className="mt-4 inline-flex items-center gap-1.5 text-[12.5px] font-semibold" style={{ color: "var(--ezd-fg-strong)" }}>
+        {cta} <ArrowRight size={13} className="transition-transform group-hover:translate-x-0.5" />
+      </span>
+    </button>
+  );
+}
 
 function NavItem({
   icon, label, href, onClick, active, count,
@@ -506,52 +654,10 @@ function ContinueWorking({ item }: { item: ContinueItem }) {
   );
 }
 
-function CreateCard({ icon, title, desc, cta, onClick, disabled, badge, golden, locked, className }: {
-  icon: React.ReactNode; title: string; desc: string; cta: string; onClick: () => void; disabled?: boolean; badge?: string; golden?: boolean; locked?: boolean; className?: string;
-}) {
-  const GOLD = "#C9A227";
-  const GOLD_SOFT = "rgba(201,162,39,0.10)";
-  return (
-    <button
-      onClick={onClick}
-      disabled={disabled}
-      className={`group relative flex flex-col items-start overflow-hidden rounded-2xl border p-6 text-left transition hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-60${className ? ` ${className}` : ""}`}
-      style={{
-        borderColor: golden ? GOLD : "var(--ezd-divider)",
-        background: golden ? `linear-gradient(180deg, ${GOLD_SOFT}, transparent)` : "var(--ezd-bg-card)",
-        boxShadow: golden ? `0 0 0 1px ${GOLD_SOFT} inset` : undefined,
-      }}
-    >
-      <div className="flex w-full items-center justify-between">
-        <div className="relative grid h-11 w-11 place-items-center rounded-xl"
-          style={{ background: golden ? GOLD : "var(--ezd-fg-strong)", color: golden ? "#1a1407" : "var(--ezd-bg-page)" }}>
-          {icon}
-          {locked && (
-            <span className="absolute -bottom-1 -right-1 grid h-5 w-5 place-items-center rounded-full" style={{ background: "#1a1407", color: GOLD, border: `1px solid ${GOLD}` }}>
-              <Lock size={11} />
-            </span>
-          )}
-        </div>
-        {badge && (
-          <span className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide"
-            style={golden ? { background: GOLD, color: "#1a1407" } : { background: "var(--ezd-button-strong)", color: "var(--ezd-button-strong-fg)" }}>
-            {badge}
-          </span>
-        )}
-      </div>
-      <h2 className="mt-4 text-[17px] font-semibold" style={{ color: "var(--ezd-fg-strong)" }}>{title}</h2>
-      <p className="mt-1.5 text-[13px] leading-relaxed" style={{ color: "var(--ezd-fg-muted)" }}>{desc}</p>
-      <span className="mt-4 inline-flex items-center gap-1.5 text-[13px] font-semibold" style={{ color: golden ? GOLD : "var(--ezd-fg-strong)" }}>
-        {locked && <Lock size={13} />}{cta} {!locked && <ArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" />}
-      </span>
-    </button>
-  );
-}
-
 /* ----------------------- Combined plan + usage card ----------------------- */
 
 function PlanUsageCard({ credits, plan, onUpgrade, membership }: { credits: CreditView | null; plan: PlanId; onUpgrade: () => void; membership?: MemberPlan | null }) {
-  const allowance = credits?.allowance ?? (plan === "pro" ? 1500 : 40);
+  const allowance = credits?.allowance ?? (plan === "pro" ? 150 : 30);
   const balance = credits?.balance ?? allowance;
   const used = Math.max(0, allowance - balance);
   const limit = allowance;
@@ -652,36 +758,6 @@ function PlanUsageCard({ credits, plan, onUpgrade, membership }: { credits: Cred
         </Link>
       )}
     </div>
-  );
-}
-
-/* ----------------------------- Continue card ----------------------------- */
-
-function ContinueCard({ deck }: { deck: DeckListItem }) {
-  return (
-    <Link
-      href={`/app?id=${deck.id}`}
-      className="group mb-6 flex items-center gap-4 rounded-2xl border p-4 transition hover:-translate-y-0.5"
-      style={{ borderColor: "var(--ezd-divider)", background: "var(--ezd-bg-card)" }}
-    >
-      <div className="hidden w-[150px] shrink-0 sm:block">
-        <DeckThumbnail item={deck} />
-      </div>
-      <div className="min-w-0 flex-1">
-        <div className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.22em]" style={{ color: "var(--ezd-fg-muted)" }}>
-          <Clock size={11} /> Continue working
-        </div>
-        <h3 className="mt-1.5 line-clamp-1 text-base font-semibold" style={{ color: "var(--ezd-fg-strong)" }}>
-          {deck.title}
-        </h3>
-        <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11.5px]" style={{ color: "var(--ezd-fg-quiet)" }}>
-          <span>{deck.slides} slide{deck.slides === 1 ? "" : "s"}</span>
-          <Sep />
-          <span>{formatRelative(deck.updatedAt)}</span>
-        </div>
-      </div>
-      <ArrowRight size={16} className="transition-transform group-hover:translate-x-0.5" style={{ color: "var(--ezd-fg-muted)" }} />
-    </Link>
   );
 }
 
@@ -851,66 +927,7 @@ function SkeletonCard() {
   );
 }
 
-/* ----------------------------- Empty / no-match ----------------------------- */
-
-function EmptyState({ onCreate, onTemplates }: { onCreate: () => void; onTemplates?: () => void }) {
-  const examples = [
-    "Series A pitch for a logistics platform",
-    "Intro lecture on transformer architectures",
-    "Q1 investor update for an early-stage SaaS",
-  ];
-  return (
-    <div className="rounded-3xl border px-6 py-10 sm:px-10 sm:py-12" style={{ borderColor: "var(--ezd-divider)", background: "var(--ezd-bg-card)" }}>
-      <div className="mx-auto flex max-w-lg flex-col items-center text-center">
-        <h3
-          className="text-[22px] font-semibold tracking-tight sm:text-[26px]"
-          style={{ fontFamily: '"Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif', letterSpacing: "-0.02em", color: "var(--ezd-fg-strong)" }}
-        >
-          Make your first presentation
-        </h3>
-        <p className="mt-2 max-w-md text-[13.5px] leading-relaxed" style={{ color: "var(--ezd-fg-muted)" }}>
-          Type a one-line brief and EXdeck assembles a full, editable deck in about ten seconds. Specific beats long. Try one of these:
-        </p>
-
-        <div className="mt-6 flex w-full max-w-md flex-col gap-2">
-          {examples.map((e) => (
-            <button
-              key={e}
-              onClick={onCreate}
-              className="group flex items-center justify-between gap-3 rounded-xl border px-4 py-2.5 text-left text-[12.5px] transition hover:-translate-y-0.5"
-              style={{ borderColor: "var(--ezd-hairline)", background: "var(--ezd-bg-hover)", color: "var(--ezd-fg-muted)" }}
-            >
-              <span className="flex items-center gap-2.5">
-                <span aria-hidden className="h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: "var(--ezd-fg-strong)", opacity: 0.55 }} />
-                {e}
-              </span>
-              <ArrowRight size={13} className="shrink-0 transition-transform group-hover:translate-x-0.5" style={{ color: "var(--ezd-fg-quiet)" }} />
-            </button>
-          ))}
-        </div>
-
-        <div className="mt-7 flex flex-wrap items-center justify-center gap-2.5">
-          <button
-            onClick={onCreate}
-            className="inline-flex items-center gap-1.5 rounded-full px-5 py-2.5 text-[12.5px] font-semibold transition hover:opacity-90"
-            style={{ background: "var(--ezd-button-strong)", color: "var(--ezd-button-strong-fg)" }}
-          >
-            <Plus size={13} /> Create your first deck
-          </button>
-          {onTemplates && (
-            <button
-              onClick={onTemplates}
-              className="inline-flex items-center gap-1.5 rounded-full border px-5 py-2.5 text-[12.5px] transition hover:opacity-80"
-              style={{ borderColor: "var(--ezd-hairline)", background: "var(--ezd-bg-card)", color: "var(--ezd-fg-strong)" }}
-            >
-              <LayoutGrid size={12} /> Browse templates
-            </button>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
+/* ----------------------------- No-match ----------------------------- */
 
 function NoMatchState({ onClear }: { onClear: () => void }) {
   return (

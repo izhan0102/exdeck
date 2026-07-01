@@ -7,6 +7,7 @@ import {
 import type { Deck, Slide } from "@/lib/types";
 import type { Theme } from "@/lib/themes";
 import { getIdToken } from "@/lib/auth";
+import { signalCreditsBlocked } from "@/lib/creditsClient";
 
 /**
  * Unified AI editor for the deck.
@@ -202,6 +203,7 @@ export default function DeckChat({
         }));
 
       if (useScope === "deck") {
+        signalCreditsBlocked();
         const res = await fetch("/api/edit-deck", {
           method: "POST",
           headers: {
@@ -229,6 +231,7 @@ export default function DeckChat({
           ? { ...tn, status: "success", explanation }
           : tn));
       } else {
+        signalCreditsBlocked();
         const res = await fetch("/api/edit-slide", {
           method: "POST",
           headers: {

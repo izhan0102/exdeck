@@ -6,8 +6,8 @@
  *   credits/{uid} = { balance: number, periodKey: string, plan: "free"|"pro" }
  *
  * Allowance + cadence live in lib/plans.ts:
- *   • Free → 40 credits / calendar month (UTC)
- *   • Pro  → 1500 credits / day (UTC)
+ *   • Free → 30 credits / calendar month (UTC)
+ *   • Pro  → 150 credits / day (UTC)
  *
  * Lazy reset: there's no cron. Whenever we read or deduct, if the stored
  * periodKey differs from the current one (or the plan changed) we refill the
@@ -75,15 +75,19 @@ export async function getCreditsServer(uid: string): Promise<CreditState> {
 }
 
 /**
- * Block the request if the user has no credits left. Throws PlanLimitError
- * (402, code "no_credits") which the routes already translate to a clean
- * client error. Returns the live state so the caller can deduct afterwards.
+ * Block the request unless the user has at least `min` credits (default 1).
+ * Throws PlanLimitError (402, code "no_credits") — routes/clients translate
+ * this to a clean error. Returns the live state so the caller can deduct
+ * afterwards. Actions with a fixed cost (e.g. export) pass that cost as `min`
+ * so a user who can't cover the full charge is blocked up front.
  */
-export async function requireCredits(uid: string): Promise<CreditState> {
+export async function requireCredits(uid: string, min = 1): Promise<CreditState> {
   const state = await getCreditsServer(uid);
-  if (state.balance <= 0) {
+  if (state.balance < Math.max(1, min)) {
     throw new PlanLimitError(
-      "You're out of AI credits. They'll reset automatically — upgrade for more.",
+      min > 1
+        ? `You need at least ${min} credits for this. They reset automatically — upgrade for more.`
+        : "You're out of AI credits. They'll reset automatically — upgrade for more.",
       "no_credits",
       402,
     );

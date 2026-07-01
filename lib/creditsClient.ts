@@ -25,6 +25,18 @@ export type CreditView = {
   exhausted: boolean;  // balance <= 0
 };
 
+/** Window event dispatched when the user attempts a credit-using action while
+ *  out of credits. The global CreditsGate listens for it to re-show its popup
+ *  after the user has dismissed it. */
+export const CREDITS_BLOCKED_EVENT = "ezd:credits-blocked";
+
+/** Fire the re-show signal (safe to call anywhere client-side). */
+export function signalCreditsBlocked(): void {
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new Event(CREDITS_BLOCKED_EVENT));
+  }
+}
+
 function periodKey(plan: PlanId, d = new Date()): string {
   return creditPeriod(plan) === "day" ? d.toISOString().slice(0, 10) : d.toISOString().slice(0, 7);
 }

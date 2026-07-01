@@ -49,20 +49,20 @@ export const PLANS: Record<PlanId, Plan> = {
     decksPerMonth: 2,
     tagline: "Try it out, no card needed.",
     features: {
-      speakerNotes: false,
-      qaPrep: false,
-      translate: false,
-      icons: false,
-      reorder: false,
-      handout: false,
-      density: false,
-      template: false,
+      speakerNotes: true,
+      qaPrep: true,
+      translate: true,
+      icons: true,
+      reorder: true,
+      handout: true,
+      density: true,
+      template: true,
     },
     highlights: [
-      "2 AI generations per month",
-      "Full AI deck generation",
+      "30 AI credits per month",
+      "Every feature unlocked — notes, Q&A, translation, icons",
       "All themes, fonts, and layouts",
-      "PDF and PPTX export",
+      "PDF and PPTX export (10 credits each)",
     ],
   },
   pro: {
@@ -106,15 +106,15 @@ export const DAILY_GEN_CAP = 10;
  * AI credits — the single balance every AI action draws from. Replaces the
  * old "decks/month" + "daily cap" model.
  *
- *   • Free  → 40 credits, resets every calendar MONTH (UTC).
- *   • Pro   → 1500 credits, resets every DAY (UTC).
+ *   • Free  → 30 credits, resets every calendar MONTH (UTC).
+ *   • Pro   → 150 credits, resets every DAY (UTC).
  *
  * When the balance hits 0 the account is blocked from all AI routes
  * server-side until the next reset (a global overlay tells the user).
  */
 export const CREDITS: Record<PlanId, number> = {
-  free: 40,
-  pro: 1500,
+  free: 30,
+  pro: 150,
 };
 
 /** Reset cadence per plan. Free is monthly; Pro is daily. */
@@ -136,7 +136,7 @@ export function creditAllowance(id: PlanId): number {
 export type CreditAction =
   | "generateDeck" | "generateDoc" | "editSlide" | "editDeck" | "redensify"
   | "speakerNotes" | "qaPrep" | "translate" | "sheetAi" | "sheetAnalyse"
-  | "refineResume" | "clarify" | "visualize" | "iconSearch" | "analyse";
+  | "refineResume" | "clarify" | "visualize" | "iconSearch" | "analyse" | "export";
 
 export const CREDIT_COSTS: Record<CreditAction, number> = {
   generateDeck: 8,
@@ -154,6 +154,7 @@ export const CREDIT_COSTS: Record<CreditAction, number> = {
   visualize: 3,
   iconSearch: 1,
   analyse: 6,
+  export: 10,
 };
 
 export function creditCost(action: CreditAction): number {

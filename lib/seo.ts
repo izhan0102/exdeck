@@ -120,7 +120,7 @@ export const SHORT_DESCRIPTION =
 export const FAQ: { q: string; a: string }[] = [
   {
     q: "Is EXdeck free to use?",
-    a: "Yes, there's a free plan. You get 40 AI credits every month to generate and edit decks, documents, spreadsheets, and resumes, and you can preview, present, and export to PowerPoint (.pptx) and PDF (free exports carry a small watermark). Pro gives you 1,500 credits per day and unlocks every feature, with Team and Organisation plans for shared seats.",
+    a: "Yes, there's a free plan. You get 30 AI credits every month to generate and edit decks, documents, spreadsheets, and resumes, and you can preview, present, and export to PowerPoint (.pptx) and PDF (free exports carry a small watermark). Pro gives you 150 credits per day and unlocks every feature, with Team and Organisation plans for shared seats.",
   },
   {
     q: "How do I make a PowerPoint presentation from text?",

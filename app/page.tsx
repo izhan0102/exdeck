@@ -57,7 +57,6 @@ export default function LandingPage() {
   const router = useRouter();
   const [user, setUser] = useState<AppUser | null>(null);
   const [scrolled, setScrolled] = useState(false);
-  const heroVideoRef = useRef<HTMLVideoElement | null>(null);
 
   useEffect(() => {
     trackEvent({ kind: "page_view", path: "/", ts: Date.now() });
@@ -71,28 +70,6 @@ export default function LandingPage() {
       unsub();
       window.removeEventListener("scroll", onScroll);
     };
-  }, []);
-
-  // Force the hero video to begin from the very start. The <video> can fire
-  // `loadedmetadata` before React hydrates (so a JSX handler is missed), and
-  // some browsers restore a cached position — both cause a mid-clip start.
-  // This effect resets to frame 0 whether metadata is already available at
-  // mount or arrives later.
-  useEffect(() => {
-    const v = heroVideoRef.current;
-    if (!v) return;
-    const startFromZero = () => {
-      try {
-        v.currentTime = 0;
-        const p = v.play();
-        if (p && typeof p.catch === "function") p.catch(() => {});
-      } catch {
-        /* ignore */
-      }
-    };
-    if (v.readyState >= 1) startFromZero(); // metadata already loaded
-    v.addEventListener("loadedmetadata", startFromZero);
-    return () => v.removeEventListener("loadedmetadata", startFromZero);
   }, []);
 
   const onGetStarted = () => {
@@ -257,11 +234,11 @@ export default function LandingPage() {
             </Reveal>
           </div>
 
-          {/* ---------- Product screenshot (browser window) ---------- */}
+          {/* ---------- Product demo (animated) ---------- */}
           <Reveal delay={300} className="w-full">
             <div className="relative w-full">
               <div 
-                className="relative overflow-hidden rounded-t-2xl border shadow-2xl"
+                className="relative overflow-hidden rounded-2xl border shadow-2xl"
                 style={{
                   borderColor: "var(--ezd-hairline)",
                   background: "var(--ezd-bg-card)"
@@ -273,24 +250,7 @@ export default function LandingPage() {
                   <span className="h-3 w-3 rounded-full" style={{ background: "#28c840" }} />
                   <span className="mx-auto pr-6 text-[12.5px] font-medium" style={{ color: "var(--ezd-fg-muted)" }}>EXdeck</span>
                 </div>
-                <video
-                  ref={heroVideoRef}
-                  src="/preview0.mp4"
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
-                  preload="auto"
-                  className="w-full cursor-pointer rounded-lg"
-                  onClick={(e) => {
-                    if (e.currentTarget.paused) {
-                      e.currentTarget.play();
-                    } else {
-                      e.currentTarget.pause();
-                    }
-                  }}
-                  style={{ display: "block", opacity: 1, objectFit: "contain" }}
-                />
+                <HeroDemo />
               </div>
             </div>
           </Reveal>
@@ -856,6 +816,332 @@ function MiniBrief() {
           </span>
         ))}
       </div>
+    </div>
+  );
+}
+
+/* ----------------------- Animated hero demo ----------------------- *
+ * Temporary replacement for the hero video: a looping, randomized demo of
+ * the core flow — type a brief → generating → a colorful output slide.
+ * The prompt, theme, and output are picked at random each cycle so it looks
+ * different on every visit. All client-side; no assets. */
+
+type HeroLayout = "bars" | "donut" | "table" | "cards" | "steps" | "quote";
+
+type HeroDemoItem = {
+  prompt: string;
+  tags: string[];
+  kicker: string;
+  title: string;
+  bullets: string[];
+  bars: number[];
+  layout: HeroLayout;
+  table?: { headers: string[]; rows: string[][] };
+  quote?: string;
+  author?: string;
+  theme: { bg: string; fg: string; accent: string };
+};
+
+const HERO_DEMOS: HeroDemoItem[] = [
+  {
+    prompt: "Series A pitch for a logistics startup",
+    tags: ["Investors", "Confident", "8 slides"],
+    kicker: "SERIES A · 2026", title: "Rebuilding logistics, software-first.",
+    bullets: ["Dispatch to delivery in one stack", "40% lower cost per shipment", "Live in 9 metros"],
+    bars: [46, 62, 54, 78, 68], layout: "bars",
+    theme: { bg: "#0B1220", fg: "#F8FAFC", accent: "#38BDF8" },
+  },
+  {
+    prompt: "Intro lecture on the attention mechanism",
+    tags: ["Students", "Clear", "10 slides"],
+    kicker: "CS401 · LECTURE 4", title: "Where attention goes.",
+    bullets: ["Queries, keys, and values", "Softmax over the sequence", "Multi-head, in parallel"],
+    bars: [48, 26, 18, 8], layout: "donut",
+    theme: { bg: "#1B1024", fg: "#FAF5FF", accent: "#C084FC" },
+  },
+  {
+    prompt: "FY26 board strategy review",
+    tags: ["Board", "Formal", "12 slides"],
+    kicker: "FY26 · STRATEGY", title: "Where we won this year.",
+    bullets: [], bars: [],
+    layout: "table",
+    table: { headers: ["Metric", "FY25", "FY26"], rows: [["Net retention", "98%", "124%"], ["Segments", "4", "6"], ["Gross margin", "31%", "39%"]] },
+    theme: { bg: "#10241C", fg: "#ECFDF5", accent: "#34D399" },
+  },
+  {
+    prompt: "Launch deck for a new coffee brand",
+    tags: ["Customers", "Bold", "7 slides"],
+    kicker: "LAUNCH · SPRING", title: "Mornings, reinvented.",
+    bullets: [], bars: [],
+    layout: "quote",
+    quote: "Single-origin coffee, ethically sourced and ready in ninety seconds.",
+    author: "— Founder, launch keynote",
+    theme: { bg: "#2A0E0E", fg: "#FFF1F2", accent: "#FB7185" },
+  },
+  {
+    prompt: "Onboarding guide for a design tool",
+    tags: ["New users", "Friendly", "9 slides"],
+    kicker: "GET STARTED", title: "Ship your first design today.",
+    bullets: ["Start from a template", "Drag, edit, and recolor", "Export anywhere"],
+    bars: [], layout: "steps",
+    theme: { bg: "#0C1A2B", fg: "#EFF6FF", accent: "#FBBF24" },
+  },
+  {
+    prompt: "Quarterly climate impact report",
+    tags: ["Public", "Data-led", "11 slides"],
+    kicker: "Q2 · IMPACT", title: "Cutting carbon, quarter by quarter.",
+    bullets: ["Emissions reduced", "Renewable sites", "On track for"],
+    bars: [18, 3, 2030], layout: "cards",
+    theme: { bg: "#052E2B", fg: "#ECFEFF", accent: "#2DD4BF" },
+  },
+];
+
+/* ---- Output-slide building blocks (shared across layouts) ---- */
+
+function HDKicker({ d }: { d: HeroDemoItem }) {
+  return <div className="ezhd-rise text-[9px] font-bold tracking-[0.24em]" style={{ color: d.theme.accent, animationDelay: "0.05s" }}>{d.kicker}</div>;
+}
+function HDTitle({ d }: { d: HeroDemoItem }) {
+  return <div className="ezhd-rise text-[19px] font-bold leading-tight sm:text-[22px]" style={{ animationDelay: "0.12s", fontFamily: DISPLAY, letterSpacing: "-0.02em" }}>{d.title}</div>;
+}
+function HDBullets({ d }: { d: HeroDemoItem }) {
+  return (
+    <ul className="mt-1 space-y-1.5">
+      {d.bullets.map((b, i) => (
+        <li key={b} className="ezhd-rise flex items-start gap-2 text-[11.5px]" style={{ animationDelay: `${0.2 + i * 0.1}s` }}>
+          <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: d.theme.accent }} />
+          <span style={{ opacity: 0.92 }}>{b}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+function HDBars({ d }: { d: HeroDemoItem }) {
+  return (
+    <div className="flex h-full w-full items-end justify-center gap-2 py-4">
+      {d.bars.map((h, i) => (
+        <div key={i} className="ezhd-grow w-3.5 rounded-t sm:w-4" style={{ height: `${h}%`, background: d.theme.accent, opacity: 0.5 + (i / Math.max(1, d.bars.length)) * 0.5, animationDelay: `${0.25 + i * 0.09}s` }} />
+      ))}
+    </div>
+  );
+}
+function HDDonut({ d }: { d: HeroDemoItem }) {
+  const vals = d.bars.slice(0, 4);
+  const total = vals.reduce((a, b) => a + b, 0) || 1;
+  const R = 42, C = 2 * Math.PI * R;
+  const shades = [1, 0.7, 0.45, 0.28];
+  let acc = 0;
+  return (
+    <svg viewBox="0 0 120 120" className="ezhd-rise h-32 w-32" style={{ animationDelay: "0.15s" }}>
+      <circle cx="60" cy="60" r={R} fill="none" stroke={d.theme.fg} strokeOpacity={0.12} strokeWidth={14} />
+      {vals.map((v, i) => {
+        const dash = (v / total) * C;
+        const seg = (
+          <circle key={i} cx="60" cy="60" r={R} fill="none" stroke={d.theme.accent} strokeOpacity={shades[i]} strokeWidth={14}
+            strokeDasharray={`${dash} ${C - dash}`} strokeDashoffset={-acc} transform="rotate(-90 60 60)" strokeLinecap="butt" />
+        );
+        acc += dash;
+        return seg;
+      })}
+      <text x="60" y="65" textAnchor="middle" fontSize="18" fontWeight="700" fill={d.theme.fg} style={{ fontFamily: DISPLAY }}>
+        {Math.round((vals[0] / total) * 100)}%
+      </text>
+    </svg>
+  );
+}
+function HDTable({ d }: { d: HeroDemoItem }) {
+  const t = d.table!;
+  return (
+    <div className="ezhd-rise w-full overflow-hidden rounded-lg" style={{ animationDelay: "0.2s", border: `1px solid ${d.theme.accent}33` }}>
+      <div className="grid" style={{ gridTemplateColumns: `1.4fr repeat(${t.headers.length - 1}, 1fr)` }}>
+        {t.headers.map((h, i) => (
+          <div key={`h-${i}`} className="px-3 py-2 text-[10px] font-bold uppercase tracking-wide" style={{ background: `${d.theme.accent}22`, color: d.theme.accent }}>{h}</div>
+        ))}
+        {t.rows.map((row, ri) => row.map((cell, ci) => (
+          <div key={`${ri}-${ci}`} className="px-3 py-2 text-[11.5px]" style={{ borderTop: `1px solid ${d.theme.fg}14`, color: d.theme.fg, opacity: ci === 0 ? 1 : 0.9, fontWeight: ci === 0 ? 600 : 400 }}>{cell}</div>
+        )))}
+      </div>
+    </div>
+  );
+}
+function HDCards({ d }: { d: HeroDemoItem }) {
+  const suffix = ["%", "", ""];
+  return (
+    <div className="grid grid-cols-3 gap-2.5">
+      {d.bullets.map((label, i) => (
+        <div key={label} className="ezhd-rise rounded-lg p-3" style={{ animationDelay: `${0.2 + i * 0.1}s`, background: `${d.theme.accent}18`, border: `1px solid ${d.theme.accent}33` }}>
+          <div className="text-[22px] font-bold leading-none" style={{ color: d.theme.accent, fontFamily: DISPLAY }}>{d.bars[i]}{suffix[i] ?? ""}</div>
+          <div className="mt-1.5 text-[10.5px] leading-tight" style={{ opacity: 0.85 }}>{label}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+function HDSteps({ d }: { d: HeroDemoItem }) {
+  return (
+    <div className="mt-1 space-y-2">
+      {d.bullets.map((b, i) => (
+        <div key={b} className="ezhd-rise flex items-center gap-3" style={{ animationDelay: `${0.2 + i * 0.12}s` }}>
+          <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full text-[11px] font-bold" style={{ background: d.theme.accent, color: d.theme.bg }}>{i + 1}</span>
+          <span className="text-[12.5px]" style={{ opacity: 0.92 }}>{b}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function HeroDemo() {
+  const [mounted, setMounted] = useState(false);
+  const [demo, setDemo] = useState(0);
+  const [phase, setPhase] = useState<"typing" | "generating" | "output">("typing");
+  const [typed, setTyped] = useState(0);
+
+  // Randomize the starting demo after mount (avoids SSR hydration mismatch).
+  useEffect(() => {
+    setMounted(true);
+    setDemo(Math.floor(Math.random() * HERO_DEMOS.length));
+  }, []);
+
+  const d = HERO_DEMOS[demo];
+  const full = d.prompt;
+
+  // Typewriter → pause → generating.
+  useEffect(() => {
+    if (!mounted || phase !== "typing") return;
+    if (typed < full.length) {
+      const t = window.setTimeout(() => setTyped((n) => n + 1), 30 + Math.random() * 45);
+      return () => window.clearTimeout(t);
+    }
+    const t = window.setTimeout(() => setPhase("generating"), 750);
+    return () => window.clearTimeout(t);
+  }, [mounted, phase, typed, full]);
+
+  // Generating → output.
+  useEffect(() => {
+    if (phase !== "generating") return;
+    const t = window.setTimeout(() => setPhase("output"), 2000);
+    return () => window.clearTimeout(t);
+  }, [phase]);
+
+  // Output → next (a different, random demo).
+  useEffect(() => {
+    if (phase !== "output") return;
+    const t = window.setTimeout(() => {
+      setDemo((cur) => {
+        if (HERO_DEMOS.length < 2) return cur;
+        let n = cur;
+        while (n === cur) n = Math.floor(Math.random() * HERO_DEMOS.length);
+        return n;
+      });
+      setTyped(0);
+      setPhase("typing");
+    }, 2800);
+    return () => window.clearTimeout(t);
+  }, [phase]);
+
+  const typingDone = typed >= full.length;
+
+  return (
+    <div className="relative aspect-[16/10] w-full overflow-hidden" style={{ background: "var(--ezd-bg-page)" }}>
+      {/* TYPING */}
+      {phase === "typing" && (
+        <div className="absolute inset-0 flex flex-col justify-center gap-4 p-6 sm:p-8">
+          <div className="text-[10px] font-semibold uppercase tracking-[0.24em]" style={{ color: "var(--ezd-fg-quiet)", fontFamily: MONO }}>Your brief</div>
+          <div className="rounded-xl border p-4" style={{ borderColor: "var(--ezd-hairline)", background: "var(--ezd-bg-card)" }}>
+            <span className="text-[15px] leading-relaxed sm:text-[17px]" style={{ color: "var(--ezd-fg-strong)", fontFamily: DISPLAY }}>
+              {full.slice(0, typed)}
+              <span className="ezhd-caret" style={{ background: "var(--ezd-fg-strong)" }} />
+            </span>
+          </div>
+          <div className="flex flex-wrap gap-1.5" style={{ opacity: typingDone ? 1 : 0.25, transition: "opacity .4s ease" }}>
+            {d.tags.map((t) => (
+              <span key={t} className="rounded-full border px-2.5 py-1 text-[11px]" style={{ borderColor: "var(--ezd-hairline)", color: "var(--ezd-fg-muted)" }}>{t}</span>
+            ))}
+          </div>
+          <div className="mt-1 inline-flex w-fit items-center gap-1.5 rounded-full px-4 py-2 text-[12.5px] font-semibold" style={{ background: "var(--ezd-button-strong)", color: "var(--ezd-button-strong-fg)", opacity: typingDone ? 1 : 0.5, transition: "opacity .4s ease" }}>
+            <Sparkles size={13} /> Generate
+          </div>
+        </div>
+      )}
+
+      {/* GENERATING */}
+      {phase === "generating" && (
+        <div key={`g-${demo}`} className="absolute inset-0 flex flex-col items-center justify-center gap-5 p-8">
+          <div className="ezhd-orb grid h-16 w-16 place-items-center rounded-2xl" style={{ background: d.theme.bg, color: d.theme.accent, boxShadow: `0 0 42px ${d.theme.accent}55` }}>
+            <Sparkles size={26} className="ezhd-spin" />
+          </div>
+          <div className="text-[14px] font-semibold" style={{ color: "var(--ezd-fg-strong)", fontFamily: DISPLAY }}>
+            Designing your deck
+            <span className="ezhd-dot">.</span>
+            <span className="ezhd-dot" style={{ animationDelay: ".2s" }}>.</span>
+            <span className="ezhd-dot" style={{ animationDelay: ".4s" }}>.</span>
+          </div>
+          <div className="w-full max-w-[260px] space-y-2">
+            {[0, 1, 2].map((i) => (
+              <div key={i} className="ezhd-shim h-2.5 rounded-full" style={{ background: "var(--ezd-bg-hover)", animationDelay: `${i * 0.15}s` }} />
+            ))}
+          </div>
+          <div className="h-1 w-full max-w-[260px] overflow-hidden rounded-full" style={{ background: "var(--ezd-bg-hover)" }}>
+            <div className="ezhd-progress h-full rounded-full" style={{ background: d.theme.accent }} />
+          </div>
+        </div>
+      )}
+
+      {/* OUTPUT */}
+      {phase === "output" && (
+        <div key={`o-${demo}`} className="ezhd-pop absolute inset-0 p-4 sm:p-5">
+          <div className="relative flex h-full w-full overflow-hidden rounded-xl" style={{ background: d.theme.bg, color: d.theme.fg }}>
+            <div className="ezhd-sweep pointer-events-none absolute inset-0" />
+            <div className="absolute left-0 top-0 h-full w-[6px]" style={{ background: d.theme.accent }} />
+
+            {(d.layout === "bars" || d.layout === "donut") ? (
+              <>
+                <div className="flex w-[56%] flex-col justify-center gap-2.5 pl-7 pr-2">
+                  <HDKicker d={d} /><HDTitle d={d} /><HDBullets d={d} />
+                </div>
+                <div className="flex w-[44%] items-center justify-center p-4">
+                  {d.layout === "bars" ? <HDBars d={d} /> : <HDDonut d={d} />}
+                </div>
+              </>
+            ) : d.layout === "quote" ? (
+              <div className="flex w-full flex-col justify-center gap-2 px-8">
+                <div className="ezhd-rise text-[52px] leading-none" style={{ color: d.theme.accent, fontFamily: DISPLAY, animationDelay: "0.05s" }}>&ldquo;</div>
+                <div className="ezhd-rise -mt-4 text-[18px] font-semibold leading-snug sm:text-[21px]" style={{ animationDelay: "0.15s", fontFamily: DISPLAY }}>{d.quote}</div>
+                <div className="ezhd-rise text-[11px]" style={{ color: d.theme.accent, animationDelay: "0.28s" }}>{d.author}</div>
+              </div>
+            ) : (
+              <div className="flex w-full flex-col justify-center gap-3 px-7">
+                <div className="flex flex-col gap-1.5"><HDKicker d={d} /><HDTitle d={d} /></div>
+                {d.layout === "table" ? <HDTable d={d} /> : d.layout === "cards" ? <HDCards d={d} /> : <HDSteps d={d} />}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      <style jsx global>{`
+        .ezhd-caret { display: inline-block; width: 2px; height: 1em; margin-left: 2px; vertical-align: -2px; animation: ezhd-blink 1s steps(2) infinite; }
+        @keyframes ezhd-blink { 0%, 50% { opacity: 1 } 50.01%, 100% { opacity: 0 } }
+        .ezhd-dot { opacity: 0.2; animation: ezhd-dot 1.2s infinite; }
+        @keyframes ezhd-dot { 0%, 100% { opacity: 0.2 } 50% { opacity: 1 } }
+        .ezhd-shim { position: relative; overflow: hidden; }
+        .ezhd-shim::after { content: ""; position: absolute; inset: 0; background: linear-gradient(100deg, transparent 30%, rgba(150,150,150,.28) 50%, transparent 70%); background-size: 200% 100%; animation: ezhd-shim 1.3s infinite linear; }
+        @keyframes ezhd-shim { 0% { background-position: 200% 0 } 100% { background-position: -200% 0 } }
+        .ezhd-progress { width: 0%; animation: ezhd-progress 2s ease-out forwards; }
+        @keyframes ezhd-progress { 0% { width: 4% } 60% { width: 72% } 100% { width: 100% } }
+        .ezhd-spin { animation: ezhd-spin 3s linear infinite; }
+        @keyframes ezhd-spin { to { transform: rotate(360deg) } }
+        .ezhd-orb { animation: ezhd-orb 1.6s ease-in-out infinite; }
+        @keyframes ezhd-orb { 0%, 100% { transform: translateY(0) scale(1) } 50% { transform: translateY(-6px) scale(1.05) } }
+        .ezhd-pop { animation: ezhd-pop .5s cubic-bezier(.22,1,.36,1) both; }
+        @keyframes ezhd-pop { 0% { opacity: 0; transform: scale(.94) } 100% { opacity: 1; transform: scale(1) } }
+        .ezhd-rise { animation: ezhd-rise .5s cubic-bezier(.22,1,.36,1) both; }
+        @keyframes ezhd-rise { 0% { opacity: 0; transform: translateY(10px) } 100% { opacity: 1; transform: translateY(0) } }
+        .ezhd-grow { transform-origin: bottom; animation: ezhd-grow .6s cubic-bezier(.22,1,.36,1) both; }
+        @keyframes ezhd-grow { 0% { transform: scaleY(0) } 100% { transform: scaleY(1) } }
+        .ezhd-sweep { background: linear-gradient(115deg, transparent 30%, rgba(255,255,255,.14) 48%, transparent 62%); background-size: 250% 100%; animation: ezhd-sweep 1.1s ease-out .15s 1 both; }
+        @keyframes ezhd-sweep { 0% { background-position: 180% 0 } 100% { background-position: -120% 0 } }
+      `}</style>
     </div>
   );
 }

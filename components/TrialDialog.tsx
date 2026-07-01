@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { Sparkles, Check, Loader2, X, Crown } from "lucide-react";
 import { startTrial, razorpayConfigured } from "@/lib/razorpay";
 import { guessCurrencyFromLocale, fetchCurrencyFromIp } from "@/lib/geo";
@@ -88,6 +89,19 @@ export default function TrialDialog({ onClose, reason, email }: { onClose: () =>
                 {busy ? <><Loader2 size={16} className="animate-spin" /> Starting…</> : <><Sparkles size={16} /> Start 7-day free trial</>}
               </button>
               {err && <p className="mt-2 text-center text-[12.5px]" style={{ color: "#ef4444" }}>{err}</p>}
+
+              <div className="mt-4 border-t pt-3 text-center text-[12px]" style={{ borderColor: "var(--ezd-divider)", color: "var(--ezd-fg-quiet)" }}>
+                Buying for a team or organisation?{" "}
+                <Link
+                  href="/app/settings"
+                  onClick={onClose}
+                  className="font-semibold underline underline-offset-2"
+                  style={{ color: "var(--ezd-fg-strong)" }}
+                >
+                  Click here
+                </Link>
+              </div>
+
               <button onClick={onClose} className="mt-3 w-full text-center text-[12.5px]" style={{ color: "var(--ezd-fg-quiet)", background: "none", border: "none", cursor: "pointer" }}>Maybe later</button>
             </>
           )}

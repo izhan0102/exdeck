@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { BarChart3, Loader2, Plus, Sparkles, Trash2, X } from "lucide-react";
 import type { Theme } from "@/lib/themes";
 import { type ChartSpec, type ChartType, chartDataUri } from "@/lib/charts";
+import { signalCreditsBlocked } from "@/lib/creditsClient";
 
 const TYPES: { id: ChartType; label: string }[] = [
   { id: "bar", label: "Bar" },
@@ -97,6 +98,7 @@ export default function VisualsDrawer({
         body: JSON.stringify({ description: description.trim(), type: wantType === "auto" ? undefined : wantType }),
       });
       const data = await res.json().catch(() => ({}));
+      if (res.status === 402) signalCreditsBlocked();
       if (!res.ok || !data?.spec) throw new Error(data?.error || "Couldn't build a chart. Try rephrasing.");
       setSpec(data.spec as ChartSpec);
     } catch (e: any) {

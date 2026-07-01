@@ -31,6 +31,7 @@ import { FONT_PRESETS, resolveFontFamily } from "@/lib/fonts";
 import type { AppUser } from "@/lib/auth";
 import { getIdToken } from "@/lib/auth";
 import { watchUserPlan } from "@/lib/plan";
+import { signalCreditsBlocked } from "@/lib/creditsClient";
 import { type PlanId, planHasFeature, planShowsWatermark } from "@/lib/plans";
 import TrialDialog from "./TrialDialog";
 import BottomBar from "./BottomBar";
@@ -96,6 +97,8 @@ export default function DeckPreview({ deck, setDeck, theme, setTheme, onRestart,
   const [plan, setPlan] = useState<PlanId>("free");
   const [upgradeOpen, setUpgradeOpen] = useState(false);
   const [upgradeReason, setUpgradeReason] = useState<string | undefined>(undefined);
+  // Shown when a user tries to export but can't cover the export credit cost.
+  const [lowCreditsOpen, setLowCreditsOpen] = useState(false);
   // Density rewrite (premium): re-runs the AI to rewrite the whole deck's
   // bullets at a new content density while showing the building overlay.
   const [densifying, setDensifying] = useState(false);
@@ -787,6 +790,7 @@ export default function DeckPreview({ deck, setDeck, theme, setTheme, onRestart,
           ...(speakers && speakers.length >= 2 ? { speakers, setting } : {}),
         }),
       });
+      if (res.status === 402) signalCreditsBlocked();
       if (!res.ok) throw new Error(await res.text());
       const data = (await res.json()) as {
         notes?: { index: number; script: string; segments?: { speaker: string; text: string }[] }[];
@@ -829,6 +833,7 @@ export default function DeckPreview({ deck, setDeck, theme, setTheme, onRestart,
         headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
         body: JSON.stringify({ deck, audience: deck.audience, tone: deck.tone }),
       });
+      if (res.status === 402) signalCreditsBlocked();
       if (!res.ok) throw new Error(await res.text());
       const data = (await res.json()) as { notes?: { index: number; script: string; segments?: { speaker: string; text: string }[] }[] };
       const byIndex = new Map<number, { script: string; segments?: { speaker: string; text: string }[] }>();
@@ -875,6 +880,7 @@ export default function DeckPreview({ deck, setDeck, theme, setTheme, onRestart,
         },
         body: JSON.stringify({ deck, targetLanguage: language.trim() }),
       });
+      if (res.status === 402) signalCreditsBlocked();
       if (!res.ok) throw new Error(await res.text());
       const data = (await res.json()) as { deck?: Deck };
       if (data.deck) setDeck(data.deck);
@@ -925,6 +931,29 @@ export default function DeckPreview({ deck, setDeck, theme, setTheme, onRestart,
     }
   };
 
+  // Charge the export credit cost via the server (the only authoritative place,
+  // since export itself is rendered client-side). Returns true if the export
+  // may proceed. On insufficient credits (402) it opens the low-credits dialog
+  // and returns false. Non-credit errors fail open so a transient blip never
+  // blocks a user from exporting their own deck.
+  const chargeExportCredits = async (): Promise<boolean> => {
+    try {
+      const token = await getIdToken();
+      const res = await fetch("/api/spend-credits", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ action: "export" }),
+      });
+      if (res.status === 402) { setLowCreditsOpen(true); return false; }
+      return true;
+    } catch {
+      return true; // fail open on network error
+    }
+  };
+
   const onExport = async (format: ExportFormat) => {
     // The notes handout is a Pro feature — gate it before anything else.
     if (format === "handout" && !planHasFeature(plan, "handout")) {
@@ -945,6 +974,10 @@ export default function DeckPreview({ deck, setDeck, theme, setTheme, onRestart,
   const runExport = async (format: ExportFormat) => {
     setDownloading(true);
     try {
+      // Every export costs credits (server-authoritative). Block up front if
+      // the user can't cover it, and nudge them to upgrade.
+      const charged = await chargeExportCredits();
+      if (!charged) return;
       if (format === "pptx") await downloadPptx();
       else if (format === "handout") await downloadHandout();
       else await downloadPdf();
@@ -1030,6 +1063,7 @@ export default function DeckPreview({ deck, setDeck, theme, setTheme, onRestart,
           body: JSON.stringify({ deck, density: target }),
         });
         const data = await res.json().catch(() => ({}));
+        if (res.status === 402) signalCreditsBlocked();
         if (!res.ok) throw new Error(data?.error || "Couldn't change the density. Try again.");
         return data as { deck?: Deck };
       })();
@@ -1179,6 +1213,44 @@ export default function DeckPreview({ deck, setDeck, theme, setTheme, onRestart,
           onClose={() => setUpgradeOpen(false)}
           email={user?.email}
         />
+      )}
+      {lowCreditsOpen && (
+        <div
+          className="fixed inset-0 z-[120] grid place-items-center p-4"
+          style={{ background: "rgba(0,0,0,0.5)", backdropFilter: "blur(4px)" }}
+          onClick={() => setLowCreditsOpen(false)}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="w-full max-w-sm overflow-hidden rounded-3xl border p-7 shadow-2xl"
+            style={{ borderColor: "var(--ezd-divider)", background: "var(--ezd-bg-elev)", color: "var(--ezd-fg)" }}
+          >
+            <div className="text-[11px] font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--ezd-fg-quiet)" }}>
+              Not enough credits
+            </div>
+            <h2 className="mt-1 text-[22px] font-bold tracking-tight" style={{ color: "var(--ezd-fg-strong)" }}>
+              You&rsquo;re low on credits
+            </h2>
+            <p className="mt-2 text-[14px] leading-relaxed" style={{ color: "var(--ezd-fg-muted)" }}>
+              Each export costs <strong style={{ color: "var(--ezd-fg-strong)" }}>10 credits</strong> and you don&rsquo;t have
+              enough left. Upgrade to Pro for far more credits, or wait for your free monthly reset.
+            </p>
+            <button
+              onClick={() => { setLowCreditsOpen(false); setUpgradeReason("You're low on credits"); setUpgradeOpen(true); }}
+              className="mt-5 w-full rounded-xl px-5 py-3 text-[14px] font-semibold transition hover:opacity-90"
+              style={{ background: "var(--ezd-button-strong)", color: "var(--ezd-button-strong-fg)" }}
+            >
+              Upgrade to Pro
+            </button>
+            <button
+              onClick={() => setLowCreditsOpen(false)}
+              className="mt-3 w-full text-center text-[12.5px]"
+              style={{ color: "var(--ezd-fg-quiet)", background: "none", border: "none", cursor: "pointer" }}
+            >
+              Maybe later
+            </button>
+          </div>
+        </div>
       )}
       {renderForPdf && <HiddenSlidesRenderer ref={hiddenRef} deck={deck} theme={theme} watermark={planShowsWatermark(plan)} />}
       {renderForHandout && <HiddenHandoutRenderer ref={handoutRef} deck={deck} theme={theme} />}
@@ -3392,6 +3464,7 @@ function QAPrepModal({ deck, onClose }: { deck: Deck; onClose: () => void }) {
         headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
         body: JSON.stringify({ deck, audience: deck.audience, tone: deck.tone }),
       });
+      if (res.status === 402) signalCreditsBlocked();
       if (!res.ok) throw new Error(await res.text());
       const data = (await res.json()) as { items?: QAItem[] };
       setItems(Array.isArray(data.items) ? data.items : []);
@@ -3416,6 +3489,7 @@ function QAPrepModal({ deck, onClose }: { deck: Deck; onClose: () => void }) {
         headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
         body: JSON.stringify({ deck, question: q, audience: deck.audience, tone: deck.tone }),
       });
+      if (res.status === 402) signalCreditsBlocked();
       if (!res.ok) throw new Error(await res.text());
       const data = (await res.json()) as { answer?: string };
       const answer = (data.answer || "").trim();

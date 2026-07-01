@@ -81,7 +81,7 @@ export default function DashboardMobile({
     );
   }, [decks, query]);
 
-  const deckLimit = credits?.allowance ?? (plan === "pro" ? 1500 : 40);
+  const deckLimit = credits?.allowance ?? (plan === "pro" ? 150 : 30);
   const unlimited = false;
   const remaining = credits?.balance ?? deckLimit;
   const quotaExhausted = !!credits?.exhausted;
