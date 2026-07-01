@@ -3,10 +3,10 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
-  ArrowRight, BarChart3, Check, Download, Contact, MonitorPlay,
-  GitCommit, Github, Languages, LayoutTemplate, LogOut, MessageSquare,
-  Play, Presentation, Shapes, Sparkles, Star, Wand2, FileText, X,
+  ArrowRight, Check, Contact, MonitorPlay, Github, LogOut,
+  Presentation, Sparkles, Star, FileText, X,
   Table, ArrowLeftRight, Brain, GraduationCap, Mic,
+  type LucideIcon,
 } from "lucide-react";
 import Logo from "@/components/Logo";
 import ThemeToggle from "@/components/ThemeToggle";
@@ -38,10 +38,26 @@ const DISPLAY = '"Bricolage Grotesque", "Plus Jakarta Sans", ui-sans-serif, syst
 const MONO = '"JetBrains Mono", ui-monospace, SFMono-Regular, "Roboto Mono", monospace';
 const HERO = '"Bitcount Single", "Fontdiner Swanky", ui-sans-serif, system-ui, sans-serif';
 
+/** The full tool suite, rendered as one divided index grid (no boxed icon
+ *  tiles). Icons stay small, inline, and muted — wayfinding, not decoration. */
+const TOOLS: { name: string; sub: string; href: string; icon: LucideIcon }[] = [
+  { name: "Ask EX-AI", sub: "Your AI guide", href: "/ex-ai", icon: Sparkles },
+  { name: "Presentations", sub: "AI slide maker", href: "/presentations", icon: Presentation },
+  { name: "Documents", sub: "AI doc writer", href: "/documents", icon: FileText },
+  { name: "Resumes", sub: "CV builder", href: "/resumes", icon: Contact },
+  { name: "PDF Presenter", sub: "Present PDFs", href: "/pdf-presenter", icon: MonitorPlay },
+  { name: "Spreadsheet", sub: "AI Excel maker", href: "/spreadsheet", icon: Table },
+  { name: "Analyser", sub: "Analyse any file", href: "/analyse", icon: Brain },
+  { name: "Converters", sub: "Free file tools", href: "/converter", icon: ArrowLeftRight },
+  { name: "Flashcards", sub: "Study & quiz", href: "/flashcards", icon: GraduationCap },
+  { name: "Mock Interview", sub: "Practice & feedback", href: "/interview", icon: Mic },
+];
+
 export default function LandingPage() {
   const router = useRouter();
   const [user, setUser] = useState<AppUser | null>(null);
   const [scrolled, setScrolled] = useState(false);
+  const heroVideoRef = useRef<HTMLVideoElement | null>(null);
 
   useEffect(() => {
     trackEvent({ kind: "page_view", path: "/", ts: Date.now() });
@@ -55,6 +71,28 @@ export default function LandingPage() {
       unsub();
       window.removeEventListener("scroll", onScroll);
     };
+  }, []);
+
+  // Force the hero video to begin from the very start. The <video> can fire
+  // `loadedmetadata` before React hydrates (so a JSX handler is missed), and
+  // some browsers restore a cached position — both cause a mid-clip start.
+  // This effect resets to frame 0 whether metadata is already available at
+  // mount or arrives later.
+  useEffect(() => {
+    const v = heroVideoRef.current;
+    if (!v) return;
+    const startFromZero = () => {
+      try {
+        v.currentTime = 0;
+        const p = v.play();
+        if (p && typeof p.catch === "function") p.catch(() => {});
+      } catch {
+        /* ignore */
+      }
+    };
+    if (v.readyState >= 1) startFromZero(); // metadata already loaded
+    v.addEventListener("loadedmetadata", startFromZero);
+    return () => v.removeEventListener("loadedmetadata", startFromZero);
   }, []);
 
   const onGetStarted = () => {
@@ -162,15 +200,15 @@ export default function LandingPage() {
           style={{ background: "radial-gradient(60% 60% at 30% 0%, var(--ezd-bg-hover), transparent 70%)" }}
         />
 
-        <div className="mx-auto flex w-full max-w-[1000px] flex-col items-start gap-14">
+        <div className="mx-auto grid w-full max-w-[1200px] grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-10">
           {/* ---------- Hero copy ---------- */}
-          <div className="w-full max-w-3xl text-left">
+          <div className="w-full text-left">
             <Reveal delay={60}>
               <h1
                 className="font-semibold"
                 style={{
                   fontFamily: DISPLAY,
-                  fontSize: "clamp(40px, 7vw, 84px)",
+                  fontSize: "clamp(38px, 6vw, 68px)",
                   lineHeight: 0.98,
                   letterSpacing: "-0.04em",
                   color: "var(--ezd-fg-strong)",
@@ -236,11 +274,13 @@ export default function LandingPage() {
                   <span className="mx-auto pr-6 text-[12.5px] font-medium" style={{ color: "var(--ezd-fg-muted)" }}>EXdeck</span>
                 </div>
                 <video
+                  ref={heroVideoRef}
                   src="/preview0.mp4"
                   autoPlay
                   loop
                   muted
                   playsInline
+                  preload="auto"
                   className="w-full cursor-pointer rounded-lg"
                   onClick={(e) => {
                     if (e.currentTarget.paused) {
@@ -257,100 +297,49 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ================== Explore by Feature ================== */}
-      <section className="relative z-10 mx-auto max-w-5xl px-5 pt-16 sm:px-6">
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <Link href="/ex-ai" className="group flex flex-col items-center gap-3 rounded-2xl border p-6 transition hover:border-white/25" style={{ borderColor: "var(--ezd-hairline)", background: "var(--ezd-bg-card)" }}>
-            <div className="grid h-12 w-12 place-items-center rounded-xl border transition group-hover:scale-105" style={{ borderColor: "var(--ezd-hairline)", background: "var(--ezd-bg-hover)", color: "var(--ezd-fg-strong)" }}>
-              <Sparkles size={20} />
-            </div>
-            <div className="text-center">
-              <div className="text-[13px] font-semibold" style={{ color: "var(--ezd-fg-strong)" }}>Ask EX-AI</div>
-              <div className="mt-0.5 text-[11px]" style={{ color: "var(--ezd-fg-quiet)" }}>Your AI guide</div>
-            </div>
-          </Link>
-          <Link href="/presentations" className="group flex flex-col items-center gap-3 rounded-2xl border p-6 transition hover:border-white/25" style={{ borderColor: "var(--ezd-hairline)", background: "var(--ezd-bg-card)" }}>
-            <div className="grid h-12 w-12 place-items-center rounded-xl border transition group-hover:scale-105" style={{ borderColor: "var(--ezd-hairline)", background: "var(--ezd-bg-hover)", color: "var(--ezd-fg-strong)" }}>
-              <Presentation size={20} />
-            </div>
-            <div className="text-center">
-              <div className="text-[13px] font-semibold" style={{ color: "var(--ezd-fg-strong)" }}>Presentations</div>
-              <div className="mt-0.5 text-[11px]" style={{ color: "var(--ezd-fg-quiet)" }}>AI slide maker</div>
-            </div>
-          </Link>
-          <Link href="/documents" className="group flex flex-col items-center gap-3 rounded-2xl border p-6 transition hover:border-white/25" style={{ borderColor: "var(--ezd-hairline)", background: "var(--ezd-bg-card)" }}>
-            <div className="grid h-12 w-12 place-items-center rounded-xl border transition group-hover:scale-105" style={{ borderColor: "var(--ezd-hairline)", background: "var(--ezd-bg-hover)", color: "var(--ezd-fg-strong)" }}>
-              <FileText size={20} />
-            </div>
-            <div className="text-center">
-              <div className="text-[13px] font-semibold" style={{ color: "var(--ezd-fg-strong)" }}>Documents</div>
-              <div className="mt-0.5 text-[11px]" style={{ color: "var(--ezd-fg-quiet)" }}>AI doc writer</div>
-            </div>
-          </Link>
-          <Link href="/resumes" className="group flex flex-col items-center gap-3 rounded-2xl border p-6 transition hover:border-white/25" style={{ borderColor: "var(--ezd-hairline)", background: "var(--ezd-bg-card)" }}>
-            <div className="grid h-12 w-12 place-items-center rounded-xl border transition group-hover:scale-105" style={{ borderColor: "var(--ezd-hairline)", background: "var(--ezd-bg-hover)", color: "var(--ezd-fg-strong)" }}>
-              <Contact size={20} />
-            </div>
-            <div className="text-center">
-              <div className="text-[13px] font-semibold" style={{ color: "var(--ezd-fg-strong)" }}>Resumes</div>
-              <div className="mt-0.5 text-[11px]" style={{ color: "var(--ezd-fg-quiet)" }}>CV builder</div>
-            </div>
-          </Link>
-          <Link href="/pdf-presenter" className="group flex flex-col items-center gap-3 rounded-2xl border p-6 transition hover:border-white/25" style={{ borderColor: "var(--ezd-hairline)", background: "var(--ezd-bg-card)" }}>
-            <div className="grid h-12 w-12 place-items-center rounded-xl border transition group-hover:scale-105" style={{ borderColor: "var(--ezd-hairline)", background: "var(--ezd-bg-hover)", color: "var(--ezd-fg-strong)" }}>
-              <MonitorPlay size={20} />
-            </div>
-            <div className="text-center">
-              <div className="text-[13px] font-semibold" style={{ color: "var(--ezd-fg-strong)" }}>PDF Presenter</div>
-              <div className="mt-0.5 text-[11px]" style={{ color: "var(--ezd-fg-quiet)" }}>Present PDFs</div>
-            </div>
-          </Link>
-          <Link href="/spreadsheet" className="group flex flex-col items-center gap-3 rounded-2xl border p-6 transition hover:border-white/25" style={{ borderColor: "var(--ezd-hairline)", background: "var(--ezd-bg-card)" }}>
-            <div className="grid h-12 w-12 place-items-center rounded-xl border transition group-hover:scale-105" style={{ borderColor: "var(--ezd-hairline)", background: "var(--ezd-bg-hover)", color: "var(--ezd-fg-strong)" }}>
-              <Table size={20} />
-            </div>
-            <div className="text-center">
-              <div className="text-[13px] font-semibold" style={{ color: "var(--ezd-fg-strong)" }}>Spreadsheet</div>
-              <div className="mt-0.5 text-[11px]" style={{ color: "var(--ezd-fg-quiet)" }}>AI Excel maker</div>
-            </div>
-          </Link>
-          <Link href="/analyse" className="group flex flex-col items-center gap-3 rounded-2xl border p-6 transition hover:border-white/25" style={{ borderColor: "var(--ezd-hairline)", background: "var(--ezd-bg-card)" }}>
-            <div className="grid h-12 w-12 place-items-center rounded-xl border transition group-hover:scale-105" style={{ borderColor: "var(--ezd-hairline)", background: "var(--ezd-bg-hover)", color: "var(--ezd-fg-strong)" }}>
-              <Brain size={20} />
-            </div>
-            <div className="text-center">
-              <div className="text-[13px] font-semibold" style={{ color: "var(--ezd-fg-strong)" }}>Analyser</div>
-              <div className="mt-0.5 text-[11px]" style={{ color: "var(--ezd-fg-quiet)" }}>Analyse any file</div>
-            </div>
-          </Link>
-          <Link href="/converter" className="group flex flex-col items-center gap-3 rounded-2xl border p-6 transition hover:border-white/25" style={{ borderColor: "var(--ezd-hairline)", background: "var(--ezd-bg-card)" }}>
-            <div className="grid h-12 w-12 place-items-center rounded-xl border transition group-hover:scale-105" style={{ borderColor: "var(--ezd-hairline)", background: "var(--ezd-bg-hover)", color: "var(--ezd-fg-strong)" }}>
-              <ArrowLeftRight size={20} />
-            </div>
-            <div className="text-center">
-              <div className="text-[13px] font-semibold" style={{ color: "var(--ezd-fg-strong)" }}>Converters</div>
-              <div className="mt-0.5 text-[11px]" style={{ color: "var(--ezd-fg-quiet)" }}>Free file tools</div>
-            </div>
-          </Link>
-          <Link href="/flashcards" className="group flex flex-col items-center gap-3 rounded-2xl border p-6 transition hover:border-white/25" style={{ borderColor: "var(--ezd-hairline)", background: "var(--ezd-bg-card)" }}>
-            <div className="grid h-12 w-12 place-items-center rounded-xl border transition group-hover:scale-105" style={{ borderColor: "var(--ezd-hairline)", background: "var(--ezd-bg-hover)", color: "var(--ezd-fg-strong)" }}>
-              <GraduationCap size={20} />
-            </div>
-            <div className="text-center">
-              <div className="text-[13px] font-semibold" style={{ color: "var(--ezd-fg-strong)" }}>Flashcards</div>
-              <div className="mt-0.5 text-[11px]" style={{ color: "var(--ezd-fg-quiet)" }}>Study &amp; quiz</div>
-            </div>
-          </Link>
-          <Link href="/interview" className="group flex flex-col items-center gap-3 rounded-2xl border p-6 transition hover:border-white/25" style={{ borderColor: "var(--ezd-hairline)", background: "var(--ezd-bg-card)" }}>
-            <div className="grid h-12 w-12 place-items-center rounded-xl border transition group-hover:scale-105" style={{ borderColor: "var(--ezd-hairline)", background: "var(--ezd-bg-hover)", color: "var(--ezd-fg-strong)" }}>
-              <Mic size={20} />
-            </div>
-            <div className="text-center">
-              <div className="text-[13px] font-semibold" style={{ color: "var(--ezd-fg-strong)" }}>Mock Interview</div>
-              <div className="mt-0.5 text-[11px]" style={{ color: "var(--ezd-fg-quiet)" }}>Practice &amp; feedback</div>
-            </div>
-          </Link>
-        </div>
+      {/* ================== The whole suite ================== */}
+      <section id="tools" className="relative z-10 mx-auto max-w-5xl px-5 pt-24 sm:px-6">
+        <Reveal>
+          <SectionLabel
+            center
+            kicker="One account, every tool"
+            title="Not just slides — a whole AI workspace."
+            sub="Presentations are only the start. The same engine writes documents, builds spreadsheets, drafts resumes, runs mock interviews, and converts files — all in one place."
+          />
+        </Reveal>
+        <Reveal delay={80}>
+          <div
+            className="mt-12 grid grid-cols-2 gap-px overflow-hidden rounded-2xl border sm:grid-cols-3 lg:grid-cols-5"
+            style={{ borderColor: "var(--ezd-hairline)", background: "var(--ezd-hairline)" }}
+          >
+            {TOOLS.map((t) => {
+              const Icon = t.icon;
+              return (
+                <Link
+                  key={t.href}
+                  href={t.href}
+                  className="group flex flex-col gap-3 bg-[var(--ezd-bg-page)] p-5 transition-colors hover:bg-[var(--ezd-bg-card)]"
+                >
+                  <Icon
+                    size={17}
+                    strokeWidth={1.75}
+                    className="text-[color:var(--ezd-fg-quiet)] transition-colors group-hover:text-[color:var(--ezd-fg-strong)]"
+                  />
+                  <div>
+                    <div className="flex items-center gap-1 text-[13px] font-semibold" style={{ color: "var(--ezd-fg-strong)" }}>
+                      {t.name}
+                      <ArrowRight
+                        size={12}
+                        className="-translate-x-1 text-[color:var(--ezd-fg-quiet)] opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100"
+                      />
+                    </div>
+                    <div className="mt-0.5 text-[11.5px]" style={{ color: "var(--ezd-fg-quiet)" }}>{t.sub}</div>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </Reveal>
       </section>
 
       {/* ================== Beyond slides: docs & sheets ================== */}
@@ -363,46 +352,50 @@ export default function LandingPage() {
             sub="EXdeck isn't only slides. The same AI writes structured, Word-style documents and builds live Excel spreadsheets from plain English — all editable, all exportable."
           />
         </Reveal>
-        <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div className="mt-12 grid grid-cols-1 gap-10 sm:grid-cols-2 sm:gap-12">
           <Reveal>
-            <div className="flex h-full flex-col rounded-2xl border p-6 transition hover:border-white/20" style={{ borderColor: "var(--ezd-divider)", background: "var(--ezd-bg-card)" }}>
-              <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-xl border" style={{ borderColor: "var(--ezd-hairline)", background: "var(--ezd-bg-hover)", color: "var(--ezd-fg-strong)" }}>
-                <FileText size={18} />
+            <div className="border-t pt-6" style={{ borderColor: "var(--ezd-fg-strong)" }}>
+              <div className="text-[10.5px] font-semibold uppercase tracking-[0.24em]" style={{ color: "var(--ezd-fg-quiet)", fontFamily: MONO }}>
+                Document maker
               </div>
-              <h3 className="text-[18px] font-semibold" style={{ fontFamily: DISPLAY, color: "var(--ezd-fg-strong)" }}>AI Document Maker</h3>
-              <p className="mt-2 text-[13.5px] leading-relaxed" style={{ color: "var(--ezd-fg-muted)" }}>
+              <h3 className="mt-3 text-[22px] font-semibold leading-tight" style={{ fontFamily: DISPLAY, color: "var(--ezd-fg-strong)", letterSpacing: "-0.02em" }}>
+                Reports that read like you wrote them.
+              </h3>
+              <p className="mt-3 text-[13.5px] leading-relaxed" style={{ color: "var(--ezd-fg-muted)" }}>
                 Describe a report, proposal, brief, or essay and AI writes a structured, Word-style document — headings, tables, data charts, images, and watermarks — with clean multi-page PDF export.
               </p>
-              <ul className="mt-4 space-y-1.5">
+              <ul className="mt-5 space-y-2">
                 {["Reports, proposals, case studies & essays", "Tables, charts, images & watermarks", "Inline editing + multi-page PDF export"].map((p) => (
-                  <li key={p} className="flex items-center gap-2 text-[12.5px]" style={{ color: "var(--ezd-fg-muted)" }}>
-                    <span style={{ color: "var(--ezd-fg-strong)" }}>—</span>{p}
+                  <li key={p} className="flex items-start gap-2.5 text-[12.5px] leading-relaxed" style={{ color: "var(--ezd-fg-muted)" }}>
+                    <span className="mt-2 h-px w-3 shrink-0" style={{ background: "var(--ezd-fg-quiet)" }} />{p}
                   </li>
                 ))}
               </ul>
-              <Link href="/documents" className="mt-6 inline-flex items-center gap-2 self-start text-[13.5px] font-semibold transition hover:opacity-80" style={{ color: "var(--ezd-fg-strong)" }}>
-                Explore the document maker <ArrowRight size={14} />
+              <Link href="/documents" className="group mt-6 inline-flex items-center gap-1.5 text-[13.5px] font-semibold transition hover:opacity-80" style={{ color: "var(--ezd-fg-strong)" }}>
+                Explore the document maker <ArrowRight size={14} className="transition group-hover:translate-x-0.5" />
               </Link>
             </div>
           </Reveal>
           <Reveal delay={80}>
-            <div className="flex h-full flex-col rounded-2xl border p-6 transition hover:border-white/20" style={{ borderColor: "var(--ezd-divider)", background: "var(--ezd-bg-card)" }}>
-              <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-xl border" style={{ borderColor: "var(--ezd-hairline)", background: "var(--ezd-bg-hover)", color: "var(--ezd-fg-strong)" }}>
-                <Table size={18} />
+            <div className="border-t pt-6" style={{ borderColor: "var(--ezd-fg-strong)" }}>
+              <div className="text-[10.5px] font-semibold uppercase tracking-[0.24em]" style={{ color: "var(--ezd-fg-quiet)", fontFamily: MONO }}>
+                Spreadsheet maker
               </div>
-              <h3 className="text-[18px] font-semibold" style={{ fontFamily: DISPLAY, color: "var(--ezd-fg-strong)" }}>AI Spreadsheet Maker</h3>
-              <p className="mt-2 text-[13.5px] leading-relaxed" style={{ color: "var(--ezd-fg-muted)" }}>
-                Type what you want — &ldquo;make a table of this data&rdquo;, &ldquo;add a total column&rdquo; — and AI builds and edits the sheet with live formulas. Export to Excel (.xlsx) or PDF, right in your browser.
+              <h3 className="mt-3 text-[22px] font-semibold leading-tight" style={{ fontFamily: DISPLAY, color: "var(--ezd-fg-strong)", letterSpacing: "-0.02em" }}>
+                Type the table. Get the formulas.
+              </h3>
+              <p className="mt-3 text-[13.5px] leading-relaxed" style={{ color: "var(--ezd-fg-muted)" }}>
+                Say what you want — &ldquo;make a table of this data&rdquo;, &ldquo;add a total column&rdquo; — and AI builds and edits the sheet with live formulas. Export to Excel (.xlsx) or PDF, right in your browser.
               </p>
-              <ul className="mt-4 space-y-1.5">
+              <ul className="mt-5 space-y-2">
                 {["Plain-English tables, totals & formulas", "Live SUM, AVERAGE, IF and more", "Excel (.xlsx) & PDF export, fully private"].map((p) => (
-                  <li key={p} className="flex items-center gap-2 text-[12.5px]" style={{ color: "var(--ezd-fg-muted)" }}>
-                    <span style={{ color: "var(--ezd-fg-strong)" }}>—</span>{p}
+                  <li key={p} className="flex items-start gap-2.5 text-[12.5px] leading-relaxed" style={{ color: "var(--ezd-fg-muted)" }}>
+                    <span className="mt-2 h-px w-3 shrink-0" style={{ background: "var(--ezd-fg-quiet)" }} />{p}
                   </li>
                 ))}
               </ul>
-              <Link href="/spreadsheet" className="mt-6 inline-flex items-center gap-2 self-start text-[13.5px] font-semibold transition hover:opacity-80" style={{ color: "var(--ezd-fg-strong)" }}>
-                Explore the spreadsheet maker <ArrowRight size={14} />
+              <Link href="/spreadsheet" className="group mt-6 inline-flex items-center gap-1.5 text-[13.5px] font-semibold transition hover:opacity-80" style={{ color: "var(--ezd-fg-strong)" }}>
+                Explore the spreadsheet maker <ArrowRight size={14} className="transition group-hover:translate-x-0.5" />
               </Link>
             </div>
           </Reveal>
@@ -424,7 +417,6 @@ export default function LandingPage() {
           <Reveal className="md:col-span-4">
             <FeatureCard
               wide
-              icon={<Wand2 size={16} />}
               title="Generate from a brief"
               body="Describe your deck in a sentence. EXdeck picks the right layout for each slide — title, bullets, table, comparison, or a real data chart — and fills it with substantive, on-topic content in about ten seconds."
             >
@@ -433,28 +425,24 @@ export default function LandingPage() {
           </Reveal>
           <Reveal className="md:col-span-2" delay={60}>
             <FeatureCard
-              icon={<BarChart3 size={16} />}
               title="Real data charts"
               body="Bar, line, area, pie, and donut — theme-colored and exported as vectors to both PPTX and PDF."
             />
           </Reveal>
           <Reveal className="md:col-span-2" delay={60}>
             <FeatureCard
-              icon={<Shapes size={16} />}
               title="Edit anything inline"
               body="Drag text boxes, recolor charts, drop in any of 200,000 icons, or rewrite a slide with plain-English chat."
             />
           </Reveal>
           <Reveal className="md:col-span-2" delay={120}>
             <FeatureCard
-              icon={<LayoutTemplate size={16} />}
               title="Premium templates"
               body="Canva/Gamma-grade designs with 45 themes, 28 fonts, and textured backgrounds. Switch the whole deck's look in one click."
             />
           </Reveal>
           <Reveal className="md:col-span-2" delay={120}>
             <FeatureCard
-              icon={<Download size={16} />}
               title="Export, no lock-in"
               body="A real .pptx that opens in PowerPoint, Keynote, or Slides — plus a high-res .pdf. Yours to keep."
             />
@@ -462,15 +450,15 @@ export default function LandingPage() {
         </div>
 
         {/* secondary feature row */}
-        <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <div className="mt-8 grid grid-cols-1 gap-x-10 gap-y-8 sm:grid-cols-3">
           <Reveal>
-            <MiniFeature icon={<MessageSquare size={15} />} title="AI speaker notes" body="A spoken script per slide with a teleprompter and split-by-speaker mode." />
+            <MiniFeature title="AI speaker notes" body="A spoken script per slide with a teleprompter and split-by-speaker mode." />
           </Reveal>
           <Reveal delay={60}>
-            <MiniFeature icon={<Presentation size={15} />} title="Present & share" body="Full-screen present mode, plus live share links with view analytics." />
+            <MiniFeature title="Present & share" body="Full-screen present mode, plus live share links with view analytics." />
           </Reveal>
           <Reveal delay={120}>
-            <MiniFeature icon={<Languages size={15} />} title="One-click translation" body="Translate a whole deck into any language with the layout preserved." />
+            <MiniFeature title="One-click translation" body="Translate a whole deck into any language with the layout preserved." />
           </Reveal>
         </div>
       </section>
@@ -816,44 +804,27 @@ function SectionLabel({
 /* ----------------------- Feature cards ----------------------- */
 
 function FeatureCard({
-  icon, title, body, children, wide,
+  title, body, children, wide,
 }: {
-  icon: React.ReactNode; title: string; body: string; children?: React.ReactNode; wide?: boolean;
+  title: string; body: string; children?: React.ReactNode; wide?: boolean;
 }) {
   return (
     <div
       className="group flex h-full flex-col rounded-2xl border p-6 transition hover:border-white/20"
       style={{ borderColor: "var(--ezd-divider)", background: "var(--ezd-bg-card)" }}
     >
-      <div
-        className="mb-4 inline-flex h-9 w-9 items-center justify-center rounded-xl border"
-        style={{ borderColor: "var(--ezd-hairline)", background: "var(--ezd-bg-hover)", color: "var(--ezd-fg-strong)" }}
-      >
-        {icon}
-      </div>
-      <h4 className="text-[15px] font-semibold" style={{ color: "var(--ezd-fg-strong)" }}>{title}</h4>
-      <p className="mt-2 text-[13px] leading-relaxed" style={{ color: "var(--ezd-fg-muted)" }}>{body}</p>
+      <h4 className="text-[17px] font-semibold leading-tight" style={{ fontFamily: DISPLAY, color: "var(--ezd-fg-strong)", letterSpacing: "-0.015em" }}>{title}</h4>
+      <p className="mt-2.5 text-[13px] leading-relaxed" style={{ color: "var(--ezd-fg-muted)" }}>{body}</p>
       {children && <div className="mt-5">{children}</div>}
     </div>
   );
 }
 
-function MiniFeature({ icon, title, body }: { icon: React.ReactNode; title: string; body: string }) {
+function MiniFeature({ title, body }: { title: string; body: string }) {
   return (
-    <div
-      className="flex h-full items-start gap-3 rounded-2xl border p-5"
-      style={{ borderColor: "var(--ezd-divider)", background: "var(--ezd-bg-card)" }}
-    >
-      <div
-        className="mt-0.5 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border"
-        style={{ borderColor: "var(--ezd-hairline)", background: "var(--ezd-bg-hover)", color: "var(--ezd-fg-strong)" }}
-      >
-        {icon}
-      </div>
-      <div>
-        <h4 className="text-[13.5px] font-semibold" style={{ color: "var(--ezd-fg-strong)" }}>{title}</h4>
-        <p className="mt-1 text-[12.5px] leading-relaxed" style={{ color: "var(--ezd-fg-muted)" }}>{body}</p>
-      </div>
+    <div className="border-t pt-5" style={{ borderColor: "var(--ezd-fg-strong)" }}>
+      <h4 className="text-[14px] font-semibold" style={{ color: "var(--ezd-fg-strong)" }}>{title}</h4>
+      <p className="mt-1.5 text-[12.5px] leading-relaxed" style={{ color: "var(--ezd-fg-muted)" }}>{body}</p>
     </div>
   );
 }
