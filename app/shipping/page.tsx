@@ -1,7 +1,12 @@
-import LegalShell from "@/components/legal/LegalShell";
+﻿import LegalShell from "@/components/legal/LegalShell";
 import { LEGAL } from "@/lib/legal";
 
-export const metadata = { title: "Shipping & Delivery Policy · EXdeck" };
+export const metadata = {
+  title: "Shipping & Delivery Policy · EXdeck",
+  description:
+    "Read EXdeck's digital delivery policy for web app access, PowerPoint and PDF downloads, plan activation, and support.",
+  alternates: { canonical: "/shipping" },
+};
 
 export default function ShippingPage() {
   return (

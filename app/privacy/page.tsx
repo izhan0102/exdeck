@@ -1,7 +1,12 @@
-import LegalShell from "@/components/legal/LegalShell";
+﻿import LegalShell from "@/components/legal/LegalShell";
 import { LEGAL } from "@/lib/legal";
 
-export const metadata = { title: "Privacy Policy · EXdeck" };
+export const metadata = {
+  title: "Privacy Policy · EXdeck",
+  description:
+    "Read the EXdeck privacy policy: what account, payment, analytics, and AI prompt data we process, how long we keep it, and how to contact us.",
+  alternates: { canonical: "/privacy" },
+};
 
 export default function PrivacyPage() {
   return (

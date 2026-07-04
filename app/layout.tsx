@@ -6,7 +6,7 @@ import CreditsGate from "@/components/CreditsGate";
 import { THEME_BOOT_SCRIPT } from "@/lib/theme";
 import {
   SITE_URL, BRAND, KEYWORDS, DEFAULT_TITLE, TITLE_TEMPLATE, DEFAULT_DESCRIPTION,
-  softwareJsonLd, organizationJsonLd, websiteJsonLd,
+  softwareJsonLd, organizationJsonLd, websiteJsonLd, founderJsonLd,
 } from "@/lib/seo";
 
 export const metadata: Metadata = {
@@ -119,6 +119,10 @@ export default function RootLayout({
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd()) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(founderJsonLd()) }}
         />
 
         {/* Preconnect speeds up the first paint of any font we end up using. */}

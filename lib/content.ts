@@ -150,6 +150,21 @@ export const LANDING_PAGES: LandingPage[] = [
           "Download a real .pptx and PDF. Your text, charts, themes, and images come with you — present from PowerPoint, hand in a PDF, or keep editing in Google Slides.",
         ],
       },
+      {
+        h: "Best-fit use cases",
+        list: [
+          "Class presentations and lecture summaries where you need a clean first draft fast.",
+          "Startup pitch decks, product updates, and sales decks that need an editable PowerPoint file.",
+          "Research summaries and client reports where charts, references, and speaker notes matter.",
+          "Team updates where you want to generate once, then keep editing instead of starting over.",
+        ],
+      },
+      {
+        h: "How EXdeck is different from one-shot generators",
+        p: [
+          "Many AI presentation tools stop at the first generated result. EXdeck treats generation as the beginning of the workflow: you can ask for slide rewrites, change density, move elements, switch templates, add icons, generate notes, and export files that are still editable after download.",
+        ],
+      },
     ],
     faq: [
       {
@@ -542,6 +557,20 @@ LANDING_PAGES.push(
           "Inline editing, 45 themes, 28 fonts, 200,000+ icons",
           "AI charts from real data only — no invented numbers",
           "Real PowerPoint and PDF export within the free monthly limit",
+        ],
+      },
+      {
+        h: "Where EXdeck fits better",
+        p: [
+          "Choose EXdeck when you need a practical presentation workflow rather than a locked web-only result: generate from a brief, edit slide-by-slide, add charts or icons, present full-screen, and export a PowerPoint file your team can still revise later.",
+        ],
+      },
+      {
+        h: "Good for students, founders, and small teams",
+        list: [
+          "Students can turn notes or research into editable class presentations.",
+          "Founders can draft investor updates and pitch decks without hiring a designer.",
+          "Small teams can create sales decks, training decks, and reports without paying for a large design suite.",
         ],
       },
     ],

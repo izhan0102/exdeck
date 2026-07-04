@@ -113,6 +113,22 @@ export default function ConverterHub() {
         </div>
       </section>
 
+      <section className="mx-auto max-w-5xl px-5 pb-14">
+        <div className="rounded-2xl border p-6 sm:p-8" style={{ borderColor: "var(--ezd-divider)", background: "var(--ezd-bg-card)" }}>
+          <h2 className="text-[22px] font-bold tracking-tight" style={{ color: "var(--ezd-fg-strong)" }}>Private file conversion for everyday work</h2>
+          <div className="mt-5 grid gap-4 text-[14px] leading-relaxed sm:grid-cols-3" style={{ color: "var(--ezd-fg-muted)" }}>
+            <p><strong style={{ color: "var(--ezd-fg-strong)" }}>Images:</strong> switch between PNG, JPG, WebP, AVIF, BMP, SVG, GIF, and PDF formats without sending files to a server.</p>
+            <p><strong style={{ color: "var(--ezd-fg-strong)" }}>PDFs:</strong> split, merge, organize, extract images, OCR scans, and convert pages into images or text.</p>
+            <p><strong style={{ color: "var(--ezd-fg-strong)" }}>Data:</strong> convert CSV, JSON, and Excel formats before analysing them or turning insights into a deck.</p>
+          </div>
+          <div className="mt-5 flex flex-wrap gap-2.5">
+            {[["Image to PDF", "/converter/image-to-pdf"], ["PDF to text", "/converter/pdf-to-text"], ["CSV to Excel", "/converter/csv-to-excel"], ["Document analyser", "/analyse"]].map(([label, href]) => (
+              <Link key={href} href={href} className="rounded-full border px-3.5 py-1.5 text-[13px]" style={{ borderColor: "var(--ezd-hairline)", color: "var(--ezd-fg-strong)" }}>{label}</Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section className="mx-auto max-w-3xl px-5 pb-20">
         <h2 className="text-[22px] font-bold tracking-tight" style={{ color: "var(--ezd-fg-strong)" }}>Frequently asked questions</h2>
         <div className="mt-5 divide-y" style={{ borderColor: "var(--ezd-divider)" }}>

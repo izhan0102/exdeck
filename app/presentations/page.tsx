@@ -64,6 +64,30 @@ export default function PresentationsPage() {
           </div>
         </div>
 
+        <section className="mt-16 grid gap-5 sm:grid-cols-2">
+          <SeoBlock
+            title="Use it for real presentation work"
+            items={[
+              "Investor updates, pitch decks, sales decks, lectures, research summaries, class projects, and product launches.",
+              "Paste existing notes or start from a one-line idea; EXdeck keeps the result editable instead of locking you into a static design.",
+              "Export a real PowerPoint file when someone asks for the deck, or use PDF when you need a clean handout.",
+            ]}
+          />
+          <SeoBlock
+            title="Related presentation workflows"
+            items={[
+              "Need a direct prompt-to-slide page? Try the AI presentation maker.",
+              "Comparing tools? See the Presentations.ai alternative and Gamma alternative pages.",
+              "Working from files? Use PDF to PPT or the document analyser before turning notes into slides.",
+            ]}
+            links={[
+              ["AI presentation maker", "/ai-presentation-maker"],
+              ["Presentations.ai alternative", "/presentations-ai-alternative"],
+              ["PDF to PPT", "/pdf-to-ppt"],
+            ]}
+          />
+        </section>
+
         <div className="mt-16 text-center">
           <Link href="/app" className="inline-flex items-center gap-2 rounded-full px-8 py-3.5 text-[15px] font-semibold transition hover:opacity-90" style={{ background: "var(--ezd-button-strong)", color: "var(--ezd-button-strong-fg)" }}>
             Create your first presentation <ArrowRight size={16} />
@@ -83,6 +107,24 @@ function Feature({ icon, title, desc }: { icon: React.ReactNode; title: string; 
       </div>
       <h3 className="mt-4 text-[15px] font-semibold" style={{ color: "var(--ezd-fg-strong)" }}>{title}</h3>
       <p className="mt-2 text-[13.5px] leading-relaxed" style={{ color: "var(--ezd-fg-muted)" }}>{desc}</p>
+    </div>
+  );
+}
+
+function SeoBlock({ title, items, links = [] }: { title: string; items: string[]; links?: [string, string][] }) {
+  return (
+    <div className="rounded-2xl border p-6" style={{ borderColor: "var(--ezd-divider)", background: "var(--ezd-bg-card)" }}>
+      <h2 className="text-[18px] font-bold tracking-tight" style={{ color: "var(--ezd-fg-strong)" }}>{title}</h2>
+      <ul className="mt-4 space-y-3 text-[13.5px] leading-relaxed" style={{ color: "var(--ezd-fg-muted)" }}>
+        {items.map((item) => <li key={item}>{item}</li>)}
+      </ul>
+      {links.length > 0 && (
+        <div className="mt-5 flex flex-wrap gap-2">
+          {links.map(([label, href]) => (
+            <Link key={href} href={href} className="rounded-full border px-3 py-1.5 text-[12.5px]" style={{ borderColor: "var(--ezd-hairline)", color: "var(--ezd-fg-strong)" }}>{label}</Link>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

@@ -11,9 +11,18 @@
  * code change needed.
  */
 
-export const SITE_URL = (
-  process.env.NEXT_PUBLIC_SITE_URL || "https://exdeck.xyz"
-).replace(/\/$/, "");
+function canonicalSiteUrl(input?: string) {
+  const raw = (input || "https://exdeck.xyz").trim();
+  try {
+    const url = new URL(raw.startsWith("http") ? raw : `https://${raw}`);
+    const hostname = url.hostname.replace(/^www\./i, "").toLowerCase();
+    return `https://${hostname}`.replace(/\/$/, "");
+  } catch {
+    return "https://exdeck.xyz";
+  }
+}
+
+export const SITE_URL = canonicalSiteUrl(process.env.NEXT_PUBLIC_SITE_URL);
 
 export const BRAND = "EXdeck";
 
@@ -92,9 +101,12 @@ export const KEYWORDS = [
  *  brand and surface this site for those queries. */
 export const BRAND_ALIASES = [
   "EXdeck",
+  "ExDeck",
   "EXdeck AI",
   "EXdeck AI PPT Maker",
   "EXdeck Presentation Maker",
+  "EXdeck PPT Maker",
+  "EXdeck PPT",
   "EXdeck Spreadsheet",
   "Exdeck",
   "Ex deck",
@@ -105,12 +117,12 @@ export const BRAND_ALIASES = [
 ];
 
 export const DEFAULT_TITLE =
-  "EXdeck — Free AI PPT Maker | Make PowerPoint Presentations from Text";
+  "EXdeck: Free AI PPT Maker | Make PowerPoint Presentations from Text";
 
-export const TITLE_TEMPLATE = "%s | EXdeck — AI PPT Maker";
+export const TITLE_TEMPLATE = "%s | EXdeck: AI PPT Maker";
 
 export const DEFAULT_DESCRIPTION =
-  "AI PPT maker with a free plan. Type a topic and get an editable PowerPoint presentation in seconds — real charts, themes, and one-click PPTX and PDF export. The fastest online AI presentation generator. No template wrestling, free to start.";
+  "EXdeck is a free AI PPT maker. Type a topic and get an editable PowerPoint presentation in seconds with real charts, themes, and one-click PPTX and PDF export. Search EXdeck or Exdeck PPT to find the official app at exdeck.xyz.";
 
 export const SHORT_DESCRIPTION =
   "Make PowerPoint presentations from text for free with AI. Editable slides in seconds, real PPTX & PDF export.";
@@ -149,10 +161,15 @@ export function softwareJsonLd() {
   return {
     "@context": "https://schema.org",
     "@type": "WebApplication",
+    "@id": `${SITE_URL}/#webapp`,
     name: "EXdeck",
     alternateName: BRAND_ALIASES,
     url: SITE_URL,
+    sameAs: [`${SITE_URL}/`, "https://github.com/izhan0102/exdeck"],
+    creator: { "@id": `${SITE_URL}/#founder` },
+    publisher: { "@id": `${SITE_URL}/#organization` },
     applicationCategory: "BusinessApplication",
+    applicationSubCategory: "AI presentation maker",
     operatingSystem: "Web",
     description: DEFAULT_DESCRIPTION,
     offers: {
@@ -182,11 +199,13 @@ export function organizationJsonLd() {
   return {
     "@context": "https://schema.org",
     "@type": "Organization",
+    "@id": `${SITE_URL}/#organization`,
     name: BRAND,
     alternateName: BRAND_ALIASES,
     url: SITE_URL,
     logo: `${SITE_URL}/icon`,
-    sameAs: ["https://github.com/izhan0102/exdeck"],
+    founder: { "@id": `${SITE_URL}/#founder` },
+    sameAs: [`${SITE_URL}/`, "https://github.com/izhan0102/exdeck"],
   };
 }
 
@@ -194,9 +213,12 @@ export function websiteJsonLd() {
   return {
     "@context": "https://schema.org",
     "@type": "WebSite",
+    "@id": `${SITE_URL}/#website`,
     name: BRAND,
     alternateName: BRAND_ALIASES,
     url: SITE_URL,
+    publisher: { "@id": `${SITE_URL}/#organization` },
+    about: { "@id": `${SITE_URL}/#webapp` },
     potentialAction: {
       "@type": "SearchAction",
       target: {
@@ -205,6 +227,17 @@ export function websiteJsonLd() {
       },
       "query-input": "required name=search_term_string",
     },
+  };
+}
+
+export function founderJsonLd() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "@id": `${SITE_URL}/#founder`,
+    name: "Muhammad Izhan",
+    url: `${SITE_URL}/developer`,
+    sameAs: ["https://github.com/izhan0102"],
   };
 }
 

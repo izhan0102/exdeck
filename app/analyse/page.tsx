@@ -83,6 +83,21 @@ export default function AnalysePage() {
         </div>
       </section>
 
+      <section className="mx-auto max-w-4xl px-5 pb-14">
+        <div className="rounded-2xl border p-6 sm:p-8" style={{ borderColor: "var(--ezd-divider)", background: "var(--ezd-bg-card)" }}>
+          <h2 className="text-[22px] font-bold tracking-tight" style={{ color: "var(--ezd-fg-strong)" }}>What people analyse with EXdeck</h2>
+          <div className="mt-5 grid gap-4 text-[14px] leading-relaxed sm:grid-cols-2" style={{ color: "var(--ezd-fg-muted)" }}>
+            <p><strong style={{ color: "var(--ezd-fg-strong)" }}>Reports and PDFs:</strong> pull out risks, action items, contradictions, metrics, and executive summaries without uploading the original file.</p>
+            <p><strong style={{ color: "var(--ezd-fg-strong)" }}>Sheets and slides:</strong> understand spreadsheet tables, presentation decks, lecture notes, code files, and mixed document packs in one pass.</p>
+          </div>
+          <div className="mt-5 flex flex-wrap gap-2.5">
+            {[["AI documents", "/documents"], ["PDF to PPT", "/pdf-to-ppt"], ["AI presentations", "/presentations"], ["Converters", "/converter"]].map(([label, href]) => (
+              <Link key={href} href={href} className="rounded-full border px-3.5 py-1.5 text-[13px]" style={{ borderColor: "var(--ezd-hairline)", color: "var(--ezd-fg-strong)" }}>{label}</Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section className="mx-auto max-w-3xl px-5 pb-20">
         <h2 className="text-[24px] font-bold tracking-tight" style={{ color: "var(--ezd-fg-strong)" }}>Frequently asked questions</h2>
         <div className="mt-6 divide-y" style={{ borderColor: "var(--ezd-divider)" }}>

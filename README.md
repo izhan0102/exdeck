@@ -2,7 +2,7 @@
 
 AI presentation builder. Type a short brief, pick a template, and get a fully editable deck in seconds — real charts, themed layouts, speaker notes, and one-click export to PowerPoint and PDF.
 
-🚀 **Try it now:** [exdeck.com](https://exdeck.com)
+🚀 **Try it now:** [exdeck.xyz](https://exdeck.xyz)
 
 Drag and edit everything inline, ask the AI chat to rewrite a slide, switch the whole deck's template or content density on the fly, present full-screen, and share a live link. A 200,000-icon library, premium Canva/Gamma-grade designs, and real data charts built from your numbers.
 

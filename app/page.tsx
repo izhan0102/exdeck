@@ -21,12 +21,12 @@ import { getTheme } from "@/lib/themes";
 import type { Slide } from "@/lib/types";
 
 /**
- * EXdeck landing — premium monochrome SaaS.
+ * EXdeck landing - premium monochrome SaaS.
  *
  * Design language follows the rest of the product: one black-and-white
  * identity (white-on-black in dark, black-on-white in light) driven by the
  * `--ezd-*` CSS tokens in globals.css, so every surface adapts to the theme
- * automatically. The only color on the page comes from the slide PREVIEWS —
+ * automatically. The only color on the page comes from the slide PREVIEWS -
  * the product's own colorful output, shown off against the neutral chrome.
  *
  * All colors are token-driven (var(--ezd-...)) or use the white/opacity
@@ -39,7 +39,7 @@ const MONO = '"JetBrains Mono", ui-monospace, SFMono-Regular, "Roboto Mono", mon
 const HERO = '"Bitcount Single", "Fontdiner Swanky", ui-sans-serif, system-ui, sans-serif';
 
 /** The full tool suite, rendered as one divided index grid (no boxed icon
- *  tiles). Icons stay small, inline, and muted — wayfinding, not decoration. */
+ *  tiles). Icons stay small, inline, and muted - wayfinding, not decoration. */
 const TOOLS: { name: string; sub: string; href: string; icon: LucideIcon }[] = [
   { name: "Ask EX-AI", sub: "Your AI guide", href: "/ex-ai", icon: Sparkles },
   { name: "Presentations", sub: "AI slide maker", href: "/presentations", icon: Presentation },
@@ -170,7 +170,7 @@ export default function LandingPage() {
 
       {/* ================== Hero ================== */}
       <section className="relative z-10 mx-auto max-w-[1200px] px-5 pb-16 pt-28 sm:px-6 sm:pt-36">
-        {/* soft glow behind the hero — subtle in both themes */}
+        {/* soft glow behind the hero - subtle in both themes */}
         <div
           aria-hidden
           className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[460px]"
@@ -191,10 +191,10 @@ export default function LandingPage() {
                   color: "var(--ezd-fg-strong)",
                 }}
               >
-                AI presentations<br />
-                in <span style={{ fontFamily: HERO, letterSpacing: "-0.02em" }}>seconds.</span>
+                EXdeck<br />
+                AI PPT maker.
                 <span className="sr-only">
-                  {" "}EXdeck is a free AI PPT maker that turns your text into an
+                  {" "}EXdeck, also searched as Exdeck and Ex deck, is a free AI PPT maker that turns your text into an
                   editable PowerPoint presentation with one-click PPTX and PDF export.
                 </span>
               </h1>
@@ -205,8 +205,7 @@ export default function LandingPage() {
                 className="mt-6 max-w-xl text-[16px] leading-relaxed sm:text-[18px]"
                 style={{ color: "var(--ezd-fg-muted)" }}
               >
-                Type a brief, pick a template, and get a fully designed deck with real charts and speaker notes. 
-                Also makes AI documents, spreadsheets, and resumes — plus free file converters.
+                EXdeck turns a short prompt into a fully designed PowerPoint deck with real charts and speaker notes. Also makes AI documents, spreadsheets, and resumes, plus free file converters.
               </p>
             </Reveal>
 
@@ -257,14 +256,36 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* ================== Brand clarity for exact-search discovery ================== */}
+      <section className="relative z-10 mx-auto max-w-5xl px-5 pt-8 sm:px-6">
+        <Reveal>
+          <div className="rounded-2xl border p-6 sm:p-8" style={{ borderColor: "var(--ezd-divider)", background: "var(--ezd-bg-card)" }}>
+            <div className="text-[11px] font-semibold uppercase tracking-[0.22em]" style={{ color: "var(--ezd-fg-quiet)", fontFamily: MONO }}>
+              Official EXdeck website
+            </div>
+            <h2 className="mt-3 text-[26px] font-bold tracking-tight sm:text-[34px]" style={{ color: "var(--ezd-fg-strong)" }}>
+              EXdeck is the AI PPT maker at exdeck.xyz.
+            </h2>
+            <p className="mt-3 max-w-3xl text-[15px] leading-relaxed" style={{ color: "var(--ezd-fg-muted)" }}>
+              If you searched for EXdeck, Exdeck, EXdeck PPT, or an AI PPT maker that exports real PowerPoint files, this is the official app. EXdeck creates editable presentations from text, then lets you export to PPTX or PDF without locking your work inside a web-only editor.
+            </p>
+            <div className="mt-5 flex flex-wrap gap-2.5">
+              {[["EXdeck PPT maker", "/ai-ppt-maker"], ["AI presentation maker", "/ai-presentation-maker"], ["Text to PPT", "/text-to-ppt"], ["Presentations", "/presentations"]].map(([label, href]) => (
+                <Link key={href} href={href} className="rounded-full border px-4 py-2 text-[13px] font-medium" style={{ borderColor: "var(--ezd-hairline)", color: "var(--ezd-fg-strong)" }}>{label}</Link>
+              ))}
+            </div>
+          </div>
+        </Reveal>
+      </section>
+
       {/* ================== The whole suite ================== */}
       <section id="tools" className="relative z-10 mx-auto max-w-5xl px-5 pt-24 sm:px-6">
         <Reveal>
           <SectionLabel
             center
             kicker="One account, every tool"
-            title="Not just slides — a whole AI workspace."
-            sub="Presentations are only the start. The same engine writes documents, builds spreadsheets, drafts resumes, runs mock interviews, and converts files — all in one place."
+            title="Not just slides - a whole AI workspace."
+            sub="Presentations are only the start. The same engine writes documents, builds spreadsheets, drafts resumes, runs mock interviews, and converts files - all in one place."
           />
         </Reveal>
         <Reveal delay={80}>
@@ -309,7 +330,7 @@ export default function LandingPage() {
             center
             kicker="More than presentations"
             title="Also an AI document & spreadsheet maker"
-            sub="EXdeck isn't only slides. The same AI writes structured, Word-style documents and builds live Excel spreadsheets from plain English — all editable, all exportable."
+            sub="EXdeck isn't only slides. The same AI writes structured, Word-style documents and builds live Excel spreadsheets from plain English - all editable, all exportable."
           />
         </Reveal>
         <div className="mt-12 grid grid-cols-1 gap-10 sm:grid-cols-2 sm:gap-12">
@@ -322,7 +343,7 @@ export default function LandingPage() {
                 Reports that read like you wrote them.
               </h3>
               <p className="mt-3 text-[13.5px] leading-relaxed" style={{ color: "var(--ezd-fg-muted)" }}>
-                Describe a report, proposal, brief, or essay and AI writes a structured, Word-style document — headings, tables, data charts, images, and watermarks — with clean multi-page PDF export.
+                Describe a report, proposal, brief, or essay and AI writes a structured, Word-style document - headings, tables, data charts, images, and watermarks - with clean multi-page PDF export.
               </p>
               <ul className="mt-5 space-y-2">
                 {["Reports, proposals, case studies & essays", "Tables, charts, images & watermarks", "Inline editing + multi-page PDF export"].map((p) => (
@@ -345,7 +366,7 @@ export default function LandingPage() {
                 Type the table. Get the formulas.
               </h3>
               <p className="mt-3 text-[13.5px] leading-relaxed" style={{ color: "var(--ezd-fg-muted)" }}>
-                Say what you want — &ldquo;make a table of this data&rdquo;, &ldquo;add a total column&rdquo; — and AI builds and edits the sheet with live formulas. Export to Excel (.xlsx) or PDF, right in your browser.
+                Say what you want - &ldquo;make a table of this data&rdquo;, &ldquo;add a total column&rdquo; - and AI builds and edits the sheet with live formulas. Export to Excel (.xlsx) or PDF, right in your browser.
               </p>
               <ul className="mt-5 space-y-2">
                 {["Plain-English tables, totals & formulas", "Live SUM, AVERAGE, IF and more", "Excel (.xlsx) & PDF export, fully private"].map((p) => (
@@ -369,7 +390,7 @@ export default function LandingPage() {
             center
             kicker="What's inside"
             title="A real editor, not a one-shot generator."
-            sub="Everything you need to go from idea to a deck you'd actually present — and keep."
+            sub="Everything you need to go from idea to a deck you'd actually present - and keep."
           />
         </Reveal>
 
@@ -378,7 +399,7 @@ export default function LandingPage() {
             <FeatureCard
               wide
               title="Generate from a brief"
-              body="Describe your deck in a sentence. EXdeck picks the right layout for each slide — title, bullets, table, comparison, or a real data chart — and fills it with substantive, on-topic content in about ten seconds."
+              body="Describe your deck in a sentence. EXdeck picks the right layout for each slide - title, bullets, table, comparison, or a real data chart - and fills it with substantive, on-topic content in about ten seconds."
             >
               <MiniBrief />
             </FeatureCard>
@@ -386,7 +407,7 @@ export default function LandingPage() {
           <Reveal className="md:col-span-2" delay={60}>
             <FeatureCard
               title="Real data charts"
-              body="Bar, line, area, pie, and donut — theme-colored and exported as vectors to both PPTX and PDF."
+              body="Bar, line, area, pie, and donut - theme-colored and exported as vectors to both PPTX and PDF."
             />
           </Reveal>
           <Reveal className="md:col-span-2" delay={60}>
@@ -404,7 +425,7 @@ export default function LandingPage() {
           <Reveal className="md:col-span-2" delay={120}>
             <FeatureCard
               title="Export, no lock-in"
-              body="A real .pptx that opens in PowerPoint, Keynote, or Slides — plus a high-res .pdf. Yours to keep."
+              body="A real .pptx that opens in PowerPoint, Keynote, or Slides - plus a high-res .pdf. Yours to keep."
             />
           </Reveal>
         </div>
@@ -429,7 +450,7 @@ export default function LandingPage() {
           <SectionLabel
             kicker="How it works"
             title="Five steps. Most people finish in under a minute."
-            sub="Describe it, choose a look, and let EXdeck design the rest — everything stays editable."
+            sub="Describe it, choose a look, and let EXdeck design the rest - everything stays editable."
           />
         </Reveal>
         <HowItWorks />
@@ -447,7 +468,7 @@ export default function LandingPage() {
               center
               kicker="Examples"
               title="Real slides, generated from one line."
-              sub="The chrome is monochrome on purpose — so your deck's own colors do the talking."
+              sub="The chrome is monochrome on purpose - so your deck's own colors do the talking."
             />
           </Reveal>
           <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-3">
@@ -455,7 +476,7 @@ export default function LandingPage() {
               <DeckSpecimen
                 tag="Pitch"
                 theme={{ bg: "#0B1220", fg: "#F8FAFC", accent: "#38BDF8", muted: "#94A3B8" }}
-                kicker="SERIES A · 2026"
+                kicker="SERIES A - 2026"
                 title="Rebuilding logistics, software-first."
                 bullets={["Dispatch to delivery in one stack", "40% lower cost per shipment", "Live in 9 metros"]}
                 brief="Series A pitch for a logistics platform."
@@ -465,7 +486,7 @@ export default function LandingPage() {
               <DeckSpecimen
                 tag="Lecture"
                 theme={{ bg: "#FBFBF7", fg: "#0A0A0A", accent: "#B45309", muted: "#57534E" }}
-                kicker="CS401 · LECTURE 4"
+                kicker="CS401 - LECTURE 4"
                 title="Attention is all you need."
                 bullets={["Self-attention, intuitively", "Queries, keys, and values", "One head, worked example"]}
                 brief="Intro lecture on transformer architecture."
@@ -476,7 +497,7 @@ export default function LandingPage() {
               <DeckSpecimen
                 tag="Report"
                 theme={{ bg: "#10241C", fg: "#ECFDF5", accent: "#34D399", muted: "#9CA3AF" }}
-                kicker="FY26 · STRATEGY"
+                kicker="FY26 - STRATEGY"
                 title="Where we won this year."
                 bullets={["Net retention reached 124%", "Two new enterprise segments", "Margin up 8 points"]}
                 brief="Annual strategy review for the board."
@@ -497,7 +518,7 @@ export default function LandingPage() {
       {/* ================== Competitors Comparison ================== */}
       <section className="relative z-10 mx-auto max-w-6xl px-5 pb-8 pt-20 sm:px-6">
         <Reveal>
-          <SectionLabel center kicker="Why choose EXdeck" title="Better than the rest — honest comparison." />
+          <SectionLabel center kicker="Why choose EXdeck" title="Better than the rest - honest comparison." />
         </Reveal>
         <Reveal delay={80}>
           <div className="mx-auto mt-10 max-w-4xl overflow-x-auto">
@@ -572,15 +593,15 @@ export default function LandingPage() {
         <Reveal delay={140}>
           <div className="mx-auto mt-10 max-w-2xl space-y-6 text-[13.5px] leading-relaxed" style={{ color: "var(--ezd-fg-muted)" }}>
             <p>
-              <span className="font-semibold" style={{ color: "var(--ezd-fg-strong)" }}>Why EXdeck costs 3× less:</span> We're
-              an indie project built for designers, developers, and students who need fast, honest presentations — not enterprise
+              <span className="font-semibold" style={{ color: "var(--ezd-fg-strong)" }}>Why EXdeck costs 3x less:</span> We're
+              an indie project built for designers, developers, and students who need fast, honest presentations - not enterprise
               sales teams. No bloat, no upsells, no tiered feature walls. You get everything at $1.99/month, and your decks export
               to real PowerPoint files you own forever.
             </p>
             <p>
               <span className="font-semibold" style={{ color: "var(--ezd-fg-strong)" }}>What makes us different:</span> Most AI
               presentation tools lock you into their web editor or charge per-seat for teams. EXdeck gives you true .pptx export
-              from day one — take your deck to PowerPoint, Google Slides, or Keynote and never look back. We also build documents
+              from day one - take your deck to PowerPoint, Google Slides, or Keynote and never look back. We also build documents
               and resumes with the same AI engine, so you're not paying for three separate tools.
             </p>
             <p>
@@ -646,7 +667,7 @@ export default function LandingPage() {
               Stop staring at the empty page.
             </h2>
             <p className="mx-auto mt-4 max-w-md text-[14.5px]" style={{ color: "var(--ezd-fg-muted)" }}>
-              Generate your first deck — or document — free in under a minute. Edit it, present it, export it.
+              Generate your first deck - or document - free in under a minute. Edit it, present it, export it.
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <button
@@ -690,7 +711,7 @@ export default function LandingPage() {
  * ===================================================================== */
 
 function Dot() {
-  return <span aria-hidden style={{ color: "var(--ezd-fg-quiet)", opacity: 0.5 }}>·</span>;
+  return <span aria-hidden style={{ color: "var(--ezd-fg-quiet)", opacity: 0.5 }}>-</span>;
 }
 
 /* ----------------------- Scroll reveal ----------------------- */
@@ -802,7 +823,7 @@ function MiniBrief() {
         </span>
       </div>
       <p className="text-[12.5px] leading-relaxed" style={{ color: "var(--ezd-fg-strong)" }}>
-        &ldquo;Series A pitch for a logistics platform — problem, our edge,
+        &ldquo;Series A pitch for a logistics platform - problem, our edge,
         traction, market, the ask.&rdquo;
       </p>
       <div className="mt-3 flex flex-wrap gap-1.5">
@@ -822,7 +843,7 @@ function MiniBrief() {
 
 /* ----------------------- Animated hero demo ----------------------- *
  * Temporary replacement for the hero video: a looping, randomized demo of
- * the core flow — type a brief → generating → a colorful output slide.
+ * the core flow - type a brief -> generating -> a colorful output slide.
  * The prompt, theme, and output are picked at random each cycle so it looks
  * different on every visit. All client-side; no assets. */
 
@@ -846,7 +867,7 @@ const HERO_DEMOS: HeroDemoItem[] = [
   {
     prompt: "Series A pitch for a logistics startup",
     tags: ["Investors", "Confident", "8 slides"],
-    kicker: "SERIES A · 2026", title: "Rebuilding logistics, software-first.",
+    kicker: "SERIES A - 2026", title: "Rebuilding logistics, software-first.",
     bullets: ["Dispatch to delivery in one stack", "40% lower cost per shipment", "Live in 9 metros"],
     bars: [46, 62, 54, 78, 68], layout: "bars",
     theme: { bg: "#0B1220", fg: "#F8FAFC", accent: "#38BDF8" },
@@ -854,7 +875,7 @@ const HERO_DEMOS: HeroDemoItem[] = [
   {
     prompt: "Intro lecture on the attention mechanism",
     tags: ["Students", "Clear", "10 slides"],
-    kicker: "CS401 · LECTURE 4", title: "Where attention goes.",
+    kicker: "CS401 - LECTURE 4", title: "Where attention goes.",
     bullets: ["Queries, keys, and values", "Softmax over the sequence", "Multi-head, in parallel"],
     bars: [48, 26, 18, 8], layout: "donut",
     theme: { bg: "#1B1024", fg: "#FAF5FF", accent: "#C084FC" },
@@ -862,7 +883,7 @@ const HERO_DEMOS: HeroDemoItem[] = [
   {
     prompt: "FY26 board strategy review",
     tags: ["Board", "Formal", "12 slides"],
-    kicker: "FY26 · STRATEGY", title: "Where we won this year.",
+    kicker: "FY26 - STRATEGY", title: "Where we won this year.",
     bullets: [], bars: [],
     layout: "table",
     table: { headers: ["Metric", "FY25", "FY26"], rows: [["Net retention", "98%", "124%"], ["Segments", "4", "6"], ["Gross margin", "31%", "39%"]] },
@@ -871,11 +892,11 @@ const HERO_DEMOS: HeroDemoItem[] = [
   {
     prompt: "Launch deck for a new coffee brand",
     tags: ["Customers", "Bold", "7 slides"],
-    kicker: "LAUNCH · SPRING", title: "Mornings, reinvented.",
+    kicker: "LAUNCH - SPRING", title: "Mornings, reinvented.",
     bullets: [], bars: [],
     layout: "quote",
     quote: "Single-origin coffee, ethically sourced and ready in ninety seconds.",
-    author: "— Founder, launch keynote",
+    author: "- Founder, launch keynote",
     theme: { bg: "#2A0E0E", fg: "#FFF1F2", accent: "#FB7185" },
   },
   {
@@ -889,7 +910,7 @@ const HERO_DEMOS: HeroDemoItem[] = [
   {
     prompt: "Quarterly climate impact report",
     tags: ["Public", "Data-led", "11 slides"],
-    kicker: "Q2 · IMPACT", title: "Cutting carbon, quarter by quarter.",
+    kicker: "Q2 - IMPACT", title: "Cutting carbon, quarter by quarter.",
     bullets: ["Emissions reduced", "Renewable sites", "On track for"],
     bars: [18, 3, 2030], layout: "cards",
     theme: { bg: "#052E2B", fg: "#ECFEFF", accent: "#2DD4BF" },
@@ -1005,7 +1026,7 @@ function HeroDemo() {
   const d = HERO_DEMOS[demo];
   const full = d.prompt;
 
-  // Typewriter → pause → generating.
+  // Typewriter -> pause -> generating.
   useEffect(() => {
     if (!mounted || phase !== "typing") return;
     if (typed < full.length) {
@@ -1016,14 +1037,14 @@ function HeroDemo() {
     return () => window.clearTimeout(t);
   }, [mounted, phase, typed, full]);
 
-  // Generating → output.
+  // Generating -> output.
   useEffect(() => {
     if (phase !== "generating") return;
     const t = window.setTimeout(() => setPhase("output"), 2000);
     return () => window.clearTimeout(t);
   }, [phase]);
 
-  // Output → next (a different, random demo).
+  // Output -> next (a different, random demo).
   useEffect(() => {
     if (phase !== "output") return;
     const t = window.setTimeout(() => {
@@ -1243,7 +1264,7 @@ function TemplateShowcase() {
             style={{ background: "var(--ezd-bg-page)", border: "1px solid var(--ezd-hairline)", color: "var(--ezd-fg-quiet)" }}
           >
             <Sparkles size={10} className="shrink-0" />
-            <span className="truncate">EXdeck · {curr.name}</span>
+            <span className="truncate">EXdeck - {curr.name}</span>
           </span>
           <span
             className="hidden shrink-0 items-center rounded-full border px-2 py-0.5 text-[10px] font-medium sm:inline-flex"
@@ -1253,7 +1274,7 @@ function TemplateShowcase() {
           </span>
         </div>
 
-        {/* Cycling viewport — overflow-hidden clips the falling card. */}
+        {/* Cycling viewport - overflow-hidden clips the falling card. */}
         <div
           className="relative aspect-[16/9] w-full overflow-hidden"
           style={{ background: "var(--ezd-bg-elev)" }}
@@ -1268,7 +1289,7 @@ function TemplateShowcase() {
           </div>
         </div>
 
-        {/* Caption — fixed height so varying names/taglines never resize the card. */}
+        {/* Caption - fixed height so varying names/taglines never resize the card. */}
         <div
           className="flex h-[58px] items-center justify-between gap-3 overflow-hidden border-t px-4"
           style={{ borderColor: "var(--ezd-divider)", background: "var(--ezd-bg-card)" }}
@@ -1295,9 +1316,9 @@ function TemplateShowcase() {
 function HowItWorks() {
   const steps: { n: number; kicker: string; title: string; body: string; visual: React.ReactNode }[] = [
     { n: 1, kicker: "The brief", title: "Type what it's about.", body: "A sentence or two is enough. Topic, audience, tone. Specific beats long every time.", visual: <BriefVisual /> },
-    { n: 2, kicker: "The look", title: "Pick a theme — or a template.", body: "37 palettes paginated by mood, or grab a template that bundles theme, font, and graphic in one click.", visual: <ThemeVisual /> },
+    { n: 2, kicker: "The look", title: "Pick a theme - or a template.", body: "37 palettes paginated by mood, or grab a template that bundles theme, font, and graphic in one click.", visual: <ThemeVisual /> },
     { n: 3, kicker: "The voice", title: "Choose a typeface.", body: "28 Google fonts served live, with a real-time preview of your own headline in each one.", visual: <FontVisual /> },
-    { n: 4, kicker: "The texture", title: "Add an optional background.", body: "27 recolorable graphics — soft grids, mesh gradients, blueprint, halftone — tuned to your accent.", visual: <GraphicVisual /> },
+    { n: 4, kicker: "The texture", title: "Add an optional background.", body: "27 recolorable graphics - soft grids, mesh gradients, blueprint, halftone - tuned to your accent.", visual: <GraphicVisual /> },
     { n: 5, kicker: "The result", title: "Edit, present, export.", body: "Drag, recolor, rewrite. Present fullscreen with arrow keys. Export to .pptx or .pdf when you're ready.", visual: <EditVisual /> },
   ];
 
@@ -1353,7 +1374,7 @@ function BriefVisual() {
       <div className="mb-2 flex items-center gap-1.5">
         <span className="h-1.5 w-1.5 rounded-full" style={{ background: "var(--ezd-fg-quiet)" }} />
         <span className="text-[9px] uppercase tracking-[0.2em]" style={{ color: "var(--ezd-fg-quiet)", fontFamily: MONO }}>
-          Brief · 76 words
+          Brief - 76 words
         </span>
       </div>
       <p className="text-[11px] leading-relaxed" style={{ color: "var(--ezd-fg-strong)" }}>
@@ -1465,12 +1486,12 @@ function EditVisual() {
         <div className="absolute left-3 right-3 top-[26%]">
           <div className="text-[7px] font-bold tracking-[0.3em] text-black/70">EDITED LIVE</div>
           <div className="mt-1 font-semibold leading-tight text-black" style={{ fontFamily: "ui-serif, Georgia, serif", fontSize: 13, letterSpacing: "-0.015em" }}>
-            From idea to slides — in one minute.
+            From idea to slides - in one minute.
           </div>
         </div>
         <ul className="absolute inset-x-3 bottom-3 space-y-0.5 text-[8px] leading-snug text-black">
-          <li className="flex gap-1"><span className="text-black/60">—</span><span>Drag, recolor, rewrite</span></li>
-          <li className="flex gap-1"><span className="text-black/60">—</span><span>Export to .pptx or .pdf</span></li>
+          <li className="flex gap-1"><span className="text-black/60">-</span><span>Drag, recolor, rewrite</span></li>
+          <li className="flex gap-1"><span className="text-black/60">-</span><span>Export to .pptx or .pdf</span></li>
         </ul>
       </div>
     </div>
@@ -1510,7 +1531,7 @@ function DeckSpecimen({
           <ul className="absolute inset-x-[7%] bottom-[12%] space-y-[5px]">
             {bullets.map((b) => (
               <li key={b} className="flex items-start gap-1.5 text-[9px] leading-snug" style={{ color: theme.fg }}>
-                <span style={{ color: theme.accent }}>—</span>
+                <span style={{ color: theme.accent }}>-</span>
                 <span style={{ opacity: 0.9 }}>{b}</span>
               </li>
             ))}
@@ -1526,7 +1547,7 @@ function DeckSpecimen({
         >
           {tag}
         </span>
-        <span className="text-[10px]" style={{ color: "var(--ezd-fg-quiet)" }}>16:9 · .pptx</span>
+        <span className="text-[10px]" style={{ color: "var(--ezd-fg-quiet)" }}>16:9 - .pptx</span>
       </div>
       <p className="px-4 pb-4 text-[11.5px] leading-[1.55]" style={{ color: "var(--ezd-fg-muted)" }}>
         Brief: <em>&ldquo;{brief}&rdquo;</em>
@@ -1540,9 +1561,9 @@ function DeckSpecimen({
 type Review = { name: string; role: string; rating: number; text: string };
 
 const REVIEWS: Review[] = [
-  { name: "Asif Mohammad", role: "Student", rating: 5, text: "Have seen & used many PPT generators, but this is different. The UI/UX in dark mode is brilliant — pick your own theme, font, and much more. Proud to be a contributor too." },
+  { name: "Asif Mohammad", role: "Student", rating: 5, text: "Have seen & used many PPT generators, but this is different. The UI/UX in dark mode is brilliant - pick your own theme, font, and much more. Proud to be a contributor too." },
   { name: "Aarav Mehta", role: "Product designer", rating: 5, text: "The UI is clean, the workflow makes sense, and generation is genuinely fast. No clutter, no learning curve." },
-  { name: "Sofia Almeida", role: "Startup founder", rating: 4.5, text: "Speed is the standout — a full presentation came back in seconds and editing felt smooth the whole way through." },
+  { name: "Sofia Almeida", role: "Startup founder", rating: 4.5, text: "Speed is the standout - a full presentation came back in seconds and editing felt smooth the whole way through." },
   { name: "Rohan Iyer", role: "MBA student", rating: 5, text: "The editor is the best part. Everything is draggable, the layouts make sense, and exporting to PowerPoint just works." },
   { name: "Lena Fischer", role: "Marketing lead", rating: 4.5, text: "Minimal and quick. Pick a theme, type a brief, done. The output looks polished without throwing a hundred options at you." },
   { name: "Karthik Nair", role: "Engineering manager", rating: 5, text: "Performance is impressive. No lag when editing, charts render instantly, the whole thing feels lightweight. Well built." },
@@ -1754,7 +1775,7 @@ function Footer() {
         className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2 px-5 py-5 text-[10.5px] sm:px-6"
         style={{ color: "var(--ezd-fg-quiet)" }}
       >
-        <span>© {new Date().getFullYear()} EXdeck — All rights reserved</span>
+        <span>(c) {new Date().getFullYear()} EXdeck - All rights reserved</span>
         <span>
           Built by{" "}
           <a

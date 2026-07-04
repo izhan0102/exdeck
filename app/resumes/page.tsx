@@ -71,6 +71,20 @@ export default function ResumesPage() {
           </div>
         </div>
 
+        <section className="mt-16 rounded-2xl border p-8" style={{ borderColor: "var(--ezd-divider)", background: "var(--ezd-bg-card)" }}>
+          <h2 className="text-center text-xl font-bold" style={{ color: "var(--ezd-fg-strong)" }}>Resume tools that support the whole job search</h2>
+          <div className="mt-6 grid gap-4 text-[14px] leading-relaxed sm:grid-cols-3" style={{ color: "var(--ezd-fg-muted)" }}>
+            <p><strong style={{ color: "var(--ezd-fg-strong)" }}>Build:</strong> create a clean ATS-friendly resume from scratch or improve an existing one with AI bullet rewrites.</p>
+            <p><strong style={{ color: "var(--ezd-fg-strong)" }}>Prepare:</strong> use the mock interview tool to practice role-specific questions and get scored feedback.</p>
+            <p><strong style={{ color: "var(--ezd-fg-strong)" }}>Present:</strong> turn case studies, portfolios, or project summaries into a polished AI presentation.</p>
+          </div>
+          <div className="mt-6 flex flex-wrap justify-center gap-2.5">
+            {[["Resume builder", "/resume"], ["Mock interview", "/interview"], ["AI presentations", "/presentations"], ["Document analyser", "/analyse"]].map(([label, href]) => (
+              <Link key={href} href={href} className="rounded-full border px-4 py-2 text-[13px]" style={{ borderColor: "var(--ezd-hairline)", color: "var(--ezd-fg-strong)" }}>{label}</Link>
+            ))}
+          </div>
+        </section>
+
         <div className="mt-16 text-center">
           <Link href="/resume" className="inline-flex items-center gap-2 rounded-full px-8 py-3.5 text-[15px] font-semibold transition hover:opacity-90" style={{ background: "var(--ezd-button-strong)", color: "var(--ezd-button-strong-fg)" }}>
             Create your resume now <ArrowRight size={16} />

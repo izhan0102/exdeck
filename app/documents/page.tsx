@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, BarChart3, FileText, Grid3x3, Image, List, Type } from "lucide-react";
+import { ArrowRight, BarChart3, FileText, Grid3x3, ImageIcon, List, Type } from "lucide-react";
 import Logo from "@/components/Logo";
 import { SITE_URL, landingSoftwareJsonLd, howToJsonLd, faqListJsonLd, breadcrumbJsonLd } from "@/lib/seo";
 
 const PATH = "/documents";
-const TITLE = "AI Document Maker — Write Reports, Proposals & Docs with AI | EXdeck";
+const TITLE = "AI Document Maker - Write Reports, Proposals & Docs with AI | EXdeck";
 const DESCRIPTION =
-  "Free AI document maker. Describe a report, proposal, brief, or essay and AI writes a structured, Word-style document — headings, tables, data charts, images, and watermarks — with clean multi-page PDF export.";
+  "Free AI document maker. Describe a report, proposal, brief, or essay and AI writes a structured, Word-style document - headings, tables, data charts, images, and watermarks - with clean multi-page PDF export.";
 
 const KEYWORDS = [
   "ai document maker", "ai document generator", "document generator", "ai writer",
@@ -26,18 +26,18 @@ export const metadata: Metadata = {
 };
 
 const STEPS = [
-  { name: "Describe your document", text: "Tell the AI what you need — a business report, proposal, case study, brief, or essay — plus the topic. It starts with the right structure." },
-  { name: "AI writes it", text: "In seconds you get a structured, Word-style document: headings, paragraphs, tables, data charts, and callouts — all editable inline." },
+  { name: "Describe your document", text: "Tell the AI what you need - a business report, proposal, case study, brief, or essay - plus the topic. It starts with the right structure." },
+  { name: "AI writes it", text: "In seconds you get a structured, Word-style document: headings, paragraphs, tables, data charts, and callouts - all editable inline." },
   { name: "Edit & export", text: "Refine any text, add images or a custom watermark, then export a clean multi-page PDF ready to share, print, or email." },
 ];
 
 const FAQ = [
-  { q: "What is the AI document maker?", a: "It's a free AI writer that turns a short brief into a structured, Word-style document — headings, paragraphs, tables, data charts, images, and watermarks — that you edit inline and export to PDF." },
+  { q: "What is the AI document maker?", a: "It's a free AI writer that turns a short brief into a structured, Word-style document - headings, paragraphs, tables, data charts, images, and watermarks - that you edit inline and export to PDF." },
   { q: "What types of documents can it write?", a: "Business reports, project proposals, case studies, white papers, briefs, letters, and essays. You describe the type and topic, and the AI starts with the right structure and formatting." },
-  { q: "Can I edit the document after it's generated?", a: "Yes — it's a true inline editor. Change any word, restyle text, add or edit tables and charts, drag in images, and set a custom watermark." },
+  { q: "Can I edit the document after it's generated?", a: "Yes - it's a true inline editor. Change any word, restyle text, add or edit tables and charts, drag in images, and set a custom watermark." },
   { q: "Can I export to PDF?", a: "Yes. Export a clean, multi-page PDF that's ready to share, print, or email. Your tables, charts, and images are preserved in the layout." },
-  { q: "Is the AI document maker free?", a: "Yes — you can make documents on the free plan using your monthly AI credits. Pro ($1.99/month) unlocks unlimited documents along with presentations, spreadsheets, and resumes." },
-  { q: "How is a document different from a presentation?", a: "Documents are long-form, Word-style pages — reports, proposals, essays — while presentations are slides. EXdeck makes both, plus spreadsheets and resumes, in one place." },
+  { q: "Is the AI document maker free?", a: "Yes - you can make documents on the free plan using your monthly AI credits. Pro ($1.99/month) unlocks unlimited documents along with presentations, spreadsheets, and resumes." },
+  { q: "How is a document different from a presentation?", a: "Documents are long-form, Word-style pages - reports, proposals, essays - while presentations are slides. EXdeck makes both, plus spreadsheets and resumes, in one place." },
 ];
 
 export default function DocumentsPage() {
@@ -67,7 +67,7 @@ export default function DocumentsPage() {
         </h1>
 
         <p className="mx-auto mt-6 max-w-2xl text-center text-[15px] leading-relaxed" style={{ color: "var(--ezd-fg-muted)" }}>
-          Describe a report, proposal, brief, or essay and AI writes a structured, Word-style document — headings, paragraphs, tables, charts, and watermarks. Export to PDF instantly.
+          Describe a report, proposal, brief, or essay and AI writes a structured, Word-style document - headings, paragraphs, tables, charts, and watermarks. Export to PDF instantly.
         </p>
 
         <div className="mt-8 flex justify-center gap-3">
@@ -84,7 +84,7 @@ export default function DocumentsPage() {
           <Feature icon={<Type size={24} />} title="Rich Text Editing" desc="Live inline editor with bold, italic, underline, lists, and font controls. Edit every word to match your voice." />
           <Feature icon={<Grid3x3 size={24} />} title="Tables & Data" desc="Add tables with custom columns and rows. Perfect for comparisons, specifications, or pricing breakdowns." />
           <Feature icon={<BarChart3 size={24} />} title="Built-in Charts" desc="Insert data charts directly into documents. Bar, line, pie, and area charts that export cleanly to PDF." />
-          <Feature icon={<Image size={24} />} title="Images & Watermarks" desc="Upload images, add custom watermarks, and control document size and layout. Multi-page PDF export included." />
+          <Feature icon={<ImageIcon size={24} />} title="Images & Watermarks" desc="Upload images, add custom watermarks, and control document size and layout. Multi-page PDF export included." />
           <Feature icon={<List size={24} />} title="Document Templates" desc="Business reports, proposals, case studies, briefs, and more. Each template starts with the right structure." />
         </div>
 
@@ -126,7 +126,7 @@ export default function DocumentsPage() {
         <div className="mt-20 rounded-2xl border p-8" style={{ borderColor: "var(--ezd-divider)", background: "var(--ezd-bg-card)" }}>
           <h2 className="text-center text-xl font-bold" style={{ color: "var(--ezd-fg-strong)" }}>Why EXdeck for Documents?</h2>
           <div className="mt-6 space-y-3 text-[14px] leading-relaxed" style={{ color: "var(--ezd-fg-muted)" }}>
-            <p><strong style={{ color: "var(--ezd-fg-strong)" }}>All-in-one workspace:</strong> Presentations, documents, spreadsheets, and resumes in one place — no separate subscriptions.</p>
+            <p><strong style={{ color: "var(--ezd-fg-strong)" }}>All-in-one workspace:</strong> Presentations, documents, spreadsheets, and resumes in one place - no separate subscriptions.</p>
             <p><strong style={{ color: "var(--ezd-fg-strong)" }}>Real PDF export:</strong> Clean, multi-page PDFs you can share, print, or email. No web-only lock-in.</p>
             <p><strong style={{ color: "var(--ezd-fg-strong)" }}>Free to start:</strong> Make documents on the free plan with your monthly credits; Pro ($1.99/month) unlocks unlimited documents, presentations, spreadsheets, and resumes.</p>
           </div>
@@ -136,7 +136,7 @@ export default function DocumentsPage() {
           <Link href="/docs" className="inline-flex items-center gap-2 rounded-full px-8 py-3.5 text-[15px] font-semibold transition hover:opacity-90" style={{ background: "var(--ezd-button-strong)", color: "var(--ezd-button-strong-fg)" }}>
             Start writing <ArrowRight size={16} />
           </Link>
-          <p className="mt-4 text-[13px]" style={{ color: "var(--ezd-fg-quiet)" }}>Free to start • Clean PDF export • Pro from $1.99/month</p>
+          <p className="mt-4 text-[13px]" style={{ color: "var(--ezd-fg-quiet)" }}>Free to start - Clean PDF export - Pro from $1.99/month</p>
         </div>
       </section>
     </main>

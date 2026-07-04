@@ -1,7 +1,12 @@
-import LegalShell from "@/components/legal/LegalShell";
+﻿import LegalShell from "@/components/legal/LegalShell";
 import { LEGAL } from "@/lib/legal";
 
-export const metadata = { title: "Terms & Conditions · EXdeck" };
+export const metadata = {
+  title: "Terms & Conditions · EXdeck",
+  description:
+    "Read the EXdeck terms and conditions for using the AI presentation maker, exports, accounts, acceptable use, plans, billing, and support.",
+  alternates: { canonical: "/terms" },
+};
 
 export default function TermsPage() {
   return (
@@ -48,8 +53,8 @@ export default function TermsPage() {
       <h2>4. Plans and Pricing</h2>
       <ul>
         <li>The free plan lets you generate, edit, present, and export decks as PowerPoint (<code>.pptx</code>) or PDF within a monthly deck limit. Free exports include a small "Made with EXdeck" watermark.</li>
-        <li>Paid plans — Pro (US$1.99/month), plus Team and Organisation plans for shared seats — remove the monthly deck limit and unlock features such as AI speaker notes, Q&amp;A prep, slide reordering, icons, watermark-free exports, deck translation, and unlimited generation. Annual billing is available at a 10% discount.</li>
-        <li>Paid plans are billed for the period you choose — monthly, or annually at a 10% discount — and grant access for that billing period. Payments are processed securely by our payment gateway, Razorpay; we do not collect or store your full card or banking details.</li>
+        <li>Paid plans - Pro (US$1.99/month), plus Team and Organisation plans for shared seats - remove the monthly deck limit and unlock features such as AI speaker notes, Q&amp;A prep, slide reordering, icons, watermark-free exports, deck translation, and unlimited generation. Annual billing is available at a 10% discount.</li>
+        <li>Paid plans are billed for the period you choose - monthly, or annually at a 10% discount - and grant access for that billing period. Payments are processed securely by our payment gateway, Razorpay; we do not collect or store your full card or banking details.</li>
         <li>Coupon or promotional codes, where offered, are subject to their stated discount, validity, and usage limits, and may be withdrawn at any time.</li>
         <li>Refunds and cancellations are governed by our Refund &amp; Cancellation Policy.</li>
         <li>Monthly generation quotas and feature limits apply per plan and may change over time.</li>
@@ -146,7 +151,7 @@ export default function TermsPage() {
         terminate your access for violation of these Terms or prolonged
         inactivity. On termination your right to use the Service
         ceases; sections that by their nature should survive (including
-        Sections 6, 9–13) will survive.
+        Sections 6, 9-13) will survive.
       </p>
 
       <h2>15. Governing Law and Disputes</h2>
@@ -182,3 +187,4 @@ export default function TermsPage() {
     </LegalShell>
   );
 }
+

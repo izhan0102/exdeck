@@ -1,7 +1,12 @@
-import LegalShell from "@/components/legal/LegalShell";
+﻿import LegalShell from "@/components/legal/LegalShell";
 import { LEGAL } from "@/lib/legal";
 
-export const metadata = { title: "Contact Us · EXdeck" };
+export const metadata = {
+  title: "Contact Us · EXdeck",
+  description:
+    "Contact EXdeck support for account help, product issues, privacy requests, billing questions, and grievance officer enquiries.",
+  alternates: { canonical: "/contact" },
+};
 
 export default function ContactPage() {
   return (
@@ -22,7 +27,7 @@ export default function ContactPage() {
 
       <h2>Phone</h2>
       <p>
-        {LEGAL.SUPPORT_PHONE} (Mon–Fri, 10:00–18:00 IST). For detailed
+        {LEGAL.SUPPORT_PHONE} (Mon-Fri, 10:00-18:00 IST). For detailed
         issues, email is preferred so we can attach references.
       </p>
 
@@ -49,3 +54,4 @@ export default function ContactPage() {
     </LegalShell>
   );
 }
+

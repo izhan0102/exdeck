@@ -111,6 +111,17 @@ export default function InterviewPage() {
         </div>
       </section>
 
+      <section className="mx-auto max-w-5xl px-5 pb-16">
+        <div className="rounded-2xl border p-6 sm:p-8" style={{ borderColor: "var(--ezd-divider)", background: "var(--ezd-bg-card)" }}>
+          <h2 className="text-[22px] font-bold tracking-tight" style={{ color: "var(--ezd-fg-strong)" }}>Practice for the interview you actually have</h2>
+          <div className="mt-5 grid gap-4 text-[14px] leading-relaxed sm:grid-cols-3" style={{ color: "var(--ezd-fg-muted)" }}>
+            <p><strong style={{ color: "var(--ezd-fg-strong)" }}>Role-specific:</strong> paste a job description or enter a role title so questions match the work, seniority, and skills expected.</p>
+            <p><strong style={{ color: "var(--ezd-fg-strong)" }}>Coached answers:</strong> get a model answer after every response, not just a score, so you can compare structure and substance.</p>
+            <p><strong style={{ color: "var(--ezd-fg-strong)" }}>Job-search flow:</strong> pair the mock interview with the resume builder, flashcards, and presentation tools for portfolio or case-study prep.</p>
+          </div>
+        </div>
+      </section>
+
       <section className="mx-auto max-w-3xl px-5 pb-16">
         <h2 className="text-[26px] font-bold tracking-tight" style={{ color: "var(--ezd-fg-strong)" }}>Mock interview FAQ</h2>
         <div className="mt-6 divide-y" style={{ borderColor: "var(--ezd-divider)" }}>

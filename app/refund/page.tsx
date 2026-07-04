@@ -1,7 +1,12 @@
-import LegalShell from "@/components/legal/LegalShell";
+﻿import LegalShell from "@/components/legal/LegalShell";
 import { LEGAL } from "@/lib/legal";
 
-export const metadata = { title: "Refund & Cancellation Policy · EXdeck" };
+export const metadata = {
+  title: "Refund & Cancellation Policy · EXdeck",
+  description:
+    "Read EXdeck's refund and cancellation policy for paid plans, billing, subscription cancellation, and refund requests.",
+  alternates: { canonical: "/refund" },
+};
 
 export default function RefundPage() {
   return (
@@ -47,7 +52,7 @@ export default function RefundPage() {
       <p>
         Payments are processed securely by our payment gateway,{" "}
         <strong>Razorpay</strong>. We do not collect or store your full card or
-        banking details — these are handled directly by Razorpay. Approved
+        banking details - these are handled directly by Razorpay. Approved
         refunds are issued to your original payment method and typically take
         5&ndash;10 business days to reflect, depending on your bank or card
         issuer. After the 14-day window, refunds for partial or unused billing
@@ -102,3 +107,4 @@ export default function RefundPage() {
     </LegalShell>
   );
 }
+
