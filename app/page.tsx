@@ -191,8 +191,8 @@ export default function LandingPage() {
                   color: "var(--ezd-fg-strong)",
                 }}
               >
-                EXdeck<br />
-                AI PPT maker.
+                AI presentations<br />
+                in <span style={{ fontFamily: HERO, letterSpacing: "-0.02em" }}>seconds.</span>
                 <span className="sr-only">
                   {" "}EXdeck, also searched as Exdeck and Ex deck, is a free AI PPT maker that turns your text into an
                   editable PowerPoint presentation with one-click PPTX and PDF export.
@@ -1666,6 +1666,15 @@ function FaqItem({ q, a }: { q: string; a: string }) {
 
 function Footer() {
    const [isHovered, setIsHovered] = useState(false);
+   const [showScrollTop, setShowScrollTop] = useState(false);
+
+   useEffect(() => {
+     const onScroll = () => setShowScrollTop(window.scrollY > 420);
+     onScroll();
+     window.addEventListener("scroll", onScroll, { passive: true });
+     return () => window.removeEventListener("scroll", onScroll);
+   }, []);
+
   return (
     <footer className="relative z-10 border-t" style={{ borderColor: "var(--ezd-divider)" }}>
       <div className="mx-auto max-w-6xl px-5 py-12 sm:px-6">
@@ -1792,6 +1801,7 @@ function Footer() {
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
+          aria-label="Scroll to top"
           style={{
             position: "fixed",
             bottom: "20px",
@@ -1800,8 +1810,10 @@ function Footer() {
             borderRadius: "50%",
             border: "none",
             backgroundColor: isHovered ? "#555" : "var(--ezd-fg-muted)",
-            transform: isHovered ? "scale(1.1)" : "scale(1)",
-            transition: "all 0.3s ease",
+            opacity: showScrollTop ? 1 : 0,
+            pointerEvents: showScrollTop ? "auto" : "none",
+            transform: showScrollTop ? (isHovered ? "scale(1.1)" : "scale(1)") : "translateY(8px) scale(0.96)",
+            transition: "opacity 0.25s ease, transform 0.25s ease, background-color 0.25s ease",
             color: "white",
             cursor: "pointer",
             fontSize:"12px",
