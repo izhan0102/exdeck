@@ -1915,6 +1915,158 @@ LANDING_PAGES.push(
   { slug: "ai-presentation-maker-for-statistics", keyword: "AI presentation maker for statistics", title: "AI Presentation Maker for Statistics — Data Slides Fast", description: "AI presentation maker for statistics. Generate statistics presentations, data analysis, and charts. Export to .pptx. Free for students.", h1: "AI Presentation Maker for Statistics", lede: "Statistics students and analysts need presentations for data analysis, reports, and findings. EXdeck's AI generates statistics slides from text prompts with charts. Export to PowerPoint or PDF.", sections: [{ h: "Statistics presentation use cases", list: ["Statistical analysis presentations", "Data visualization slides", "Research findings presentations", "Survey results presentations", "A/B test reports"] }, { h: "Data visualization features", list: ["AI charts from statistical data", "Bar, line, pie, area charts", "Professional data themes", "Real .pptx export"] }], faq: [{ q: "Can it create statistical charts?", a: "Yes. The AI generates charts from data you provide in your prompt." }, { q: "Is it free?", a: "Yes. Free plan for all users." }], related: ["ai-presentation-maker-for-mathematics", "ai-presentation-maker-for-economics", "ai-presentation-for-students"] },
 );
 
+LANDING_PAGES.push(
+  {
+    slug: "free-ai-ppt-maker",
+    keyword: "free AI PPT maker",
+    title: "Free AI PPT Maker - Generate Editable PowerPoint Slides",
+    description:
+      "Free AI PPT maker for students, founders, and teams. Type a topic, preview a generated deck, edit every slide, and export real PPTX or PDF files.",
+    h1: "Free AI PPT Maker",
+    lede:
+      "EXdeck is a free AI PPT maker that turns a short topic into a structured, editable PowerPoint deck. Start with a sample instantly, then sign in when you want to generate your own deck and export PPTX or PDF.",
+    sections: [
+      {
+        h: "What you can do for free",
+        list: [
+          "Preview a realistic sample deck before creating an account",
+          "Generate presentations from a topic or outline",
+          "Edit slide text, layouts, themes, fonts, and charts",
+          "Export to real PowerPoint and PDF within your credit balance",
+        ],
+      },
+      {
+        h: "Why EXdeck is different",
+        p: [
+          "Many free AI PPT tools create a static preview or lock export behind a surprise paywall. EXdeck is built around editable decks: the canvas, chart renderer, speaker notes, and PPTX export are part of the same workflow.",
+        ],
+      },
+      {
+        h: "Best for high-intent work",
+        list: [
+          "Class presentations and group projects",
+          "Startup pitch decks and product updates",
+          "Client proposals and status reports",
+          "Research summaries and training decks",
+        ],
+      },
+    ],
+    faq: [
+      { q: "Is EXdeck a free AI PPT maker?", a: "Yes. EXdeck has a free plan with monthly AI credits, full editor access, and PPTX/PDF export within the credit balance." },
+      { q: "Do I need to sign up to see an example?", a: "No. The homepage sample deck opens instantly without an account and does not use AI credits." },
+      { q: "Can I export to PowerPoint?", a: "Yes. EXdeck exports real .pptx files plus PDF, so you can keep editing in PowerPoint, Keynote, or Google Slides." },
+    ],
+    related: ["ai-ppt-maker", "ppt-maker-from-text", "text-to-ppt"],
+  },
+  {
+    slug: "ppt-maker-from-text",
+    keyword: "PPT maker from text",
+    title: "PPT Maker from Text - Turn Any Topic into PowerPoint",
+    description:
+      "Use EXdeck as a PPT maker from text. Paste a topic, outline, or notes and generate an editable PowerPoint deck with charts, themes, and PPTX export.",
+    h1: "PPT Maker from Text",
+    lede:
+      "EXdeck turns text into a complete PPT. Use a one-line topic for a fast first draft, or paste a longer outline when you already know the structure. The result is editable, themed, and exportable.",
+    sections: [
+      {
+        h: "From raw text to slide structure",
+        p: [
+          "The AI does more than split paragraphs across slides. It identifies sections, creates slide titles, turns details into readable bullets, and uses tables or charts when your text includes structured data.",
+        ],
+      },
+      {
+        h: "Use it with any starting point",
+        list: [
+          "A single presentation topic",
+          "Class notes or lecture outlines",
+          "Meeting notes and product briefs",
+          "Research summaries and reports",
+          "Sales talking points or proposal copy",
+        ],
+      },
+      {
+        h: "Keep control after generation",
+        p: [
+          "After generation, you can edit every slide, switch themes, rewrite content, add charts, and export a real PowerPoint file. The AI gets you out of the blank page; you still control the final deck.",
+        ],
+      },
+    ],
+    faq: [
+      { q: "Can I paste long text into EXdeck?", a: "Yes. EXdeck supports prompt-based generation and content-based generation, so you can paste a longer source text or outline." },
+      { q: "Does it create editable slides?", a: "Yes. Text, charts, and layouts stay editable inside EXdeck and after PPTX export." },
+      { q: "Is it useful for students?", a: "Yes. Students can turn notes, reports, and project topics into presentation drafts quickly, then refine the result before submitting." },
+    ],
+    related: ["text-to-ppt", "make-powerpoint-from-text", "free-ai-ppt-maker"],
+  },
+  {
+    slug: "make-powerpoint-from-text",
+    keyword: "make PowerPoint from text",
+    title: "Make PowerPoint from Text - AI Slides in Seconds",
+    description:
+      "Make a PowerPoint from text with EXdeck. Generate slides from a short prompt or pasted content, edit everything, and export PPTX or PDF.",
+    h1: "Make PowerPoint from Text",
+    lede:
+      "If you have the words but not the slides, EXdeck turns your text into a real PowerPoint draft. It writes the structure, applies a theme, adds charts when useful, and keeps the result editable.",
+    sections: [
+      {
+        h: "A faster path than templates",
+        p: [
+          "Templates still leave the hardest work to you: deciding what each slide should say. EXdeck starts from your text, builds the story, and gives you a presentation you can refine instead of assemble from scratch.",
+        ],
+      },
+      {
+        h: "What the generated deck includes",
+        list: [
+          "Slide titles and concise supporting points",
+          "Layouts matched to the content",
+          "Charts for numeric data",
+          "Speaker notes and presenter-ready structure",
+          "PPTX and PDF export",
+        ],
+      },
+    ],
+    faq: [
+      { q: "Can I make a PowerPoint from one sentence?", a: "Yes. A short prompt is enough. EXdeck asks clarifying questions before generating so the result matches your intent." },
+      { q: "Can I use pasted notes?", a: "Yes. Paste your notes or outline into content mode when you want the deck to follow existing material." },
+      { q: "Does it cost money to start?", a: "No. You can start on the free plan and upgrade to Pro when you need daily credits, no watermark, and more volume." },
+    ],
+    related: ["ppt-maker-from-text", "ai-powerpoint-generator", "free-ppt-maker"],
+  },
+  {
+    slug: "ai-ppt-maker-online",
+    keyword: "AI PPT maker online",
+    title: "AI PPT Maker Online - Create and Export PowerPoint Decks",
+    description:
+      "Online AI PPT maker for fast editable presentations. Generate from text, edit in the browser, and export real PowerPoint or PDF files.",
+    h1: "AI PPT Maker Online",
+    lede:
+      "EXdeck is an online AI PPT maker: no install, no template hunting, and no locked web-only output. Generate a deck in your browser, edit it, then export the files you actually need.",
+    sections: [
+      {
+        h: "Why online matters",
+        p: [
+          "You can start on any laptop, preview a sample before signup, generate a deck after login, and export to PowerPoint when you need to present or share offline.",
+        ],
+      },
+      {
+        h: "Designed for repeat work",
+        list: [
+          "Fast topic-to-deck generation",
+          "Reusable themes, fonts, and layouts",
+          "Documents, spreadsheets, resumes, and converters in the same workspace",
+          "Pro credits for daily creation instead of occasional demos",
+        ],
+      },
+    ],
+    faq: [
+      { q: "Do I need to install PowerPoint?", a: "No. You can generate and edit online. PowerPoint is only needed if you want to continue editing the exported .pptx locally." },
+      { q: "Does EXdeck work in the browser?", a: "Yes. EXdeck is web-based and runs in a modern browser." },
+      { q: "Can I try it before signup?", a: "Yes. The homepage has an instant sample deck preview that does not call the AI or require an account." },
+    ],
+    related: ["ai-ppt-maker", "free-ai-ppt-maker", "presentation-maker-online"],
+  },
+);
+
 export function getLandingPage(slug: string): LandingPage | undefined {
   return LANDING_PAGES.find((p) => p.slug === slug);
 }

@@ -618,6 +618,20 @@ export default function LandingPage() {
         <Reveal>
           <SectionLabel center kicker="Pricing" title="Start free. Upgrade when you present more." />
         </Reveal>
+        <Reveal delay={60}>
+          <div className="mx-auto mt-8 grid max-w-4xl gap-3 sm:grid-cols-3">
+            {[
+              ["Free is for trying", "30 monthly AI credits, full editor access, and real export so you can judge the product properly."],
+              ["Pro is for shipping", "150 credits every day, no export watermark, and enough room for decks, docs, resumes, and revisions."],
+              ["No lock-in", "Your work exports to PPTX and PDF. Upgrade for speed and volume, not because your files are trapped."],
+            ].map(([title, body]) => (
+              <div key={title} className="rounded-2xl border p-4" style={{ borderColor: "var(--ezd-hairline)", background: "var(--ezd-bg-card)" }}>
+                <div className="text-[13px] font-semibold" style={{ color: "var(--ezd-fg-strong)" }}>{title}</div>
+                <p className="mt-2 text-[12.5px] leading-relaxed" style={{ color: "var(--ezd-fg-muted)" }}>{body}</p>
+              </div>
+            ))}
+          </div>
+        </Reveal>
         <Reveal delay={80}>
           <div className="mx-auto mt-12 max-w-4xl">
             <PricingPlans onUpgrade={() => router.push("/auth?redirect=/app")} />
