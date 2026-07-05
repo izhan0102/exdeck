@@ -40,6 +40,7 @@ import {
 import { getFirebaseDb } from "./firebase";
 import type { Deck } from "./types";
 import type { Theme } from "./themes";
+import type { AppUser } from "./auth";
 
 export type StoredDeck = {
   id: string;
@@ -66,6 +67,66 @@ export type SharedDeckData = {
   title: string;
   mode: ShareMode;
   ownerUid?: string;
+  collaborators?: Record<string, DeckCollaborator>;
+  pinEnabled?: boolean;
+};
+
+export type CollaborationRole = "OWNER" | "EDITOR" | "VIEWER";
+
+export type DeckCollaborator = {
+  userId: string;
+  name: string;
+  username: string;
+  avatar?: string;
+  role: CollaborationRole;
+  addedAt?: number | object;
+};
+
+export type DeckPresence = {
+  userId: string;
+  name: string;
+  username: string;
+  avatar?: string;
+  active: boolean;
+  lastSeen: number | object;
+  slideId?: string;
+  slideIndex?: number;
+};
+
+export type DeckChangeType =
+  | "SLIDE_ADDED"
+  | "SLIDE_DELETED"
+  | "SLIDE_DUPLICATED"
+  | "SLIDE_REORDERED"
+  | "SLIDE_REGENERATED"
+  | "TEXT_UPDATED"
+  | "IMAGE_REPLACED"
+  | "LAYOUT_CHANGED"
+  | "THEME_CHANGED"
+  | "ELEMENT_ADDED"
+  | "ELEMENT_DELETED"
+  | "AI_EDIT_APPLIED"
+  | "UNDO_APPLIED"
+  | "REDO_APPLIED";
+
+export type DeckChange = {
+  id: string;
+  deckId: string;
+  userId: string;
+  userName: string;
+  username: string;
+  avatar?: string;
+  actionType: DeckChangeType;
+  description: string;
+  slideId?: string;
+  slideIndex?: number;
+  elementId?: string;
+  beforeState?: unknown;
+  afterState?: unknown;
+  timestamp: number | object;
+  undone?: boolean;
+  undoneBy?: string;
+  undoneAt?: number | object;
 };
 
 export type DeckListItem = {
@@ -86,6 +147,17 @@ export type DeckListItem = {
 
 function rid(): string {
   return Math.random().toString(36).slice(2, 9) + Date.now().toString(36).slice(-4);
+}
+
+function identityFromUser(user: AppUser): Pick<DeckCollaborator, "userId" | "name" | "username" | "avatar"> {
+  const fallback = user.email?.split("@")[0] || user.uid.slice(0, 8);
+  const name = (user.name || fallback || "Collaborator").trim();
+  return {
+    userId: user.uid,
+    name,
+    username: fallback.replace(/[^a-z0-9._-]/gi, "").toLowerCase() || user.uid.slice(0, 8),
+    avatar: user.photoUrl,
+  };
 }
 
 /**
@@ -233,6 +305,8 @@ export async function publishDeck(
   const stored = await loadDeck(uid, deckId);
   if (!stored) throw new Error("Deck not found.");
   const shareId = stored.shareId || `s_${rid()}`;
+  const existing = await get(child(ref(db), `shared/${shareId}`)).catch(() => null);
+  const old = existing?.exists() ? existing.val() : {};
 
   await set(ref(db, `shared/${shareId}`), sanitize({
     ownerUid: uid,
@@ -241,6 +315,19 @@ export async function publishDeck(
     theme: stored.theme,
     title: stored.meta?.title || "Deck",
     mode,
+    pinEnabled: !!old.pinEnabled,
+    pinHash: old.pinHash || null,
+    collaborators: {
+      ...(old.collaborators || {}),
+      [uid]: {
+        userId: uid,
+        name: old.collaborators?.[uid]?.name || "Owner",
+        username: old.collaborators?.[uid]?.username || "owner",
+        avatar: old.collaborators?.[uid]?.avatar || null,
+        role: "OWNER",
+        addedAt: serverTimestamp(),
+      },
+    },
     publishedAt: serverTimestamp(),
   }));
   await update(ref(db, `decks/${uid}/${deckId}`), { shareId, shareMode: mode });
@@ -278,6 +365,147 @@ export async function writeSharedDeck(
     title: deck.title || "Deck",
     publishedAt: serverTimestamp(),
   }));
+}
+
+export async function ensureSharedOwnerIdentity(shareId: string, user: AppUser): Promise<void> {
+  const db = getFirebaseDb();
+  if (!db) return;
+  const me = identityFromUser(user);
+  await update(ref(db, `shared/${shareId}/collaborators/${user.uid}`), sanitize({
+    ...me,
+    role: "OWNER",
+    addedAt: serverTimestamp(),
+  }));
+}
+
+export async function addDeckCollaborator(
+  shareId: string,
+  collaborator: Omit<DeckCollaborator, "addedAt">,
+): Promise<void> {
+  const db = getFirebaseDb();
+  if (!db) throw new Error("Cloud sync unavailable.");
+  await update(ref(db, `shared/${shareId}/collaborators/${collaborator.userId}`), sanitize({
+    ...collaborator,
+    addedAt: serverTimestamp(),
+  }));
+}
+
+export async function removeDeckCollaborator(shareId: string, userId: string): Promise<void> {
+  const db = getFirebaseDb();
+  if (!db) return;
+  await remove(ref(db, `shared/${shareId}/collaborators/${userId}`));
+  await remove(ref(db, `collabPresence/${shareId}/${userId}`)).catch(() => {});
+}
+
+export function watchDeckCollaborators(
+  shareId: string,
+  cb: (items: DeckCollaborator[]) => void,
+): () => void {
+  const db = getFirebaseDb();
+  if (!db) { cb([]); return () => {}; }
+  const node = ref(db, `shared/${shareId}/collaborators`);
+  const unsub = onValue(node, (snap) => {
+    const val = snap.val() || {};
+    cb(Object.values(val));
+  }, () => cb([]));
+  return () => unsub();
+}
+
+export async function writeDeckPresence(
+  shareId: string,
+  user: AppUser,
+  patch: Partial<Pick<DeckPresence, "slideId" | "slideIndex">> = {},
+): Promise<void> {
+  const db = getFirebaseDb();
+  if (!db) return;
+  const me = identityFromUser(user);
+  await update(ref(db, `collabPresence/${shareId}/${user.uid}`), sanitize({
+    ...me,
+    ...patch,
+    active: true,
+    lastSeen: serverTimestamp(),
+  }));
+}
+
+export async function clearDeckPresence(shareId: string, uid: string): Promise<void> {
+  const db = getFirebaseDb();
+  if (!db) return;
+  await update(ref(db, `collabPresence/${shareId}/${uid}`), {
+    active: false,
+    lastSeen: serverTimestamp(),
+  });
+}
+
+export function watchDeckPresence(
+  shareId: string,
+  cb: (items: DeckPresence[]) => void,
+): () => void {
+  const db = getFirebaseDb();
+  if (!db) { cb([]); return () => {}; }
+  const node = ref(db, `collabPresence/${shareId}`);
+  const unsub = onValue(node, (snap) => {
+    const val = snap.val() || {};
+    cb(Object.values(val));
+  }, () => cb([]));
+  return () => unsub();
+}
+
+export async function recordDeckChange(
+  shareId: string,
+  user: AppUser,
+  change: Omit<DeckChange, "id" | "deckId" | "userId" | "userName" | "username" | "avatar" | "timestamp">,
+): Promise<string | null> {
+  const db = getFirebaseDb();
+  if (!db) return null;
+  const node = push(ref(db, `collabChanges/${shareId}`));
+  const me = identityFromUser(user);
+  await set(node, sanitize({
+    ...change,
+    id: node.key,
+    deckId: shareId,
+    userId: user.uid,
+    userName: me.name,
+    username: me.username,
+    avatar: me.avatar,
+    timestamp: serverTimestamp(),
+  }));
+  return node.key;
+}
+
+export async function markDeckChangeUndone(
+  shareId: string,
+  change: DeckChange,
+  user: AppUser,
+): Promise<void> {
+  const db = getFirebaseDb();
+  if (!db) return;
+  await set(ref(db, `collabChanges/${shareId}/${change.id}`), sanitize({
+    ...change,
+    undone: true,
+    undoneBy: user.uid,
+    undoneAt: serverTimestamp(),
+  }));
+}
+
+export function watchDeckChanges(
+  shareId: string,
+  cb: (items: DeckChange[]) => void,
+  limit = 40,
+): () => void {
+  const db = getFirebaseDb();
+  if (!db) { cb([]); return () => {}; }
+  const node = ref(db, `collabChanges/${shareId}`);
+  const unsub = onValue(node, (snap) => {
+    const val = snap.val() || {};
+    const items = Object.values(val) as DeckChange[];
+    items.sort((a, b) => {
+      const at = typeof a.timestamp === "number" ? a.timestamp : 0;
+      const bt = typeof b.timestamp === "number" ? b.timestamp : 0;
+      return bt - at;
+    });
+    cb(items.slice(0, limit));
+  }, () => cb([]));
+  return () => unsub();
 }
 
 /** Clone a shared deck into the signed-in user's own My Decks. Returns the new
@@ -347,6 +575,8 @@ export async function loadSharedDeck(shareId: string): Promise<SharedDeckData | 
     title: v.title || v.deck?.title || "Shared deck",
     mode: v.mode === "edit" ? "edit" : "view",
     ownerUid: v.ownerUid,
+    collaborators: v.collaborators || {},
+    pinEnabled: !!v.pinEnabled,
   };
 }
 
@@ -371,6 +601,8 @@ export function watchSharedDeck(
         title: v.title || v.deck?.title || "Shared deck",
         mode: v.mode === "edit" ? "edit" : "view",
         ownerUid: v.ownerUid,
+        collaborators: v.collaborators || {},
+        pinEnabled: !!v.pinEnabled,
       });
     },
     () => cb(null),

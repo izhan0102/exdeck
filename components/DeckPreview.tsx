@@ -22,7 +22,11 @@ import { exportSlidesToPdf, exportHandoutToPdf, exportSlidesToPptx } from "@/lib
 import { trackEvent } from "@/lib/stats";
 import type { ExportFormat } from "./ExportFormatPicker";
 import { getDecoration } from "@/lib/decorations";
-import { saveDeck, publishDeck, unpublishDeck, syncSharedDeck, writeSharedDeck, watchSharedDeck, setShareMode, type ShareMode } from "@/lib/decks";
+import {
+  saveDeck, publishDeck, unpublishDeck, syncSharedDeck, writeSharedDeck, watchSharedDeck, setShareMode,
+  ensureSharedOwnerIdentity, recordDeckChange, watchDeckChanges, writeDeckPresence, clearDeckPresence,
+  markDeckChangeUndone, type DeckChange, type ShareMode,
+} from "@/lib/decks";
 import { submitReview, REVIEW_LIMITS } from "@/lib/reviews";
 import { loadShareAnalytics, formatDwell, type ShareAnalytics } from "@/lib/analytics";
 import { stripHtml, applyWholeStyle, readWholeStyle } from "@/lib/richText";
@@ -79,6 +83,207 @@ type Props = {
    *  edit mode) rather than the owner. Binds persistence to the shared node. */
   collab?: { shareId: string; isOwner: boolean } | null;
 };
+
+function slideLabel(index?: number) {
+  return typeof index === "number" ? `Slide ${index + 1}` : "the deck";
+}
+
+function relativeTime(ts: DeckChange["timestamp"]) {
+  if (typeof ts !== "number") return "just now";
+  const diff = Math.max(0, Date.now() - ts);
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return "just now";
+  if (mins < 60) return `${mins} minute${mins === 1 ? "" : "s"} ago`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `${hours} hour${hours === 1 ? "" : "s"} ago`;
+  const days = Math.floor(hours / 24);
+  return `${days} day${days === 1 ? "" : "s"} ago`;
+}
+
+function initialsFor(name?: string, username?: string) {
+  const source = (name || username || "?").trim();
+  const parts = source.split(/\s+/).filter(Boolean);
+  if (parts.length >= 2) return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+  return source.slice(0, 2).toUpperCase();
+}
+
+function slideStableId(slide: Slide, index: number) {
+  return (slide as any).id || `${index}:${slide.layout}`;
+}
+
+function speakerNotesChanged(a: Slide, b: Slide) {
+  return JSON.stringify({ notes: (a as any).notes, noteSegments: (a as any).noteSegments }) !==
+    JSON.stringify({ notes: (b as any).notes, noteSegments: (b as any).noteSegments });
+}
+
+type ChangeDraft = Pick<DeckChange, "actionType" | "description" | "slideId" | "slideIndex" | "elementId">;
+
+function fullChange(
+  draft: ChangeDraft,
+  beforeDeck: Deck | null,
+  afterDeck: Deck,
+  beforeTheme: Theme | null,
+  afterTheme: Theme,
+): Pick<DeckChange, "actionType" | "description" | "slideId" | "slideIndex" | "elementId" | "beforeState" | "afterState"> {
+  return {
+    ...draft,
+    beforeState: { deck: beforeDeck, theme: beforeTheme },
+    afterState: { deck: afterDeck, theme: afterTheme },
+  };
+}
+
+function summarizeDeckChange(prev: Deck | null, next: Deck, prevTheme: Theme | null, nextTheme: Theme): Pick<DeckChange, "actionType" | "description" | "slideId" | "slideIndex" | "beforeState" | "afterState"> | null {
+  if (!prev) return null;
+  if (prevTheme && JSON.stringify(prevTheme) !== JSON.stringify(nextTheme)) {
+    return fullChange({
+      actionType: "THEME_CHANGED",
+      description: "changed the deck theme",
+    }, prev, next, prevTheme, nextTheme);
+  }
+  if (prev.slides.length < next.slides.length) {
+    return fullChange({
+      actionType: "SLIDE_ADDED",
+      description: `added ${slideLabel(next.slides.length - 1)}`,
+      slideIndex: next.slides.length - 1,
+    }, prev, next, prevTheme, nextTheme);
+  }
+  if (prev.slides.length > next.slides.length) {
+    return fullChange({
+      actionType: "SLIDE_DELETED",
+      description: "deleted a slide",
+    }, prev, next, prevTheme, nextTheme);
+  }
+  const prevIds = prev.slides.map(slideStableId);
+  const nextIds = next.slides.map(slideStableId);
+  if (prevIds.join("|") !== nextIds.join("|")) {
+    return fullChange({
+      actionType: "SLIDE_REORDERED",
+      description: "reordered slides",
+    }, prev, next, prevTheme, nextTheme);
+  }
+  for (let i = 0; i < next.slides.length; i += 1) {
+    const a = prev.slides[i];
+    const b = next.slides[i];
+    if (JSON.stringify(a) === JSON.stringify(b)) continue;
+    if (speakerNotesChanged(a, b)) {
+      return fullChange({
+        actionType: "AI_EDIT_APPLIED",
+        description: `generated speaker notes for ${slideLabel(i)}`,
+        slideIndex: i,
+        slideId: (b as any).id,
+      }, prev, next, prevTheme, nextTheme);
+    }
+    const beforeText = JSON.stringify({ title: a.title, subtitle: (a as any).subtitle, kicker: (a as any).kicker, bullets: (a as any).bullets, textBoxes: (a as any).textBoxes });
+    const afterText = JSON.stringify({ title: b.title, subtitle: (b as any).subtitle, kicker: (b as any).kicker, bullets: (b as any).bullets, textBoxes: (b as any).textBoxes });
+    if (beforeText !== afterText) {
+      return fullChange({
+        actionType: "TEXT_UPDATED",
+        description: `edited text on ${slideLabel(i)}`,
+        slideIndex: i,
+        slideId: (b as any).id,
+      }, prev, next, prevTheme, nextTheme);
+    }
+    if (JSON.stringify((a as any).uploadedImages || []) !== JSON.stringify((b as any).uploadedImages || [])) {
+      return fullChange({
+        actionType: "IMAGE_REPLACED",
+        description: `replaced an image on ${slideLabel(i)}`,
+        slideIndex: i,
+        slideId: (b as any).id,
+      }, prev, next, prevTheme, nextTheme);
+    }
+    if (a.layout !== b.layout) {
+      return fullChange({
+        actionType: "LAYOUT_CHANGED",
+        description: `changed the layout on ${slideLabel(i)}`,
+        slideIndex: i,
+        slideId: (b as any).id,
+      }, prev, next, prevTheme, nextTheme);
+    }
+    return fullChange({
+      actionType: "AI_EDIT_APPLIED",
+      description: `updated ${slideLabel(i)}`,
+      slideIndex: i,
+      slideId: (b as any).id,
+    }, prev, next, prevTheme, nextTheme);
+  }
+  return null;
+}
+
+function fullStateFrom(value: unknown): { deck?: Deck; theme?: Theme } | null {
+  if (!value || typeof value !== "object") return null;
+  const v = value as any;
+  if (v.deck || v.theme) return { deck: v.deck, theme: v.theme };
+  return null;
+}
+
+function applyChangeState(deck: Deck, theme: Theme, change: DeckChange, direction: "undo" | "redo"): { deck: Deck; theme: Theme } | null {
+  const target = fullStateFrom(direction === "undo" ? change.beforeState : change.afterState);
+  if (target?.deck || target?.theme) {
+    return { deck: target.deck || deck, theme: target.theme || theme };
+  }
+  if (direction === "redo") return null;
+  if (change.actionType === "SLIDE_ADDED" && typeof change.slideIndex === "number") {
+    return { deck: { ...deck, slides: deck.slides.filter((_, i) => i !== change.slideIndex) }, theme };
+  }
+  if (change.actionType === "SLIDE_DELETED" && Array.isArray(change.beforeState)) {
+    return { deck: { ...deck, slides: change.beforeState as Slide[] }, theme };
+  }
+  if (change.actionType === "SLIDE_REORDERED" && Array.isArray(change.beforeState)) {
+    const ids = change.beforeState as string[];
+    const byId = new Map(deck.slides.map((s, i) => [slideStableId(s, i), s]));
+    const reordered = ids.map((id) => byId.get(id)).filter(Boolean) as Slide[];
+    if (reordered.length === deck.slides.length) return { deck: { ...deck, slides: reordered }, theme };
+    return null;
+  }
+  if (typeof change.slideIndex !== "number") return null;
+  const slide = deck.slides[change.slideIndex];
+  if (!slide) return null;
+  const before = (change.beforeState || {}) as any;
+  if (change.actionType === "TEXT_UPDATED") {
+    const patch = {
+      title: before.title,
+      subtitle: before.subtitle,
+      kicker: before.kicker,
+      bullets: before.bullets,
+      textBoxes: before.textBoxes,
+    } as Partial<Slide>;
+    return {
+      deck: { ...deck, slides: deck.slides.map((s, i) => i === change.slideIndex ? { ...s, ...patch } : s) },
+      theme,
+    };
+  }
+  if (change.actionType === "IMAGE_REPLACED" && Array.isArray(change.beforeState)) {
+    return {
+      deck: { ...deck, slides: deck.slides.map((s, i) => i === change.slideIndex ? { ...s, uploadedImages: change.beforeState as any } : s) },
+      theme,
+    };
+  }
+  if (change.actionType === "LAYOUT_CHANGED" && before.layout) {
+    return {
+      deck: { ...deck, slides: deck.slides.map((s, i) => i === change.slideIndex ? { ...s, layout: before.layout } : s) },
+      theme,
+    };
+  }
+  if (change.actionType === "AI_EDIT_APPLIED") {
+    if ("notes" in before || "noteSegments" in before) {
+      return {
+        deck: {
+          ...deck,
+          slides: deck.slides.map((s, i) => i === change.slideIndex ? {
+            ...s,
+            notes: before.notes || undefined,
+            noteSegments: before.noteSegments || undefined,
+          } : s),
+        },
+        theme,
+      };
+    }
+    if (before && typeof before === "object") {
+      return { deck: { ...deck, slides: deck.slides.map((s, i) => i === change.slideIndex ? before as Slide : s) }, theme };
+    }
+  }
+  return null;
+}
 
 export default function DeckPreview({ deck, setDeck, theme, setTheme, onRestart, deckId, user, initialShareId, initialShareMode, collab }: Props) {
   const [active, setActive] = useState(0);
@@ -173,6 +378,13 @@ export default function DeckPreview({ deck, setDeck, theme, setTheme, onRestart,
   // owner whose deck is currently shared in "edit" mode.
   const collabShareId = collab?.shareId ?? (shareMode === "edit" ? shareId : null);
   const collabIsOwner = collab ? collab.isOwner : true;
+  const [changesOpen, setChangesOpen] = useState(false);
+  const [changes, setChanges] = useState<DeckChange[]>([]);
+  const lastTrackedDeckRef = useRef<Deck | null>(null);
+  const lastTrackedThemeRef = useRef<string>("");
+  const lastTrackedThemeValueRef = useRef<Theme | null>(null);
+  const suppressNextChangeRecordRef = useRef(false);
+  const pendingChangeRef = useRef<ChangeDraft | null>(null);
   const [themeTransferOpen, setThemeTransferOpen] = useState(false);
   // Mandatory one-time review before exporting (replaces the old payment
   // gate — exports are free now). Persisted per-browser so we only ask once.
@@ -184,9 +396,11 @@ export default function DeckPreview({ deck, setDeck, theme, setTheme, onRestart,
   // We store full Deck objects (small, JSON-friendly) and skip pushing on
   // every keystroke by debouncing in the saver, not here.
   const historyRef = useRef<Deck[]>([]);
+  const redoRef = useRef<Deck[]>([]);
   const skipNextHistoryPushRef = useRef(false);
   const HISTORY_LIMIT = 30;
   const [canUndo, setCanUndo] = useState(false);
+  const [canRedo, setCanRedo] = useState(false);
 
   // Push current deck onto history stack whenever it changes — except for
   // changes that came from popping history itself.
@@ -201,26 +415,99 @@ export default function DeckPreview({ deck, setDeck, theme, setTheme, onRestart,
     if (last && JSON.stringify(last) === JSON.stringify(deck)) return;
     hist.push(deck);
     while (hist.length > HISTORY_LIMIT) hist.shift();
+    redoRef.current = [];
     setCanUndo(hist.length > 1);
+    setCanRedo(false);
   }, [deck]);
 
   const undo = useCallback(() => {
     const hist = historyRef.current;
     if (hist.length < 2) return;
     // Pop current state; the new "last" is the previous state.
-    hist.pop();
+    const current = hist.pop();
     const prev = hist[hist.length - 1];
     if (!prev) return;
+    if (current) redoRef.current.push(current);
     skipNextHistoryPushRef.current = true;
     setDeck(prev);
     setCanUndo(hist.length > 1);
+    setCanRedo(redoRef.current.length > 0);
   }, [setDeck, setCanUndo]);
+
+  const redo = useCallback(() => {
+    const next = redoRef.current.pop();
+    if (!next) return;
+    historyRef.current.push(next);
+    while (historyRef.current.length > HISTORY_LIMIT) historyRef.current.shift();
+    skipNextHistoryPushRef.current = true;
+    setDeck(next);
+    setCanUndo(historyRef.current.length > 1);
+    setCanRedo(redoRef.current.length > 0);
+  }, [setDeck]);
+
+  const undoChange = useCallback(async (change: DeckChange) => {
+    if (!collabShareId || !user || change.undone) return;
+    const next = applyChangeState(deck, theme, change, "undo");
+    if (!next) {
+      alert("This change can't be undone safely yet.");
+      return;
+    }
+    skipNextHistoryPushRef.current = true;
+    suppressNextChangeRecordRef.current = true;
+    setDeck(next.deck);
+    if (setTheme) setTheme(next.theme);
+    await markDeckChangeUndone(collabShareId, change, user).catch(() => {});
+    recordDeckChange(collabShareId, user, {
+      actionType: "UNDO_APPLIED",
+      description: `undid ${change.userName}'s change`,
+      slideId: change.slideId,
+      slideIndex: change.slideIndex,
+      beforeState: change.afterState,
+      afterState: change.beforeState,
+    }).catch(() => {});
+  }, [collabShareId, deck, setDeck, setTheme, theme, user]);
+
+  const redoChange = useCallback(async (change: DeckChange) => {
+    if (!collabShareId || !user || !change.undone) return;
+    const next = applyChangeState(deck, theme, change, "redo");
+    if (!next) {
+      alert("This change can't be redone safely yet.");
+      return;
+    }
+    skipNextHistoryPushRef.current = true;
+    suppressNextChangeRecordRef.current = true;
+    setDeck(next.deck);
+    if (setTheme) setTheme(next.theme);
+    recordDeckChange(collabShareId, user, {
+      actionType: "REDO_APPLIED",
+      description: `redid ${change.userName}'s change`,
+      slideId: change.slideId,
+      slideIndex: change.slideIndex,
+      elementId: change.id,
+      beforeState: { deck, theme },
+      afterState: { deck: next.deck, theme: next.theme },
+    }).catch(() => {});
+  }, [collabShareId, deck, setDeck, setTheme, theme, user]);
+
+  const redoneChangeIds = useMemo(() => new Set(
+    changes
+      .filter((c) => c.actionType === "REDO_APPLIED" && c.elementId)
+      .map((c) => c.elementId as string),
+  ), [changes]);
+
+  useEffect(() => {
+    if (lastTrackedDeckRef.current) return;
+    lastTrackedDeckRef.current = deck;
+    lastTrackedThemeRef.current = JSON.stringify(theme);
+    lastTrackedThemeValueRef.current = theme;
+  }, [deck, theme]);
 
   // Global keyboard shortcuts for the deck editor.
   // Replaces the previous single-action Ctrl+Z listener with a unified hook
   // that covers undo, duplicate, delete, insert, and slide navigation.
   useKeyboardShortcuts({
     onUndo: undo,
+    onRedo: redo,
     onDuplicate: useCallback(() => {
       if (deck.slides.length === 0) return;
       const next = [...deck.slides];
@@ -275,6 +562,24 @@ export default function DeckPreview({ deck, setDeck, theme, setTheme, onRestart,
           if (json !== lastSyncedRef.current) {
             lastSyncedRef.current = json;
             await writeSharedDeck(collabShareId, deck, theme);
+            if (user) {
+              const themeJson = JSON.stringify(theme);
+              const beforeDeck = lastTrackedDeckRef.current;
+              const beforeTheme = lastTrackedThemeValueRef.current;
+              const pending = pendingChangeRef.current;
+              const summary = pending
+                ? fullChange(pending, beforeDeck, deck, beforeTheme, theme)
+                : summarizeDeckChange(beforeDeck, deck, beforeTheme, theme);
+              lastTrackedDeckRef.current = deck;
+              lastTrackedThemeRef.current = themeJson;
+              lastTrackedThemeValueRef.current = theme;
+              pendingChangeRef.current = null;
+              if (suppressNextChangeRecordRef.current) {
+                suppressNextChangeRecordRef.current = false;
+              } else if (summary) {
+                recordDeckChange(collabShareId, user, summary).catch(() => {});
+              }
+            }
           }
           // Owner keeps a private backup copy in their own My Decks.
           if (collabIsOwner && user && deckId) {
@@ -314,6 +619,17 @@ export default function DeckPreview({ deck, setDeck, theme, setTheme, onRestart,
     return () => unsub();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [collabShareId]);
+
+  useEffect(() => {
+    if (!collabShareId || !user) return;
+    ensureSharedOwnerIdentity(collabShareId, user).catch(() => {});
+    const unsub = watchDeckChanges(collabShareId, setChanges);
+    writeDeckPresence(collabShareId, user, { slideIndex: active }).catch(() => {});
+    return () => {
+      unsub();
+      clearDeckPresence(collabShareId, user.uid).catch(() => {});
+    };
+  }, [collabShareId, user, active]);
 
   // Clear graphic selection when switching slides.
   useEffect(() => { setSelectedImageId(null); }, [active]);
@@ -801,6 +1117,10 @@ export default function DeckPreview({ deck, setDeck, theme, setTheme, onRestart,
           byIndex.set(n.index, { script: n.script, segments: n.segments });
         }
       }
+      pendingChangeRef.current = {
+        actionType: "AI_EDIT_APPLIED",
+        description: "generated speaker notes for the deck",
+      };
       setDeck({
         ...deck,
         speakerNotesGenerated: true,
@@ -840,6 +1160,10 @@ export default function DeckPreview({ deck, setDeck, theme, setTheme, onRestart,
       for (const n of data.notes || []) {
         if (typeof n?.index === "number" && typeof n?.script === "string") byIndex.set(n.index, { script: n.script, segments: n.segments });
       }
+      pendingChangeRef.current = {
+        actionType: "AI_EDIT_APPLIED",
+        description: "generated speaker notes for the deck",
+      };
       setDeck({
         ...deck,
         speakerNotesGenerated: true,
@@ -883,7 +1207,13 @@ export default function DeckPreview({ deck, setDeck, theme, setTheme, onRestart,
       if (res.status === 402) signalCreditsBlocked();
       if (!res.ok) throw new Error(await res.text());
       const data = (await res.json()) as { deck?: Deck };
-      if (data.deck) setDeck(data.deck);
+      if (data.deck) {
+        pendingChangeRef.current = {
+          actionType: "AI_EDIT_APPLIED",
+          description: `translated the deck to ${language.trim()}`,
+        };
+        setDeck(data.deck);
+      }
       return true;
     } catch (e) {
       console.error("[translateDeck] failed:", e);
@@ -1036,6 +1366,10 @@ export default function DeckPreview({ deck, setDeck, theme, setTheme, onRestart,
   };
 
   const applyTheme = (next: Theme) => {
+    pendingChangeRef.current = {
+      actionType: "THEME_CHANGED",
+      description: "changed the deck theme",
+    };
     if (setTheme) setTheme(next);
     setThemeTransferOpen(false);
   };
@@ -1068,6 +1402,10 @@ export default function DeckPreview({ deck, setDeck, theme, setTheme, onRestart,
         return data as { deck?: Deck };
       })();
       const [data] = await Promise.all([fetchPromise, minDelay]);
+      pendingChangeRef.current = {
+        actionType: "AI_EDIT_APPLIED",
+        description: `changed deck density to ${DENSITY_TABS.find((d) => d.id === target)?.label || target}`,
+      };
       if (data?.deck) setDeck(data.deck);
       else setDeck({ ...deck, density: target });
     } catch (e: any) {
@@ -1093,6 +1431,10 @@ export default function DeckPreview({ deck, setDeck, theme, setTheme, onRestart,
   // clear any per-slide overrides a previous template left behind.
   const applyPresetTemplate = (t: DeckTemplate) => {
     const picked = getTheme(t.themeId);
+    pendingChangeRef.current = {
+      actionType: "THEME_CHANGED",
+      description: `applied the ${t.name} template`,
+    };
     if (picked && setTheme) setTheme(picked);
     const v = t.variants;
     setDeck({
@@ -1131,6 +1473,10 @@ export default function DeckPreview({ deck, setDeck, theme, setTheme, onRestart,
   // Premium: re-skin the deck to follow one of the user's custom templates.
   const applyCustomTemplate = (t: CustomTemplate) => {
     const applied = applyCustomTemplateToDeck(deck, t);
+    pendingChangeRef.current = {
+      actionType: "THEME_CHANGED",
+      description: `applied the ${t.name} template`,
+    };
     setDeck(applied.deck);
     if (setTheme) setTheme(applied.theme);
     setTemplateGalleryOpen(false);
@@ -1391,6 +1737,15 @@ export default function DeckPreview({ deck, setDeck, theme, setTheme, onRestart,
                 <Undo2 size={14} /> Undo
               </button>
               <button
+                onClick={redo}
+                disabled={!canRedo}
+                className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-1.5 text-[13px] hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
+                style={{ touchAction: "manipulation", minHeight: "30px" }}
+                title="Redo last undone change (Ctrl/Cmd+Shift+Z)"
+              >
+                <RotateCcw size={14} /> Redo
+              </button>
+              <button
                 onClick={() => requireFeatureOrUpgrade("icons", "Adding icons is a Pro feature. Upgrade to use the icon library.", () => setIconOpen(true))}
                 data-tour="tour-icon"
                 className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-1.5 text-[13px] hover:bg-white/10"
@@ -1422,6 +1777,16 @@ export default function DeckPreview({ deck, setDeck, theme, setTheme, onRestart,
               title="Get a public link to share this deck"
             >
               <LinkIcon size={14} /> {sharing ? "Sharing…" : "Share"}
+            </button>
+          )}
+          {collabShareId && (
+            <button
+              onClick={() => setChangesOpen(true)}
+              className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-1.5 text-[13px] hover:bg-white/10"
+              style={{ touchAction: "manipulation", minHeight: "30px" }}
+              title="View collaborative deck changes"
+            >
+              <Users size={14} /> Changes
             </button>
           )}
           <div className="relative" data-tour="tour-notes" />
@@ -1597,6 +1962,7 @@ export default function DeckPreview({ deck, setDeck, theme, setTheme, onRestart,
         <ShareModal
           url={shareUrl}
           deck={deck}
+          deckId={deckId}
           mode={shareMode}
           onChangeMode={onChangeShareMode}
           onClose={() => setShareOpen(false)}
@@ -1716,6 +2082,62 @@ export default function DeckPreview({ deck, setDeck, theme, setTheme, onRestart,
         onOpenPattern={() => setPatternOpen(true)}
       />
 
+      {changesOpen && (
+        <div className="fixed inset-0 z-[110] flex justify-end bg-black/45 backdrop-blur-sm" onClick={() => setChangesOpen(false)}>
+          <aside
+            className="h-full w-full max-w-sm border-l p-4 shadow-2xl"
+            style={{ borderColor: "var(--ezd-divider)", background: "var(--ezd-bg-page)", color: "var(--ezd-fg-strong)" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between border-b pb-3" style={{ borderColor: "var(--ezd-divider)" }}>
+              <div>
+                <div className="text-[11px] font-semibold uppercase tracking-[0.22em]" style={{ color: "var(--ezd-fg-quiet)" }}>Collaboration</div>
+                <h2 className="mt-1 text-[18px] font-semibold">Changes</h2>
+              </div>
+              <button onClick={() => setChangesOpen(false)} aria-label="Close changes" className="rounded-lg p-2 hover:bg-white/10">
+                <X size={17} />
+              </button>
+            </div>
+
+            <div className="mt-4 space-y-3">
+              {changes.length === 0 && (
+                <div className="rounded-xl border p-4 text-[13px]" style={{ borderColor: "var(--ezd-divider)", color: "var(--ezd-fg-muted)", background: "var(--ezd-bg-card)" }}>
+                  No collaborative changes yet.
+                </div>
+              )}
+              {changes.map((change) => (
+                <div key={change.id} className="rounded-xl border p-3" style={{ borderColor: "var(--ezd-divider)", background: "var(--ezd-bg-card)" }}>
+                  <div className="flex items-start gap-3">
+                    <div className="grid h-9 w-9 place-items-center rounded-full border text-[12px] font-semibold" style={{ borderColor: "var(--ezd-divider)", background: "var(--ezd-bg-hover)" }}>
+                      {initialsFor(change.userName, change.username)}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate text-[13.5px] font-semibold">{change.userName}</div>
+                      <div className="truncate text-[12px]" style={{ color: "var(--ezd-fg-quiet)" }}>@{change.username}</div>
+                      <p className="mt-2 text-[13px] leading-relaxed" style={{ color: "var(--ezd-fg-muted)" }}>
+                        {change.userName} {change.description}
+                      </p>
+                      <div className="mt-2 flex items-center justify-between gap-3">
+                        <span className="text-[11.5px]" style={{ color: "var(--ezd-fg-quiet)" }}>{relativeTime(change.timestamp)}</span>
+                        <button
+                          disabled={change.actionType === "UNDO_APPLIED" || change.actionType === "REDO_APPLIED" || redoneChangeIds.has(change.id)}
+                          onClick={() => change.undone ? redoChange(change) : undoChange(change)}
+                          className="rounded-lg border px-2.5 py-1 text-[11.5px] disabled:cursor-not-allowed disabled:opacity-45"
+                          style={{ borderColor: "var(--ezd-divider)", color: "var(--ezd-fg-muted)" }}
+                          title={redoneChangeIds.has(change.id) ? "Already redone" : change.undone ? "Redo this change" : "Undo this change"}
+                        >
+                          {redoneChangeIds.has(change.id) ? "Redone" : change.undone ? "Redo" : "Undo"}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </aside>
+        </div>
+      )}
+
       {aiPanelOpen && (
         <div className="fixed inset-x-0 bottom-24 z-[95] flex justify-center px-3">
           <div className="w-full max-w-2xl rounded-2xl border p-3 shadow-2xl backdrop-blur-md" style={{ borderColor: "var(--ezd-divider)", background: "var(--ezd-nav-bg)" }}>
@@ -1727,8 +2149,22 @@ export default function DeckPreview({ deck, setDeck, theme, setTheme, onRestart,
               deck={deck}
               theme={theme}
               slideIndex={active}
-              onApplySlide={replaceActive}
-              onApplyDeck={setDeck}
+              onApplySlide={(next) => {
+                pendingChangeRef.current = {
+                  actionType: "AI_EDIT_APPLIED",
+                  description: `used AI to edit ${slideLabel(active)}`,
+                  slideIndex: active,
+                  slideId: (next as any).id,
+                };
+                replaceActive(next);
+              }}
+              onApplyDeck={(next) => {
+                pendingChangeRef.current = {
+                  actionType: "AI_EDIT_APPLIED",
+                  description: "used AI to edit the deck",
+                };
+                setDeck(next);
+              }}
             />
           </div>
         </div>
@@ -1809,10 +2245,14 @@ function SaveBadge({ state }: { state: "idle" | "saving" | "saved" | "error" }) 
 }
 
 function ShareModal({
-  url, deck, onClose, onUnpublish, mode, onChangeMode,
-}: { url: string; deck: Deck; onClose: () => void; onUnpublish: () => Promise<void> | void; mode: ShareMode; onChangeMode: (m: ShareMode) => void }) {
+  url, deck, deckId, onClose, onUnpublish, mode, onChangeMode,
+}: { url: string; deck: Deck; deckId?: string | null; onClose: () => void; onUnpublish: () => Promise<void> | void; mode: ShareMode; onChangeMode: (m: ShareMode) => void }) {
   const [copied, setCopied] = useState(false);
   const [tab, setTab] = useState<"link" | "stats">("link");
+  const [pin, setPin] = useState("");
+  const [pinBusy, setPinBusy] = useState(false);
+  const [pinEnabled, setPinEnabled] = useState(false);
+  const [pinMessage, setPinMessage] = useState<string | null>(null);
 
   // Derive the shareId from the public URL (.../share/<shareId>).
   const shareId = url.split("/share/")[1] || "";
@@ -1820,6 +2260,24 @@ function ShareModal({
   const [stats, setStats] = useState<ShareAnalytics | null>(null);
   const [statsLoading, setStatsLoading] = useState(false);
   const [statsLoaded, setStatsLoaded] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    const loadPinState = async () => {
+      if (!shareId) return;
+      const res = await fetch("/api/share-access", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "open", shareId }),
+      }).catch(() => null);
+      if (!res || cancelled) return;
+      if (res.status === 403) { setPinEnabled(true); return; }
+      const json = await res.json().catch(() => null);
+      if (!cancelled) setPinEnabled(!!json?.data?.pinEnabled);
+    };
+    loadPinState();
+    return () => { cancelled = true; };
+  }, [shareId]);
 
   const loadStats = async () => {
     if (!shareId) return;
@@ -1837,6 +2295,55 @@ function ShareModal({
   const openStats = () => {
     setTab("stats");
     if (!statsLoaded) loadStats();
+  };
+
+  const savePin = async () => {
+    if (!deckId || !/^\d{4}$/.test(pin)) {
+      setPinMessage("Enter exactly 4 digits.");
+      return;
+    }
+    setPinBusy(true);
+    setPinMessage(null);
+    try {
+      const token = await getIdToken();
+      const res = await fetch("/api/share-access", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+        body: JSON.stringify({ action: "set-pin", deckId, pin }),
+      });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(json?.error || "Could not set PIN.");
+      setPinEnabled(true);
+      setPin("");
+      setPinMessage("PIN lock is on.");
+    } catch (e: any) {
+      setPinMessage(e?.message || "Could not set PIN.");
+    } finally {
+      setPinBusy(false);
+    }
+  };
+
+  const removePin = async () => {
+    if (!deckId) return;
+    setPinBusy(true);
+    setPinMessage(null);
+    try {
+      const token = await getIdToken();
+      const res = await fetch("/api/share-access", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+        body: JSON.stringify({ action: "remove-pin", deckId }),
+      });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(json?.error || "Could not remove PIN.");
+      setPinEnabled(false);
+      setPin("");
+      setPinMessage("PIN lock removed.");
+    } catch (e: any) {
+      setPinMessage(e?.message || "Could not remove PIN.");
+    } finally {
+      setPinBusy(false);
+    }
   };
 
   return (
@@ -1895,6 +2402,52 @@ function ShareModal({
                   Can edit
                 </button>
               </div>
+
+              {mode === "edit" && (
+                <div className="mt-4 rounded-xl border border-white/10 bg-black/30 p-3">
+                  <div className="flex items-center justify-between gap-3">
+                    <div>
+                      <div className="text-[12.5px] font-semibold text-white">Optional edit PIN</div>
+                      <div className="mt-0.5 text-[11.5px] text-white/45">
+                        {pinEnabled ? "Collaborators must enter the PIN before this link opens." : "Add a 4-digit PIN to lock this collaboration link."}
+                      </div>
+                    </div>
+                    <span className={`rounded-full border px-2 py-0.5 text-[10px] font-medium ${pinEnabled ? "border-emerald-400/35 bg-emerald-400/10 text-emerald-200" : "border-white/10 text-white/45"}`}>
+                      {pinEnabled ? "PIN on" : "Optional"}
+                    </span>
+                  </div>
+                  <div className="mt-3 flex items-center gap-2">
+                    <input
+                      value={pin}
+                      onChange={(e) => setPin(e.target.value.replace(/\D/g, "").slice(0, 4))}
+                      inputMode="numeric"
+                      pattern="[0-9]*"
+                      maxLength={4}
+                      placeholder="1234"
+                      className="w-24 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-center font-mono text-sm text-white outline-none placeholder:text-white/25 focus:border-white/35"
+                    />
+                    <button
+                      onClick={savePin}
+                      disabled={pinBusy || pin.length !== 4}
+                      className="rounded-lg bg-white px-3 py-2 text-xs font-medium text-black hover:bg-white/90 disabled:opacity-45"
+                      style={{ touchAction: "manipulation", minHeight: "40px" }}
+                    >
+                      {pinEnabled ? "Change PIN" : "Set PIN"}
+                    </button>
+                    {pinEnabled && (
+                      <button
+                        onClick={removePin}
+                        disabled={pinBusy}
+                        className="rounded-lg border border-white/10 px-3 py-2 text-xs font-medium text-white/65 hover:bg-white/10 disabled:opacity-45"
+                        style={{ touchAction: "manipulation", minHeight: "40px" }}
+                      >
+                        Remove
+                      </button>
+                    )}
+                  </div>
+                  {pinMessage && <div className="mt-2 text-[11.5px] text-white/50">{pinMessage}</div>}
+                </div>
+              )}
 
               <div className="mt-4 flex items-center gap-2 rounded-xl border border-white/10 bg-black/40 px-3 py-2">
                 <span className="flex-1 truncate font-mono text-[12px] text-white/85">{url}</span>

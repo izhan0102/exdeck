@@ -15,6 +15,8 @@ function isEditableTarget(e: KeyboardEvent): boolean {
 export interface KeyboardShortcutHandlers {
   /** Undo the last deck change. */
   onUndo: () => void;
+  /** Redo the last undone deck change. */
+  onRedo?: () => void;
   /** Duplicate the currently active slide and select the copy. */
   onDuplicate: () => void;
   /** Delete the currently active slide. */
@@ -45,6 +47,7 @@ export interface KeyboardShortcutHandlers {
  */
 export function useKeyboardShortcuts({
   onUndo,
+  onRedo,
   onDuplicate,
   onDelete,
   onInsert,
@@ -59,6 +62,12 @@ export function useKeyboardShortcuts({
       const ctrl = e.ctrlKey || e.metaKey;
 
       // Ctrl/Cmd + Z — undo
+      if (ctrl && e.key.toLowerCase() === "z" && e.shiftKey && onRedo) {
+        e.preventDefault();
+        onRedo();
+        return;
+      }
+
       if (ctrl && e.key.toLowerCase() === "z" && !e.shiftKey) {
         e.preventDefault();
         onUndo();
@@ -103,5 +112,5 @@ export function useKeyboardShortcuts({
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [onUndo, onDuplicate, onDelete, onInsert, onPrev, onNext]);
+  }, [onUndo, onRedo, onDuplicate, onDelete, onInsert, onPrev, onNext]);
 }

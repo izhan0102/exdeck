@@ -3,10 +3,23 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import type { Deck, Slide } from "@/lib/types";
 import type { Theme } from "@/lib/themes";
 import SlideCanvas from "./SlideCanvas";
-import { ChevronLeft, ChevronRight, X, Pause, NotebookText, Timer, RotateCcw } from "lucide-react";
+import { ChevronLeft, ChevronRight, X, Pause, NotebookText, Timer, RotateCcw, Sparkles } from "lucide-react";
 
 /** Rough spoken pace: words per minute used to estimate per-slide talk time. */
 const WORDS_PER_MIN = 130;
+type PresentAnimation = "fade" | "push" | "wipe" | "zoom" | "cover" | "uncover" | "flip" | "cube" | "rise";
+
+const PRESENT_ANIMATIONS: { id: PresentAnimation; label: string; hint: string }[] = [
+  { id: "fade", label: "Fade", hint: "Classic dissolve" },
+  { id: "push", label: "Push", hint: "PowerPoint-style move" },
+  { id: "wipe", label: "Wipe", hint: "Clean reveal edge" },
+  { id: "zoom", label: "Zoom", hint: "Subtle scale-in" },
+  { id: "cover", label: "Cover", hint: "New slide covers old" },
+  { id: "uncover", label: "Uncover", hint: "Slide pulls away" },
+  { id: "flip", label: "Flip", hint: "Professional card turn" },
+  { id: "cube", label: "Cube", hint: "Soft 3D rotate" },
+  { id: "rise", label: "Rise", hint: "Lift and settle" },
+];
 
 function plain(s?: string): string {
   return (s || "").replace(/<[^>]+>/g, "").replace(/&nbsp;/g, " ").replace(/\s+/g, " ").trim();
@@ -56,6 +69,8 @@ export default function Presenter({
   const [showControls, setShowControls] = useState(true);
   const [jumpBuffer, setJumpBuffer] = useState("");
   const [showNotes, setShowNotes] = useState(false);
+  const [animation, setAnimation] = useState<PresentAnimation>("fade");
+  const [animationMenuOpen, setAnimationMenuOpen] = useState(false);
   const [elapsed, setElapsed] = useState(0);
   const [timerRunning, setTimerRunning] = useState(true);
   const idleTimer = useRef<number | null>(null);
@@ -73,6 +88,7 @@ export default function Presenter({
   const total = enriched.length;
   const goNext = () => {
     setJumpBuffer("");
+    setAnimationMenuOpen(false);
     setActive((i) => {
       if (i >= total - 1) return i;
       setDirection("next");
@@ -81,6 +97,7 @@ export default function Presenter({
   };
   const goPrev = () => {
     setJumpBuffer("");
+    setAnimationMenuOpen(false);
     setActive((i) => {
       if (i <= 0) return i;
       setDirection("prev");
@@ -89,6 +106,7 @@ export default function Presenter({
   };
   const goTo = (i: number) => {
     setJumpBuffer("");
+    setAnimationMenuOpen(false);
     if (i < 0 || i >= total) return;
     setDirection(i > active ? "next" : "prev");
     setActive(i);
@@ -105,7 +123,7 @@ export default function Presenter({
       try {
         const p = req.call(el);
         if (p && typeof p.then === "function") p.catch(() => {});
-      } catch { /* user gesture missing — overlay still works */ }
+      } catch { /* user gesture missing - overlay still works */ }
     }
     el.focus();
     // When the user exits fullscreen via Esc/F11, close the presenter too.
@@ -197,6 +215,7 @@ export default function Presenter({
     }
 
     if (jumpBuffer) setJumpBuffer("");
+    if (e.key !== "a" && e.key !== "A") setAnimationMenuOpen(false);
 
     let handled = false;
 
@@ -273,6 +292,13 @@ export default function Presenter({
         handled = true;
         break;
 
+      case "a": case "A":
+        e.preventDefault();
+        e.stopPropagation();
+        setAnimationMenuOpen((v) => !v);
+        handled = true;
+        break;
+
       default:
         // Not a key we handle
         break;
@@ -315,7 +341,7 @@ export default function Presenter({
         touchAction: "manipulation",
       }}
     >
-      {/* Slide stage — letterboxed to a 16:9 area */}
+      {/* Slide stage - letterboxed to a 16:9 area */}
       <div style={{ width: "100%", height: "100%", display: "grid", placeItems: "center" }}>
         <div
           style={{
@@ -329,7 +355,7 @@ export default function Presenter({
           {blank !== "none" ? (
             <div style={{ position: "absolute", inset: 0, background: blank === "black" ? "#000" : "#fff" }} />
           ) : (
-            <SlideTransition activeIndex={active} direction={direction}>
+            <SlideTransition activeIndex={active} direction={direction} animation={animation}>
               {enriched.map((s, i) => (
                 <div
                   key={i}
@@ -415,6 +441,12 @@ export default function Presenter({
             <ChevronRight size={16} />
           </button>
           <span style={{ width: 1, height: 20, background: "rgba(255,255,255,0.15)", margin: "0 4px" }} />
+          <AnimationPicker
+            value={animation}
+            open={animationMenuOpen}
+            onOpenChange={setAnimationMenuOpen}
+            onChange={setAnimation}
+          />
           <button onClick={(e) => { e.stopPropagation(); setBlank((s) => s === "black" ? "none" : "black"); }} style={{ ...chromeButton, touchAction: "manipulation", minHeight: "36px", minWidth: "44px" }} title="Black (B)">
             <Pause size={14} /> B
           </button>
@@ -480,6 +512,107 @@ const chromeButton: React.CSSProperties = {
   fontFamily: "ui-sans-serif, system-ui, sans-serif",
 };
 
+function AnimationPicker({
+  value,
+  open,
+  onOpenChange,
+  onChange,
+}: {
+  value: PresentAnimation;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onChange: (value: PresentAnimation) => void;
+}) {
+  const selected = PRESENT_ANIMATIONS.find((a) => a.id === value) || PRESENT_ANIMATIONS[0];
+  return (
+    <div style={{ position: "relative" }}>
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          onOpenChange(!open);
+        }}
+        style={{
+          ...chromeButton,
+          background: open ? "rgba(255,255,255,0.22)" : chromeButton.background,
+          touchAction: "manipulation",
+          minHeight: "36px",
+          minWidth: "44px",
+        }}
+        title="Slide animation (A)"
+        aria-haspopup="menu"
+        aria-expanded={open}
+      >
+        <Sparkles size={14} /> {selected.label}
+      </button>
+      {open && (
+        <div
+          role="menu"
+          onClick={(e) => e.stopPropagation()}
+          style={{
+            position: "absolute",
+            left: "50%",
+            bottom: 46,
+            transform: "translateX(-50%)",
+            minWidth: 230,
+            maxHeight: "min(420px, 70vh)",
+            overflowY: "auto",
+            padding: 6,
+            borderRadius: 14,
+            background: "rgba(18,18,20,0.96)",
+            border: "1px solid rgba(255,255,255,0.12)",
+            boxShadow: "0 18px 50px rgba(0,0,0,0.45)",
+            backdropFilter: "blur(12px)",
+          }}
+        >
+          {PRESENT_ANIMATIONS.map((item) => {
+            const isSelected = item.id === value;
+            return (
+              <button
+                key={item.id}
+                role="menuitemradio"
+                aria-checked={isSelected}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onChange(item.id);
+                  onOpenChange(false);
+                }}
+                style={{
+                  display: "flex",
+                  width: "100%",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  gap: 12,
+                  padding: "9px 10px",
+                  border: "none",
+                  borderRadius: 10,
+                  background: isSelected ? "rgba(255,255,255,0.16)" : "transparent",
+                  color: "#fff",
+                  cursor: "pointer",
+                  textAlign: "left",
+                  fontFamily: "ui-sans-serif, system-ui, sans-serif",
+                }}
+              >
+                <span>
+                  <span style={{ display: "block", fontSize: 13, fontWeight: 700 }}>{item.label}</span>
+                  <span style={{ display: "block", marginTop: 1, fontSize: 11, color: "rgba(255,255,255,0.52)" }}>{item.hint}</span>
+                </span>
+                <span
+                  style={{
+                    width: 8,
+                    height: 8,
+                    borderRadius: "50%",
+                    background: isSelected ? "#fff" : "rgba(255,255,255,0.24)",
+                  }}
+                />
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function ProgressDots({ total, active, onJump }: { total: number; active: number; onJump: (i: number) => void }) {
   const max = 18;
   if (total <= max) {
@@ -517,21 +650,67 @@ function ProgressDots({ total, active, onJump }: { total: number; active: number
 }
 
 function SlideTransition({
-  activeIndex, direction, children,
-}: { activeIndex: number; direction: "next" | "prev" | "none"; children: React.ReactNode }) {
-  // Ultra-simple cross-fade. The visibility hack above keeps only one slide visible.
+  activeIndex, direction, animation, children,
+}: { activeIndex: number; direction: "next" | "prev" | "none"; animation: PresentAnimation; children: React.ReactNode }) {
+  const sign = direction === "prev" ? -1 : 1;
+  const enterX = direction === "none" ? "0" : `${sign * 96}px`;
+  const coverX = direction === "none" ? "0" : `${sign * 100}%`;
+  const uncoverX = direction === "none" ? "0" : `${sign * -72}px`;
+  const wipeStart = direction === "prev" ? "inset(0 0 0 100%)" : "inset(0 100% 0 0)";
+  const flipRotate = direction === "prev" ? "-18deg" : "18deg";
+  const cubeRotate = direction === "prev" ? "-34deg" : "34deg";
+  const animationName = `presenter-${animation}`;
+  const duration =
+    animation === "cube" ? 560 :
+    animation === "flip" ? 520 :
+    animation === "wipe" || animation === "cover" || animation === "uncover" ? 460 :
+    420;
   return (
     <div
       key={activeIndex}
       style={{
         position: "absolute", inset: 0,
-        animation: "presenter-fade 240ms ease",
+        perspective: "1400px",
+        transformOrigin: "center",
+        animation: `${animationName} ${duration}ms cubic-bezier(0.22, 1, 0.36, 1) both`,
       }}
     >
       <style>{`
         @keyframes presenter-fade {
-          from { opacity: 0; transform: translateX(${direction === "prev" ? "-12px" : direction === "next" ? "12px" : "0"}); }
+          from { opacity: 0; transform: scale(0.992); }
           to   { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes presenter-push {
+          from { opacity: 0.86; transform: translateX(${enterX}); filter: blur(1px); }
+          to   { opacity: 1; transform: translateX(0); filter: blur(0); }
+        }
+        @keyframes presenter-wipe {
+          from { opacity: 1; clip-path: ${wipeStart}; }
+          to   { opacity: 1; clip-path: inset(0 0 0 0); }
+        }
+        @keyframes presenter-cover {
+          from { opacity: 1; transform: translateX(${coverX}); box-shadow: 0 0 0 rgba(0,0,0,0); }
+          to   { opacity: 1; transform: translateX(0); box-shadow: 0 0 60px rgba(0,0,0,0.28); }
+        }
+        @keyframes presenter-uncover {
+          from { opacity: 0.82; transform: translateX(${uncoverX}) scale(0.985); }
+          to   { opacity: 1; transform: translateX(0); filter: blur(0); }
+        }
+        @keyframes presenter-zoom {
+          from { opacity: 0; transform: scale(0.92); filter: blur(1px); }
+          to   { opacity: 1; transform: scale(1); }
+        }
+        @keyframes presenter-flip {
+          from { opacity: 0; transform: rotateY(${flipRotate}) scale(0.965); filter: brightness(0.86); }
+          to   { opacity: 1; transform: rotateY(0) scale(1); }
+        }
+        @keyframes presenter-cube {
+          from { opacity: 0; transform: rotateY(${cubeRotate}) translateX(${enterX}) scale(0.94); transform-origin: ${direction === "prev" ? "left center" : "right center"}; filter: brightness(0.82); }
+          to   { opacity: 1; transform: rotateY(0) translateX(0) scale(1); filter: brightness(1); }
+        }
+        @keyframes presenter-rise {
+          from { opacity: 0; transform: translateY(44px) scale(0.965); filter: blur(1px); }
+          to   { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
         }
       `}</style>
       {children}
@@ -559,7 +738,7 @@ function FirstHint() {
       animation: "presenter-fade 200ms ease",
       touchAction: "manipulation",
     }}>
-      ← / → to navigate · S = notes · B = blank · Esc to exit
+      ← / → to navigate · A = animation · S = notes · B = blank · Esc to exit
     </div>
   );
 }

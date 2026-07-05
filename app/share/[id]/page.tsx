@@ -12,8 +12,8 @@ import DeckPreview from "@/components/DeckPreview";
 import Logo from "@/components/Logo";
 import type { Deck } from "@/lib/types";
 import type { Theme } from "@/lib/themes";
-import { watchSharedDeck, copySharedDeck, type ShareMode } from "@/lib/decks";
-import { onAuthStateChange, type AppUser } from "@/lib/auth";
+import { watchSharedDeck, copySharedDeck, type SharedDeckData, type ShareMode } from "@/lib/decks";
+import { getIdToken, onAuthStateChange, type AppUser } from "@/lib/auth";
 import { trackShareOpen, trackSlideTime } from "@/lib/analytics";
 import { stripHtml } from "@/lib/richText";
 
@@ -45,9 +45,16 @@ export default function ShareViewer({ params }: { params: { id: string } }) {
   const [user, setUser] = useState<AppUser | null>(null);
   const [authReady, setAuthReady] = useState(false);
   const [copying, setCopying] = useState(false);
+  const [pinRequired, setPinRequired] = useState(false);
+  const [pinInput, setPinInput] = useState("");
+  const [pinError, setPinError] = useState<string | null>(null);
+  const [accessLoading, setAccessLoading] = useState(true);
+  const [pinUnlocked, setPinUnlocked] = useState(false);
+  const [rememberPin, setRememberPin] = useState(false);
   // Share mode + collaborative editing state.
   const [mode, setMode] = useState<ShareMode>("view");
   const [ownerUid, setOwnerUid] = useState<string | undefined>(undefined);
+  const [canEditShare, setCanEditShare] = useState(false);
   const [editDeck, setEditDeck] = useState<Deck | null>(null);
   const [editTheme, setEditTheme] = useState<Theme | null>(null);
   const editSeededRef = useRef(false);
@@ -68,29 +75,97 @@ export default function ShareViewer({ params }: { params: { id: string } }) {
 
   /* ----------------------------- data ----------------------------- */
 
+  const applySharedData = useCallback((result: SharedDeckData, unlocked = pinUnlocked) => {
+    setMissing(false);
+    setMode(result.mode);
+    setOwnerUid(result.ownerUid);
+    const role = user ? result.collaborators?.[user.uid]?.role : undefined;
+    setCanEditShare(unlocked || (!!user && (user.uid === result.ownerUid || role === "OWNER" || role === "EDITOR")));
+    if (result.mode === "edit") {
+      if (!editSeededRef.current) {
+        editSeededRef.current = true;
+        setEditDeck(result.deck);
+        setEditTheme(result.theme);
+      }
+      setData({ deck: result.deck, theme: result.theme, title: result.title });
+    } else {
+      editSeededRef.current = false;
+      setData(result);
+    }
+  }, [pinUnlocked, user]);
+
   useEffect(() => {
+    let cancelled = false;
+    const open = async () => {
+      setAccessLoading(true);
+      setPinError(null);
+      const remembered = (() => {
+        try { return localStorage.getItem(`exdeck:share-pin:${params.id}`) || ""; } catch { return ""; }
+      })();
+      const token = user ? await getIdToken() : null;
+      const res = await fetch("/api/share-access", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+        body: JSON.stringify({ action: "open", shareId: params.id, pin: remembered }),
+      }).catch(() => null);
+      if (cancelled) return;
+      setAccessLoading(false);
+      if (!res) { setMissing(true); return; }
+      const json = await res.json().catch(() => ({}));
+      if (res.status === 403 && json?.pinRequired) {
+        setPinRequired(true);
+        setPinUnlocked(false);
+        setData(null);
+        return;
+      }
+      if (!res.ok || !json?.data) { setMissing(true); return; }
+      setPinRequired(false);
+      if (remembered) setPinUnlocked(true);
+      applySharedData(json.data, !!remembered);
+    };
+    open();
+    return () => { cancelled = true; };
+  }, [params.id, user, applySharedData]);
+
+  useEffect(() => {
+    if (pinRequired || pinUnlocked) return;
     // Live subscription. Read-only decks update the viewer in place; edit
     // decks seed the embedded editor once, after which DeckPreview's own
     // collab subscription drives realtime sync (avoids double-applying).
     const unsub = watchSharedDeck(params.id, (result) => {
       if (!result) { setMissing(true); return; }
-      setMissing(false);
-      setMode(result.mode);
-      setOwnerUid(result.ownerUid);
-      if (result.mode === "edit") {
-        if (!editSeededRef.current) {
-          editSeededRef.current = true;
-          setEditDeck(result.deck);
-          setEditTheme(result.theme);
-        }
-        setData({ deck: result.deck, theme: result.theme, title: result.title });
-      } else {
-        editSeededRef.current = false;
-        setData(result);
-      }
+      applySharedData(result);
     });
     return () => unsub();
-  }, [params.id]);
+  }, [params.id, pinRequired, pinUnlocked, applySharedData]);
+
+  const unlockWithPin = async () => {
+    if (!/^\d{4}$/.test(pinInput)) {
+      setPinError("Enter the 4-digit PIN.");
+      return;
+    }
+    setAccessLoading(true);
+    setPinError(null);
+    const token = user ? await getIdToken() : null;
+    const res = await fetch("/api/share-access", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+      body: JSON.stringify({ action: "open", shareId: params.id, pin: pinInput }),
+    }).catch(() => null);
+    setAccessLoading(false);
+    if (!res) { setPinError("Could not check PIN."); return; }
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok || !json?.data) {
+      setPinError(json?.error || "Incorrect PIN.");
+      return;
+    }
+    setPinRequired(false);
+    setPinUnlocked(true);
+    if (rememberPin) {
+      try { localStorage.setItem(`exdeck:share-pin:${params.id}`, pinInput); } catch { /* ignore */ }
+    }
+    applySharedData(json.data, true);
+  };
 
   /* --------------------- save a copy (Feature A) -------------------- */
 
@@ -219,6 +294,46 @@ export default function ShareViewer({ params }: { params: { id: string } }) {
 
   /* ------------------------- early returns ------------------------- */
 
+  if (pinRequired) {
+    return (
+      <main className="grid min-h-screen place-items-center px-6 text-center text-white" style={{ background: "var(--ezd-bg-page)" }}>
+        <div className="w-full max-w-sm rounded-2xl border p-6 shadow-2xl" style={{ borderColor: "var(--ezd-divider)", background: "var(--ezd-bg-card)" }}>
+          <Logo />
+          <h1 className="mt-6 text-2xl font-semibold tracking-tight">Enter collaboration PIN</h1>
+          <p className="mt-2 text-sm text-white/55">This EXdeck share link is locked by the deck owner.</p>
+          <input
+            value={pinInput}
+            onChange={(e) => setPinInput(e.target.value.replace(/\D/g, "").slice(0, 4))}
+            onKeyDown={(e) => { if (e.key === "Enter") unlockWithPin(); }}
+            inputMode="numeric"
+            pattern="[0-9]*"
+            maxLength={4}
+            autoFocus
+            placeholder="0000"
+            className="mt-5 w-32 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-center font-mono text-xl tracking-[0.3em] text-white outline-none placeholder:text-white/25 focus:border-white/35"
+          />
+          <label className="mx-auto mt-4 flex w-fit cursor-pointer items-center gap-2 text-[12.5px] text-white/55">
+            <input
+              type="checkbox"
+              checked={rememberPin}
+              onChange={(e) => setRememberPin(e.target.checked)}
+              className="h-4 w-4 accent-white"
+            />
+            Don&apos;t ask again for this deck
+          </label>
+          {pinError && <p className="mt-3 text-[12.5px] text-red-300">{pinError}</p>}
+          <button
+            onClick={unlockWithPin}
+            disabled={accessLoading || pinInput.length !== 4}
+            className="mt-5 w-full rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-[#03070F] hover:bg-white/90 disabled:opacity-50"
+          >
+            {accessLoading ? "Checking..." : "Unlock deck"}
+          </button>
+        </div>
+      </main>
+    );
+  }
+
   if (missing) {
     return (
       <main className="grid min-h-screen place-items-center px-6 text-center text-white"
@@ -239,9 +354,42 @@ export default function ShareViewer({ params }: { params: { id: string } }) {
     );
   }
 
+  if (accessLoading && !data) {
+    return (
+      <main className="grid min-h-screen place-items-center text-sm text-white/60" style={{ background: "var(--ezd-bg-page)" }}>
+        Loading...
+      </main>
+    );
+  }
+
   // Collaborative edit mode: open the FULL editor bound to the shared node.
   // Anyone with the link can edit; changes sync live for everyone (incl. owner).
   if (mode === "edit") {
+    if (!authReady || !user) {
+      return (
+        <main className="grid min-h-screen place-items-center px-6 text-center text-white" style={{ background: "var(--ezd-bg-page)" }}>
+          <div className="max-w-md">
+            <Logo />
+            <h1 className="mt-6 text-2xl font-semibold tracking-tight">Sign in to collaborate</h1>
+            <p className="mt-2 text-sm text-white/55">Collaboration Mode tracks every change by Exdeck account, so editing requires a signed-in collaborator.</p>
+            <button onClick={() => router.push(`/auth?redirect=${encodeURIComponent(`/share/${params.id}`)}`)} className="mt-6 rounded-full bg-white px-5 py-2 text-sm font-semibold text-[#03070F] hover:bg-white/90">
+              Sign in
+            </button>
+          </div>
+        </main>
+      );
+    }
+    if (!canEditShare) {
+      return (
+        <main className="grid min-h-screen place-items-center px-6 text-center text-white" style={{ background: "var(--ezd-bg-page)" }}>
+          <div className="max-w-md">
+            <Logo />
+            <h1 className="mt-6 text-2xl font-semibold tracking-tight">No edit access</h1>
+            <p className="mt-2 text-sm text-white/55">Ask the deck owner to add your Exdeck account as an editor.</p>
+          </div>
+        </main>
+      );
+    }
     if (!editDeck || !editTheme) {
       return (
         <main className="grid min-h-screen place-items-center text-sm text-white/60"

@@ -74,15 +74,62 @@
     },
 
     "shared": {
-      ".read": true,
       "$shareId": {
-        ".write": "(auth != null && newData.child('ownerUid').val() === auth.uid) || ((data.child('mode').val() === 'edit' || newData.child('mode').val() === 'edit') && newData.child('ownerUid').val() === data.child('ownerUid').val())"
+        ".read": "data.child('pinEnabled').val() !== true || (auth != null && (data.child('ownerUid').val() === auth.uid || data.child('collaborators').child(auth.uid).exists()))",
+        ".write": "auth != null && (newData.child('ownerUid').val() === auth.uid || data.child('ownerUid').val() === auth.uid)",
+        "ownerUid": {
+          ".write": "auth != null && (!data.exists() || data.val() === auth.uid) && newData.val() === auth.uid"
+        },
+        "deckId": {
+          ".write": "auth != null && root.child('shared').child($shareId).child('ownerUid').val() === auth.uid"
+        },
+        "mode": {
+          ".write": "auth != null && root.child('shared').child($shareId).child('ownerUid').val() === auth.uid"
+        },
+        "collaborators": {
+          "$uid": {
+            ".write": "auth != null && (root.child('shared').child($shareId).child('ownerUid').val() === auth.uid || ($uid === auth.uid && root.child('shared').child($shareId).child('ownerUid').val() === auth.uid))"
+          }
+        },
+        "deck": {
+          ".write": "auth != null && (root.child('shared').child($shareId).child('ownerUid').val() === auth.uid || root.child('shared').child($shareId).child('collaborators').child(auth.uid).child('role').val() === 'OWNER' || root.child('shared').child($shareId).child('collaborators').child(auth.uid).child('role').val() === 'EDITOR')"
+        },
+        "theme": {
+          ".write": "auth != null && (root.child('shared').child($shareId).child('ownerUid').val() === auth.uid || root.child('shared').child($shareId).child('collaborators').child(auth.uid).child('role').val() === 'OWNER' || root.child('shared').child($shareId).child('collaborators').child(auth.uid).child('role').val() === 'EDITOR')"
+        },
+        "title": {
+          ".write": "auth != null && (root.child('shared').child($shareId).child('ownerUid').val() === auth.uid || root.child('shared').child($shareId).child('collaborators').child(auth.uid).child('role').val() === 'OWNER' || root.child('shared').child($shareId).child('collaborators').child(auth.uid).child('role').val() === 'EDITOR')"
+        },
+        "publishedAt": {
+          ".write": "auth != null && (root.child('shared').child($shareId).child('ownerUid').val() === auth.uid || root.child('shared').child($shareId).child('collaborators').child(auth.uid).child('role').val() === 'OWNER' || root.child('shared').child($shareId).child('collaborators').child(auth.uid).child('role').val() === 'EDITOR')"
+        },
+        "$other": {
+          ".write": false
+        }
+      }
+    },
+
+    "collabChanges": {
+      "$shareId": {
+        ".read": "auth != null && (root.child('shared').child($shareId).child('ownerUid').val() === auth.uid || root.child('shared').child($shareId).child('collaborators').child(auth.uid).exists())",
+        "$changeId": {
+          ".write": "auth != null && ((!data.exists() && (root.child('shared').child($shareId).child('ownerUid').val() === auth.uid || root.child('shared').child($shareId).child('collaborators').child(auth.uid).child('role').val() === 'OWNER' || root.child('shared').child($shareId).child('collaborators').child(auth.uid).child('role').val() === 'EDITOR')) || (data.exists() && newData.child('id').val() === data.child('id').val() && newData.child('deckId').val() === data.child('deckId').val() && newData.child('actionType').val() === data.child('actionType').val() && newData.child('userId').val() === data.child('userId').val() && newData.child('timestamp').val() === data.child('timestamp').val() && newData.child('undone').val() === true && newData.child('undoneBy').val() === auth.uid && (root.child('shared').child($shareId).child('ownerUid').val() === auth.uid || root.child('shared').child($shareId).child('collaborators').child(auth.uid).exists())))"
+        }
+      }
+    },
+
+    "collabPresence": {
+      "$shareId": {
+        ".read": "auth != null && (root.child('shared').child($shareId).child('ownerUid').val() === auth.uid || root.child('shared').child($shareId).child('collaborators').child(auth.uid).exists())",
+        "$uid": {
+          ".write": "auth != null && auth.uid === $uid && (root.child('shared').child($shareId).child('ownerUid').val() === auth.uid || root.child('shared').child($shareId).child('collaborators').child(auth.uid).exists())"
+        }
       }
     },
 
     "sharedDocs": {
-      ".read": true,
       "$shareId": {
+        ".read": true,
         ".write": "(auth != null && newData.child('ownerUid').val() === auth.uid) || ((data.child('mode').val() === 'edit' || newData.child('mode').val() === 'edit') && newData.child('ownerUid').val() === data.child('ownerUid').val())"
       }
     },

@@ -256,22 +256,32 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ================== Brand clarity for exact-search discovery ================== */}
-      <section className="relative z-10 mx-auto max-w-5xl px-5 pt-8 sm:px-6">
+      {/* ================== Collaboration Mode ================== */}
+      <section id="collaboration" className="relative z-10 mx-auto max-w-5xl px-5 pt-16 sm:px-6">
         <Reveal>
-          <div className="rounded-2xl border p-6 sm:p-8" style={{ borderColor: "var(--ezd-divider)", background: "var(--ezd-bg-card)" }}>
-            <div className="text-[11px] font-semibold uppercase tracking-[0.22em]" style={{ color: "var(--ezd-fg-quiet)", fontFamily: MONO }}>
-              Official EXdeck website
+          <div className="grid grid-cols-1 gap-8 border-t pt-10 md:grid-cols-[0.9fr_1.1fr]" style={{ borderColor: "var(--ezd-divider)" }}>
+            <div>
+              <div className="text-[11px] font-semibold uppercase tracking-[0.22em]" style={{ color: "var(--ezd-fg-quiet)", fontFamily: MONO }}>
+                Collaboration Mode
+              </div>
+              <h2 className="mt-3 text-[28px] font-bold leading-tight tracking-tight sm:text-[38px]" style={{ color: "var(--ezd-fg-strong)" }}>
+                Edit the same deck together.
+              </h2>
+              <p className="mt-4 text-[14.5px] leading-relaxed" style={{ color: "var(--ezd-fg-muted)" }}>
+                EXdeck collaboration lets invited teammates open the same presentation, edit with the normal deck editor, and see a clear Changes history with each person&apos;s name and @username attached to the work.
+              </p>
             </div>
-            <h2 className="mt-3 text-[26px] font-bold tracking-tight sm:text-[34px]" style={{ color: "var(--ezd-fg-strong)" }}>
-              EXdeck is the AI PPT maker at exdeck.xyz.
-            </h2>
-            <p className="mt-3 max-w-3xl text-[15px] leading-relaxed" style={{ color: "var(--ezd-fg-muted)" }}>
-              If you searched for EXdeck, Exdeck, EXdeck PPT, or an AI PPT maker that exports real PowerPoint files, this is the official app. EXdeck creates editable presentations from text, then lets you export to PPTX or PDF without locking your work inside a web-only editor.
-            </p>
-            <div className="mt-5 flex flex-wrap gap-2.5">
-              {[["EXdeck PPT maker", "/ai-ppt-maker"], ["AI presentation maker", "/ai-presentation-maker"], ["Text to PPT", "/text-to-ppt"], ["Presentations", "/presentations"]].map(([label, href]) => (
-                <Link key={href} href={href} className="rounded-full border px-4 py-2 text-[13px] font-medium" style={{ borderColor: "var(--ezd-hairline)", color: "var(--ezd-fg-strong)" }}>{label}</Link>
+            <div className="grid gap-px overflow-hidden rounded-2xl border" style={{ borderColor: "var(--ezd-divider)", background: "var(--ezd-divider)" }}>
+              {[
+                "Invite Exdeck users as owners, editors, or viewers",
+                "Track slide edits, text updates, regenerated slides, images, layouts, themes, and AI changes",
+                "Show chronological Changes with names, @usernames, avatars, timestamps, and undo-ready history",
+                "Keep the current EXdeck editor UI, theme controls, slide canvas, AI tools, and exports",
+              ].map((item) => (
+                <div key={item} className="flex items-start gap-3 p-4" style={{ background: "var(--ezd-bg-card)" }}>
+                  <Check size={15} className="mt-0.5 shrink-0" style={{ color: "var(--ezd-fg-strong)" }} />
+                  <span className="text-[13.5px] leading-relaxed" style={{ color: "var(--ezd-fg-muted)" }}>{item}</span>
+                </div>
               ))}
             </div>
           </div>
