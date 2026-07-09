@@ -156,8 +156,7 @@ Diagram example — Instruction: "add a diagram of how JWT auth works"
 CRITICAL rules:
 
 - Read the user's instruction CAREFULLY and identify exactly which
-  slides they mean.
-    "first slide" = index 0.
+  slides they mean.    "first slide" = index 0.
     "last slide" = index slides.length - 1.
     "every slide" = every index.
     "section/intro/closing" = match by layout or by what's on the slide.

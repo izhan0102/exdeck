@@ -34,10 +34,9 @@ import type { Slide } from "@/lib/types";
  * cleanly in both themes with no per-theme branches.
  */
 
-const DISPLAY = '"Newsreader", "Georgia", serif';
-const BODY = '"Space Grotesk", "Inter", ui-sans-serif, system-ui, sans-serif';
-const MONO = '"Azeret Mono", "JetBrains Mono", ui-monospace, monospace';
-const ACCENT_COLOR = "#0066FF";
+const DISPLAY = '"Bricolage Grotesque", "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif';
+const MONO = '"JetBrains Mono", ui-monospace, SFMono-Regular, "Roboto Mono", monospace';
+const HERO = '"Bitcount Single", "Fontdiner Swanky", ui-sans-serif, system-ui, sans-serif';
 
 /** The full tool suite, rendered as one divided index grid (no boxed icon
  *  tiles). Icons stay small, inline, and muted - wayfinding, not decoration. */

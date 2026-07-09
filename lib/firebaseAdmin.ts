@@ -1,6 +1,7 @@
 import { type NextRequest } from "next/server";
 import { cert, getApps, initializeApp, type App } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
+import { getDatabase, type Database } from "firebase-admin/database";
 
 let _app: App | undefined;
 
@@ -34,6 +35,12 @@ function getAdminApp(): App {
 /** Exposed so server-only helpers (plan/usage enforcement) can reach RTDB. */
 export function getAdminAppOrThrow(): App {
   return getAdminApp();
+}
+
+/** Get the admin Realtime Database instance (bypasses security rules). */
+export function getAdminDatabase(): Database {
+  getAdminApp();
+  return getDatabase();
 }
 
 // Verifies Bearer token and returns the user's uid
