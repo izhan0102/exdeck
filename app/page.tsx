@@ -178,83 +178,120 @@ export default function LandingPage() {
 
       {/* ================== Hero ================== */}
       <section className="relative z-10 mx-auto max-w-[1200px] px-5 pb-16 pt-28 sm:px-6 sm:pt-36">
-        {/* soft glow behind the hero - subtle in both themes */}
+        {/* Layered backdrop: soft glow + masked grid for depth (both themes) */}
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[460px]"
-          style={{ background: "radial-gradient(60% 60% at 30% 0%, var(--ezd-bg-hover), transparent 70%)" }}
+          className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[620px]"
+          style={{ background: "radial-gradient(55% 55% at 50% -5%, var(--ezd-bg-hover), transparent 70%)" }}
+        />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[620px] opacity-60"
+          style={{
+            backgroundImage:
+              "linear-gradient(var(--ezd-hairline) 1px, transparent 1px), linear-gradient(90deg, var(--ezd-hairline) 1px, transparent 1px)",
+            backgroundSize: "48px 48px",
+            maskImage: "radial-gradient(60% 55% at 50% 0%, black, transparent 78%)",
+            WebkitMaskImage: "radial-gradient(60% 55% at 50% 0%, black, transparent 78%)",
+          }}
         />
 
         <div className="mx-auto flex w-full max-w-3xl flex-col items-center text-center">
-          {/* ---------- Hero copy ---------- */}
-          <div className="w-full">
-            <Reveal delay={60}>
-              <h1
-                className="font-semibold"
-                style={{
-                  fontFamily: DISPLAY,
-                  fontSize: "clamp(38px, 6vw, 68px)",
-                  lineHeight: 0.98,
-                  letterSpacing: "-0.04em",
-                  color: "var(--ezd-fg-strong)",
-                }}
+          {/* Eyebrow: What's new pill (live changelog) */}
+          <Reveal delay={20}>
+            <Link
+              href="/changelog"
+              className="group inline-flex max-w-full items-center gap-2 rounded-full border px-2 py-1 text-[12px] font-medium transition hover:opacity-90"
+              style={{ borderColor: "var(--ezd-hairline)", background: "var(--ezd-bg-card)", color: "var(--ezd-fg-muted)" }}
+            >
+              <span className="inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 text-[10.5px] font-semibold uppercase tracking-wide" style={{ background: "var(--ezd-button-strong)", color: "var(--ezd-button-strong-fg)" }}>
+                <Sparkles size={11} /> New
+              </span>
+              <span className="truncate">{latestChange || "Regenerate any slide with 7 AI models"}</span>
+              <ArrowRight size={13} className="shrink-0 transition group-hover:translate-x-0.5" />
+            </Link>
+          </Reveal>
+
+          {/* Headline */}
+          <Reveal delay={80}>
+            <h1
+              className="mt-6 font-semibold"
+              style={{
+                fontFamily: DISPLAY,
+                fontSize: "clamp(42px, 7vw, 82px)",
+                lineHeight: 0.95,
+                letterSpacing: "-0.045em",
+                color: "var(--ezd-fg-strong)",
+              }}
+            >
+              Make a presentation
+              <br />
+              in{" "}
+              <span style={{ position: "relative", fontFamily: HERO, letterSpacing: "-0.02em" }}>
+                seconds
+                <span
+                  aria-hidden
+                  style={{
+                    position: "absolute", left: 0, right: 0, bottom: "0.06em", height: "0.12em",
+                    background: "var(--ezd-fg-strong)", borderRadius: 999, opacity: 0.9,
+                  }}
+                />
+              </span>
+              .
+              <span className="sr-only">
+                {" "}EXdeck, also searched as Exdeck and Ex deck, is a free AI PPT maker that turns your text into an
+                editable PowerPoint presentation with one-click PPTX and PDF export.
+              </span>
+            </h1>
+          </Reveal>
+
+          {/* Subhead */}
+          <Reveal delay={140}>
+            <p
+              className="mx-auto mt-6 max-w-xl text-[16.5px] leading-relaxed sm:text-[18px]"
+              style={{ color: "var(--ezd-fg-muted)" }}
+            >
+              Type one line. EXdeck&rsquo;s AI writes and designs a full, editable PowerPoint — with real
+              3D data charts, premium themes, and one-click <span style={{ color: "var(--ezd-fg-strong)", fontWeight: 600 }}>.pptx &amp; PDF</span> export.
+            </p>
+          </Reveal>
+
+          {/* CTAs */}
+          <Reveal delay={200}>
+            <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
+              <button
+                onClick={onGetStarted}
+                className="group inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-[15px] font-semibold shadow-lg transition hover:scale-[1.02] hover:opacity-95"
+                style={{ background: "var(--ezd-button-strong)", color: "var(--ezd-button-strong-fg)", touchAction: "manipulation", minHeight: "48px" }}
               >
-                AI presentations<br />
-                in <span style={{ fontFamily: HERO, letterSpacing: "-0.02em" }}>seconds.</span>
-                <span className="sr-only">
-                  {" "}EXdeck, also searched as Exdeck and Ex deck, is a free AI PPT maker that turns your text into an
-                  editable PowerPoint presentation with one-click PPTX and PDF export.
+                Start free — build a deck
+                <ArrowRight size={16} className="transition group-hover:translate-x-0.5" />
+              </button>
+              <a
+                href="#how"
+                className="inline-flex items-center gap-2 rounded-full border px-7 py-3.5 text-[15px] font-semibold transition hover:bg-white/5"
+                style={{ borderColor: "var(--ezd-hairline)", color: "var(--ezd-fg-strong)", background: "var(--ezd-bg-card)", minHeight: "48px" }}
+              >
+                <MonitorPlay size={16} /> See how it works
+              </a>
+            </div>
+          </Reveal>
+
+          {/* Feature chips */}
+          <Reveal delay={260}>
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-[13px]" style={{ color: "var(--ezd-fg-muted)" }}>
+              {[
+                "Real .pptx & PDF export",
+                "3D data charts",
+                "45 themes · 200k icons",
+                "No card needed",
+              ].map((f) => (
+                <span key={f} className="inline-flex items-center gap-1.5">
+                  <Check size={14} style={{ color: "var(--ezd-fg-strong)" }} /> {f}
                 </span>
-              </h1>
-            </Reveal>
-
-            <Reveal delay={120}>
-              <p
-                className="mx-auto mt-6 max-w-xl text-[16px] leading-relaxed sm:text-[18px]"
-                style={{ color: "var(--ezd-fg-muted)" }}
-              >
-                EXdeck turns a short prompt into a fully designed PowerPoint deck with real charts and speaker notes. Also makes AI documents, spreadsheets, and resumes, plus free file converters.
-              </p>
-            </Reveal>
-
-            <Reveal delay={180}>
-              <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
-                <button
-                  onClick={onGetStarted}
-                  className="group inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-[15px] font-semibold transition hover:opacity-90"
-                  style={{ background: "var(--ezd-button-strong)", color: "var(--ezd-button-strong-fg)", touchAction: "manipulation", minHeight: "48px" }}
-                >
-                  Get started for free
-                  <ArrowRight size={16} className="transition group-hover:translate-x-0.5" />
-                </button>
-                <a
-                  href="#how"
-                  className="inline-flex items-center rounded-full border px-7 py-3.5 text-[15px] font-semibold transition hover:opacity-80"
-                  style={{ borderColor: "var(--ezd-fg-strong)", color: "var(--ezd-fg-strong)", minHeight: "48px" }}
-                >
-                  See how it works
-                </a>
-              </div>
-            </Reveal>
-
-            <Reveal delay={240}>
-              <div className="mt-5 flex justify-center">
-                <Link
-                  href="/changelog"
-                  className="group inline-flex max-w-full items-center gap-2 rounded-full border px-3.5 py-1.5 text-[12.5px] font-medium transition hover:opacity-90"
-                  style={{ borderColor: "var(--ezd-hairline)", background: "var(--ezd-bg-card)", color: "var(--ezd-fg-muted)" }}
-                >
-                  <span className="shrink-0 rounded-full px-2 py-0.5 text-[10.5px] font-semibold uppercase tracking-wide" style={{ background: "var(--ezd-button-strong)", color: "var(--ezd-button-strong-fg)" }}>
-                    What&rsquo;s new
-                  </span>
-                  <span className="truncate">
-                    {latestChange || "Regenerate any slide with 7 AI models"}
-                  </span>
-                  <ArrowRight size={13} className="shrink-0 transition group-hover:translate-x-0.5" />
-                </Link>
-              </div>
-            </Reveal>
-          </div>
+              ))}
+            </div>
+          </Reveal>
         </div>
       </section>
 
@@ -1854,6 +1891,19 @@ function Footer() {
               { label: "Text to PPT", href: "/text-to-ppt" },
               { label: "PowerPoint generator", href: "/powerpoint-generator" },
               { label: "Blog", href: "/blog" },
+            ]}
+          />
+          <FooterCol
+            title="Compare"
+            items={[
+              { label: "Compare all", href: "/compare" },
+              { label: "EXdeck", href: "/exdeck" },
+              { label: "EXdeck PPT", href: "/exdeck-ppt" },
+              { label: "EXdeck vs Gamma", href: "/exdeck-vs-gamma" },
+              { label: "EXdeck vs Canva", href: "/exdeck-vs-canva" },
+              { label: "EXdeck vs Tome", href: "/exdeck-vs-tome" },
+              { label: "vs PowerPoint Copilot", href: "/exdeck-vs-powerpoint-copilot" },
+              { label: "vs Google Slides", href: "/exdeck-vs-google-slides" },
             ]}
           />
           <FooterCol

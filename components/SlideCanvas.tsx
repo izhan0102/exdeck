@@ -36,6 +36,30 @@ function shadeHex(hex: string, t: number): string {
   return `rgb(${m(r)}, ${m(g)}, ${m(b)})`;
 }
 
+/* ----------------------- 3D depth style helpers -------------------------
+ * Shared elevation/gloss used by every card-based bullet variant so the
+ * deck reads as professional 3D on screen and in the PDF capture (html2canvas
+ * supports box-shadow + gradients). PPTX export is a separate flat renderer.
+ */
+/** Elevation shadow for larger cards. */
+const CARD_SHADOW = "0 12px 26px -12px rgba(15,23,42,0.45), 0 4px 10px -5px rgba(15,23,42,0.28)";
+/** Elevation shadow for smaller cards / bands. */
+const CARD_SHADOW_SM = "0 8px 18px -10px rgba(15,23,42,0.4), 0 2px 6px -3px rgba(15,23,42,0.25)";
+/** Raised badge/number-chip: outer shadow + inner top highlight + bottom core. */
+const BADGE_SHADOW = "0 5px 12px -3px rgba(0,0,0,0.42), inset 0 1.5px 0 rgba(255,255,255,0.55), inset 0 -2px 3px rgba(0,0,0,0.2)";
+/** Top-lit gloss overlay for SOLID colored cards (layer over a background-color). */
+const GLOSS = "linear-gradient(157deg, rgba(255,255,255,0.26) 0%, rgba(255,255,255,0.05) 42%, rgba(0,0,0,0.14) 100%)";
+/** Inset ridge (top light + bottom shade) to give bands/segments thickness. */
+const RIDGE = "inset 0 1.5px 0 rgba(255,255,255,0.22), inset 0 -2px 3px rgba(0,0,0,0.16)";
+/** A raised circular badge with a diagonal color gloss. */
+function badge3d(color: string): React.CSSProperties {
+  return {
+    backgroundColor: color,
+    backgroundImage: `radial-gradient(circle at 32% 26%, ${shadeHex(color, 0.4)}, ${color} 68%)`,
+    boxShadow: BADGE_SHADOW,
+  };
+}
+
 /** Resolve a per-role template font-family (title/subtitle/kicker/body),
  *  falling back to undefined so the slide's base font applies. */
 function roleFontFamily(slide: Slide | undefined, role: "title" | "subtitle" | "kicker" | "body"): string | undefined {
@@ -126,10 +150,16 @@ export default function SlideCanvas({
 
   const effective: Theme = {
     ...theme,
-    fg: slide.textColorOverride || theme.fg,
+    fg: slide.titleColorOverride || slide.textColorOverride || theme.fg,
     accent: slide.accentColorOverride || theme.accent,
     bg: slide.backgroundColorOverride || theme.bg,
   };
+
+  // Decoupled BODY colors: body/bullet text and the on-background markers/
+  // icons. Fall back to the BASE theme fg/accent (not the title color) so
+  // changing the title color never drags the body along, and vice-versa.
+  const bodyColor = slide.bodyColorOverride || slide.textColorOverride || theme.fg;
+  const iconColor = slide.bodyColorOverride || slide.accentColorOverride || theme.accent;
 
   const containerRef = useRef<HTMLDivElement>(null);
   const graphic = getGraphic(graphicId);
@@ -224,6 +254,7 @@ export default function SlideCanvas({
         slide={slide} theme={effective} idx={idx} total={total} deckTitle={deckTitle}
         interactive={interactive} onUpdate={onUpdate} canvasRef={containerRef}
         onEditChart={onEditChart}
+        bodyColor={bodyColor} iconColor={iconColor}
       />
       <ImageLayer
         key="imagelayer"
@@ -1665,6 +1696,7 @@ function BulletsStandard(props: any) {
           interactive={interactive}
           theme={theme}
           slide={slide}
+          textColor={props.bodyColor}
           fontSize={pt(bulletSize(slide.bullets?.length || 0, slide) * (slide.imageRight ? 0.86 : 1))}
           bullets={slide.bullets || []}
           onCommit={(text) => {
@@ -1672,7 +1704,7 @@ function BulletsStandard(props: any) {
             onUpdate?.({ bullets: next });
           }}
           renderMarker={(_b, i) => (
-            <span style={{ color: theme.accent, fontWeight: 700 }}>•</span>
+            <span style={{ color: props.iconColor || theme.accent, fontWeight: 700 }}>•</span>
           )}
         />
       </Movable>
@@ -1694,6 +1726,7 @@ function BulletsNumbered(props: any) {
           interactive={interactive}
           theme={theme}
           slide={slide}
+          textColor={props.bodyColor}
           fontSize={pt(bulletSize(slide.bullets?.length || 0, slide))}
           bullets={slide.bullets || []}
           onCommit={(text) => {
@@ -1702,12 +1735,13 @@ function BulletsNumbered(props: any) {
           }}
           renderMarker={(_b, i) => (
             <span style={{
-              color: theme.bg, background: theme.accent,
+              color: theme.bg,
               fontWeight: 800,
               minWidth: pt(22), width: pt(22), height: pt(22),
               display: "inline-flex", alignItems: "center", justifyContent: "center",
               textAlign: "center", lineHeight: 1,
               borderRadius: pt(11), fontSize: pt(11),
+              ...badge3d(theme.accent),
             }}>{String(i + 1).padStart(2, "0")}</span>
           )}
         />
@@ -1743,7 +1777,7 @@ function BulletsCards(props: any) {
           justifyContent: "center",
           gap,
           fontSize: pt(bulletSize(bullets.length, slide)),
-          color: theme.fg,
+          color: props.bodyColor || theme.fg,
         }}>
           {bullets.map((b, i) => (
             <div key={i} style={{
@@ -1751,10 +1785,12 @@ function BulletsCards(props: any) {
               flexGrow: 0,
               flexShrink: 0,
               padding: pt(14),
-              borderRadius: pt(8),
-              border: `1px solid ${theme.muted}33`,
-              background: `${theme.accent}0d`,
+              borderRadius: pt(10),
+              border: `1px solid ${theme.muted}22`,
+              borderTop: `1px solid ${theme.accent}44`,
               borderLeft: `3px solid ${theme.accent}`,
+              background: `linear-gradient(158deg, ${theme.accent}1f, ${theme.accent}08)`,
+              boxShadow: CARD_SHADOW_SM,
               lineHeight: 1.4,
             }}>
               <div style={{ color: theme.accent, fontSize: pt(10), letterSpacing: "0.18em", fontWeight: 700, marginBottom: pt(6) }}>
@@ -1802,7 +1838,7 @@ function BulletsConcept(props: any) {
           justifyContent: "center",
           gap,
           fontSize: pt(bulletSize(bullets.length, slide)),
-          color: theme.fg,
+          color: props.bodyColor || theme.fg,
         }}>
           {bullets.map((b, i) => {
             const c = PALETTE[i % PALETTE.length];
@@ -1817,7 +1853,9 @@ function BulletsConcept(props: any) {
                 gap: pt(12),
                 padding: pt(12),
                 borderRadius: pt(14),
-                background: `${c}20`,
+                background: `linear-gradient(158deg, ${c}2b, ${c}12)`,
+                border: `1px solid ${c}33`,
+                boxShadow: CARD_SHADOW_SM,
                 lineHeight: 1.4,
               }}>
                 <div style={{
@@ -1825,7 +1863,6 @@ function BulletsConcept(props: any) {
                   width: badge,
                   height: badge,
                   borderRadius: "50%",
-                  background: c,
                   color: "#FFFFFF",
                   display: "flex",
                   alignItems: "center",
@@ -1833,6 +1870,7 @@ function BulletsConcept(props: any) {
                   fontWeight: 800,
                   fontSize: pt(15),
                   letterSpacing: "0.01em",
+                  ...badge3d(c),
                 }}>
                   {icon ? <BulletIcon id={icon} color="#FFFFFF" size={pt(22)} /> : String(i + 1).padStart(2, "0")}
                 </div>
@@ -1877,7 +1915,7 @@ function BulletsBands(props: any) {
     <>
       <ContentTitle {...props} />
       <Movable id="bullets" slide={slide} theme={theme} interactive={interactive} onUpdate={onUpdate} canvasRef={canvasRef}
-        baseStyle={{ position: "absolute", left: inches(0.6), top: inches(slide.subtitle ? 2.7 : 2.2), right: inches(0.6), bottom: inches(0.7), display: "flex", flexDirection: "column", borderRadius: pt(12), overflow: "hidden" }}
+        baseStyle={{ position: "absolute", left: inches(0.6), top: inches(slide.subtitle ? 2.7 : 2.2), right: inches(0.6), bottom: inches(0.7), display: "flex", flexDirection: "column", borderRadius: pt(12), overflow: "hidden", boxShadow: CARD_SHADOW }}
       >
         {bullets.map((b, i) => {
           const t = n > 1 ? (i / (n - 1)) * 0.42 : 0;
@@ -1885,12 +1923,13 @@ function BulletsBands(props: any) {
           return (
             <div key={i} style={{
               flex: 1, minHeight: 0, display: "flex", alignItems: "center", gap: pt(16),
-              padding: `0 ${pt(22)}`, background: shadeHex(theme.accent, t), color: "#ffffff",
+              padding: `0 ${pt(22)}`, backgroundColor: shadeHex(theme.accent, t), backgroundImage: GLOSS,
+              boxShadow: RIDGE, color: "#ffffff",
             }}>
               <span style={{
                 flexShrink: 0, width: pt(30), height: pt(30), borderRadius: pt(8),
                 background: "rgba(255,255,255,0.22)", display: "flex", alignItems: "center", justifyContent: "center",
-                fontWeight: 800, fontSize: pt(12),
+                fontWeight: 800, fontSize: pt(12), boxShadow: BADGE_SHADOW,
               }}>{icon ? <BulletIcon id={icon} color="#ffffff" size={pt(17)} /> : String(i + 1).padStart(2, "0")}</span>
               <div style={{ flex: 1, minWidth: 0, fontSize: pt(fs), fontWeight: 600, lineHeight: 1.3, textShadow: "0 1px 6px rgba(0,0,0,0.18)" }}>
                 <EditableText value={b} interactive={interactive} onCommit={(v) => editBullet(i, v)} />
@@ -1926,8 +1965,10 @@ function BulletsChevron(props: any) {
           const icon = slide.bulletIcons?.[i];
           return (
             <div key={i} style={{
-              flex: 1, minWidth: 0, background: shadeHex(theme.accent, n > 1 ? (i / (n - 1)) * 0.4 : 0),
+              flex: 1, minWidth: 0, backgroundColor: shadeHex(theme.accent, n > 1 ? (i / (n - 1)) * 0.4 : 0),
+              backgroundImage: GLOSS,
               color: "#ffffff", clipPath: clip, minHeight: pt(132),
+              filter: "drop-shadow(0 8px 12px rgba(15,23,42,0.32))",
               padding: `${pt(16)} ${pt(20)} ${pt(16)} ${i === 0 ? pt(20) : pt(36)}`,
               display: "flex", flexDirection: "column", justifyContent: "center", gap: pt(7),
             }}>
@@ -1966,12 +2007,13 @@ function BulletsNumberedCards(props: any) {
           const icon = slide.bulletIcons?.[i];
           return (
             <div key={i} style={{
-              flex: 1, minWidth: 0, maxWidth: pt(220), background: c, color: "#ffffff",
+              flex: 1, minWidth: 0, maxWidth: pt(220), backgroundColor: c, backgroundImage: GLOSS, color: "#ffffff",
               borderRadius: pt(16), padding: `${pt(16)} ${pt(16)} ${pt(18)}`,
+              boxShadow: CARD_SHADOW,
               display: "flex", flexDirection: "column", gap: pt(8), minHeight: pt(150),
             }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                <span style={{ fontSize: pt(34), fontWeight: 800, lineHeight: 1, color: "rgba(255,255,255,0.45)" }}>{String(i + 1).padStart(2, "0")}</span>
+                <span style={{ fontSize: pt(34), fontWeight: 800, lineHeight: 1, color: "rgba(255,255,255,0.5)", textShadow: "0 2px 4px rgba(0,0,0,0.25)" }}>{String(i + 1).padStart(2, "0")}</span>
                 {icon && <BulletIcon id={icon} color="#ffffff" size={pt(22)} />}
               </div>
               <div style={{ flex: 1, fontSize: pt(12.5), fontWeight: 600, lineHeight: 1.35, textShadow: "0 1px 6px rgba(0,0,0,0.18)" }}>
@@ -2013,12 +2055,13 @@ function BulletsTimeline(props: any) {
             <div key={i} style={{ display: "flex", gap: pt(14), alignItems: "stretch" }}>
               <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: pt(34), flexShrink: 0 }}>
                 <span style={{
-                  width: pt(34), height: pt(34), borderRadius: "50%", background: c, color: "#ffffff",
+                  width: pt(34), height: pt(34), borderRadius: "50%", color: "#ffffff",
                   display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: pt(13), flexShrink: 0,
+                  ...badge3d(c),
                 }}>{icon ? <BulletIcon id={icon} color="#ffffff" size={pt(18)} /> : i + 1}</span>
                 {!last && <span style={{ flex: 1, width: pt(2), background: `${theme.fg}22`, minHeight: pt(10) }} />}
               </div>
-              <div style={{ flex: 1, minWidth: 0, paddingBottom: last ? 0 : pt(14), color: theme.fg }}>
+              <div style={{ flex: 1, minWidth: 0, paddingBottom: last ? 0 : pt(14), color: props.bodyColor || theme.fg }}>
                 <div style={{ fontSize: pt(14), fontWeight: 800, lineHeight: 1.25 }}>
                   <EditableText value={titleText} interactive={interactive} onCommit={(v) => editBullet(i, detailText ? `${v} — ${detailText}` : v)} />
                 </div>
@@ -2050,6 +2093,7 @@ function BulletsIconCheck(props: any) {
           interactive={interactive}
           theme={theme}
           slide={slide}
+          textColor={props.bodyColor}
           fontSize={pt(bulletSize(slide.bullets?.length || 0, slide))}
           bullets={slide.bullets || []}
           onCommit={(text) => {
@@ -2057,9 +2101,10 @@ function BulletsIconCheck(props: any) {
             onUpdate?.({ bullets: next });
           }}
           renderMarker={(_b, i) => {
+            const iconClr = props.iconColor || theme.accent;
             const icon = slide.bulletIcons?.[i];
             if (icon) {
-              const url = iconifySvgUrl(icon, theme.accent);
+              const url = iconifySvgUrl(icon, iconClr);
               if (url) {
                 // eslint-disable-next-line @next/next/no-img-element
                 return <img src={url} alt="" style={{ minWidth: pt(18), width: pt(18), height: pt(18), objectFit: "contain", display: "block" }} />;
@@ -2071,8 +2116,10 @@ function BulletsIconCheck(props: any) {
               display: "inline-flex", alignItems: "center", justifyContent: "center",
               textAlign: "center",
               borderRadius: "50%",
-              border: `1.5px solid ${theme.accent}`,
-              color: theme.accent,
+              border: `1.5px solid ${iconClr}`,
+              background: `${iconClr}14`,
+              boxShadow: "0 2px 5px -2px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.4)",
+              color: iconClr,
               fontSize: pt(11), fontWeight: 800,
               lineHeight: 1,
             }}>✓</span>
@@ -2098,6 +2145,7 @@ function BulletsDashed(props: any) {
           interactive={interactive}
           theme={theme}
           slide={slide}
+          textColor={props.bodyColor}
           fontSize={pt(bulletSize(slide.bullets?.length || 0, slide))}
           bullets={slide.bullets || []}
           onCommit={(text) => {
@@ -2108,7 +2156,7 @@ function BulletsDashed(props: any) {
             <span style={{
               display: "inline-block",
               width: pt(14), height: pt(2),
-              background: theme.accent,
+              background: props.iconColor || theme.accent,
               marginTop: pt(10),
               borderRadius: pt(1),
             }}/>
@@ -2121,19 +2169,20 @@ function BulletsDashed(props: any) {
 }
 
 function BulletList({
-  interactive, theme, slide, fontSize, bullets, onCommit, renderMarker,
+  interactive, theme, slide, fontSize, bullets, onCommit, renderMarker, textColor, markerColor,
 }: {
   interactive: boolean; theme: Theme; slide: Slide; fontSize: string;
   bullets: string[]; onCommit: (text: string) => void;
   renderMarker?: (b: string, i: number) => React.ReactNode;
+  textColor?: string; markerColor?: string;
 }) {
   const marker = renderMarker || ((_b: string, _i: number) => (
-    <span style={{ color: theme.accent, fontWeight: 700 }}>•</span>
+    <span style={{ color: markerColor || theme.accent, fontWeight: 700 }}>•</span>
   ));
   return (
     <ul style={{
       margin: 0, padding: 0, listStyle: "none",
-      fontSize, color: theme.fg, lineHeight: 1.5,
+      fontSize, color: textColor || theme.fg, lineHeight: 1.5,
     }}>
       {bullets.map((b: string, i: number) => (
         <li key={i} style={{ marginBottom: pt(12), display: "flex", gap: pt(10), alignItems: "flex-start" }}>
@@ -2184,7 +2233,7 @@ function TwoColumnClassic(props: any) {
         baseStyle={{
           position: "absolute", left: inches(0.6), top: inches(2.6), right: inches(0.6),
           display: "flex", gap: inches(0.6),
-          fontSize: pt(bulletSize(all.length, slide)), color: theme.fg, lineHeight: 1.5,
+          fontSize: pt(bulletSize(all.length, slide)), color: props.bodyColor || theme.fg, lineHeight: 1.5,
         }}
       >
         <ul style={{ width: colW, margin: 0, padding: 0, listStyle: "none" }}>
@@ -2242,7 +2291,7 @@ function TwoColumnDivider(props: any) {
         baseStyle={{
           position: "absolute", left: inches(0.6), top: inches(2.6), right: inches(0.6),
           display: "grid", gridTemplateColumns: "1fr 1fr", gap: inches(0.7),
-          fontSize: pt(bulletSize(all.length, slide)), color: theme.fg, lineHeight: 1.5,
+          fontSize: pt(bulletSize(all.length, slide)), color: props.bodyColor || theme.fg, lineHeight: 1.5,
         }}
       >
         <ul style={{ margin: 0, padding: 0, listStyle: "none" }}>
@@ -2276,9 +2325,11 @@ function TwoColumnCards(props: any) {
   };
   const Col = ({ items, offset }: { items: string[]; offset: number }) => (
     <div style={{
-      padding: pt(16), borderRadius: pt(10),
-      border: `1px solid ${theme.muted}33`,
-      background: `${theme.accent}08`,
+      padding: pt(16), borderRadius: pt(12),
+      border: `1px solid ${theme.muted}22`,
+      borderTop: `1px solid ${theme.accent}44`,
+      background: `linear-gradient(158deg, ${theme.accent}14, ${theme.accent}05)`,
+      boxShadow: CARD_SHADOW_SM,
       lineHeight: 1.5,
     }}>
       {items.map((b, i) => (
@@ -2297,7 +2348,7 @@ function TwoColumnCards(props: any) {
         baseStyle={{
           position: "absolute", left: inches(0.6), top: inches(2.6), right: inches(0.6),
           display: "grid", gridTemplateColumns: "1fr 1fr", gap: pt(14),
-          fontSize: pt(bulletSize(all.length, slide)), color: theme.fg,
+          fontSize: pt(bulletSize(all.length, slide)), color: props.bodyColor || theme.fg,
         }}
       >
         <Col items={all.slice(0, half)} offset={0} />
@@ -2317,11 +2368,12 @@ function TwoColumnNumbered(props: any) {
   };
   const numberMarker = (n: number) => (
     <span style={{
-      color: theme.bg, background: theme.accent,
+      color: "#ffffff",
       minWidth: pt(20), width: pt(20), height: pt(20),
       display: "inline-flex", alignItems: "center", justifyContent: "center",
       textAlign: "center", lineHeight: 1,
       borderRadius: pt(10), fontSize: pt(10), fontWeight: 800,
+      ...badge3d(theme.accent),
     }}>{n}</span>
   );
   return (
@@ -2332,7 +2384,7 @@ function TwoColumnNumbered(props: any) {
         baseStyle={{
           position: "absolute", left: inches(0.6), top: inches(2.6), right: inches(0.6),
           display: "grid", gridTemplateColumns: "1fr 1fr", gap: inches(0.6),
-          fontSize: pt(bulletSize(all.length, slide)), color: theme.fg, lineHeight: 1.5,
+          fontSize: pt(bulletSize(all.length, slide)), color: props.bodyColor || theme.fg, lineHeight: 1.5,
         }}
       >
         <ul style={{ margin: 0, padding: 0, listStyle: "none" }}>
@@ -2412,7 +2464,7 @@ function TwoColumnCompare(props: any) {
         baseStyle={{
           position: "absolute", left: inches(0.6), top: inches(2.6), right: inches(0.6),
           display: "grid", gridTemplateColumns: "1fr 1fr", gap: inches(0.5),
-          fontSize: pt(bulletSize(all.length, slide)), color: theme.fg, lineHeight: 1.5,
+          fontSize: pt(bulletSize(all.length, slide)), color: props.bodyColor || theme.fg, lineHeight: 1.5,
         }}
       >
         <Side items={all.slice(0, half)} offset={0} side="left" />

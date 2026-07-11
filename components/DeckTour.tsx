@@ -24,70 +24,94 @@ import { ArrowRight, Sparkles, X } from "lucide-react";
  *     sees it once on their next visit, then never again.
  */
 
-const STORAGE_KEY = "exdeck_deck_tour_v1";
+const STORAGE_KEY = "exdeck_editor_tour_v2";
 
 type Placement = "top" | "bottom" | "left" | "right";
 type Step = { sel: string; title: string; body: string; placement?: Placement };
 
 const STEPS: Step[] = [
   {
-    sel: "tour-styles",
-    title: "Restyle any slide here",
-    body: "This is the style menu. Pick a different layout or variant and the current slide instantly takes on a new look — no redoing your content.",
-    placement: "left",
-  },
-  {
-    sel: "tour-add-slide",
-    title: "Add a slide anywhere",
-    body: "Hover between any two thumbnails and click the + to drop a fresh slide right in that spot. Add as many as you need.",
-    placement: "right",
-  },
-  {
-    sel: "tour-notes",
-    title: "Generate speaker notes",
-    body: "One click writes spoken notes for every slide — perfect for the teleprompter when you present, or to export alongside your deck.",
-    placement: "bottom",
-  },
-  {
     sel: "tour-ask-ai",
-    title: "Ask AI to make changes",
-    body: "Type what you want — “make this punchier”, “add a slide on pricing”, “turn these into a chart” — and the AI edits the deck for you.",
+    title: "Ask AI to edit the slide",
+    body: "Click here and just talk to the AI — “make this punchier”, “add a stat about cost”, “turn this into a chart”. It rewrites the current slide for you.",
     placement: "top",
   },
   {
-    sel: "tour-share",
-    title: "Share with a link",
-    body: "Publish a live link to your deck. Anyone can open it in the browser — no account or download needed.",
-    placement: "bottom",
+    sel: "tour-bb-text",
+    title: "Add a text box",
+    body: "Drop a free-floating text box anywhere on the slide, then drag and style it.",
+    placement: "top",
   },
   {
-    sel: "tour-present",
-    title: "Present full-screen",
-    body: "Launch a clean full-screen presentation. Arrow keys to move, S for notes, Esc to exit.",
-    placement: "bottom",
+    sel: "tour-bb-image",
+    title: "Add your own image",
+    body: "Upload a photo or logo from your device straight onto the slide.",
+    placement: "top",
   },
   {
-    sel: "tour-export",
-    title: "Export to PowerPoint or PDF",
-    body: "Download a real editable .pptx, a high-res PDF, or a notes handout. Your charts, fonts, and theme come along.",
-    placement: "bottom",
+    sel: "tour-bb-photo",
+    title: "Insert a stock photo",
+    body: "Search millions of free stock photos and place one in a click.",
+    placement: "top",
   },
   {
-    sel: "tour-theme",
-    title: "Switch the whole theme",
-    body: "Recolor the entire deck in one tap. Try a few — the layout and content stay exactly where they are.",
-    placement: "bottom",
+    sel: "tour-bb-visuals",
+    title: "Add a chart or visual",
+    body: "Insert a real data chart or a visual element. Charts render in crisp 3D and export to PowerPoint.",
+    placement: "top",
   },
   {
-    sel: "tour-icon",
-    title: "Add icons & graphics",
-    body: "Drop in any of 200,000+ icons, patterns, and decorations to bring a slide to life.",
-    placement: "bottom",
+    sel: "tour-bb-diagram",
+    title: "Add a diagram",
+    body: "Generate flowcharts, mind maps, and process diagrams from a short description.",
+    placement: "top",
   },
   {
-    sel: "tour-outline",
-    title: "Edit as an outline",
-    body: "Prefer writing? Flip to Outline view to restructure the whole deck as a simple list, then switch back to slides.",
+    sel: "tour-bb-notes",
+    title: "Generate speaker notes",
+    body: "One click writes spoken notes for every slide — great for the teleprompter in Present mode or a notes handout.",
+    placement: "top",
+  },
+  {
+    sel: "tour-bb-qa",
+    title: "Prep for Q&A",
+    body: "Get the likely audience questions with suggested answers, so you're ready for anything.",
+    placement: "top",
+  },
+  {
+    sel: "tour-bb-translate",
+    title: "Translate the whole deck",
+    body: "Instantly translate every slide into another language — the layout and design stay intact.",
+    placement: "top",
+  },
+  {
+    sel: "tour-bb-theme",
+    title: "Theme & colors",
+    body: "Recolor the entire deck in one tap. Your layout and content stay exactly where they are.",
+    placement: "top",
+  },
+  {
+    sel: "tour-bb-pattern",
+    title: "Background pattern",
+    body: "Add a subtle textured background to give slides depth and polish.",
+    placement: "top",
+  },
+  {
+    sel: "tour-styles",
+    title: "Pick a slide style",
+    body: "Every slide can wear a different look — concept cards, bands, numbered cards, timeline, chevron and more. Choose the one that fits the content.",
+    placement: "left",
+  },
+  {
+    sel: "tour-regenerate",
+    title: "Regenerate with any AI model",
+    body: "Not happy with a slide? Regenerate just it with the model of your choice — Llama, Qwen, or GPT-OSS — text, tables, and charts included.",
+    placement: "top",
+  },
+  {
+    sel: "tour-template",
+    title: "Switch the template",
+    body: "Change the whole deck's template — theme, fonts and background — while keeping your content and per-slide styles.",
     placement: "bottom",
   },
 ];
@@ -104,8 +128,10 @@ export default function DeckTour({ userId }: { userId?: string | null }) {
   const [rect, setRect] = useState<DOMRect | null>(null);
   const [vp, setVp] = useState({ w: 0, h: 0 });
 
-  // Per-user flag so the tour runs exactly once for each account.
-  const storeKey = `${STORAGE_KEY}:${userId || "anon"}`;
+  // A single per-browser flag: the tour runs once for anyone on this browser,
+  // regardless of account or when they registered. Clearing site data /
+  // switching browsers makes it show again.
+  const storeKey = STORAGE_KEY;
 
   const step = STEPS[idx];
 

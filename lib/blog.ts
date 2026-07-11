@@ -740,6 +740,290 @@ BLOG_POSTS.push(
   },
 );
 
+/* -------------------------------------------------------------------------- */
+/*  More SEO blog posts (2026)                                                */
+/* -------------------------------------------------------------------------- */
+
+BLOG_POSTS.push(
+  {
+    slug: "gamma-vs-canva-vs-exdeck",
+    title: "Gamma vs Canva vs EXdeck: Which AI Presentation Maker Wins?",
+    description:
+      "A practical comparison of Gamma, Canva, and EXdeck for AI presentations — export quality, editing, charts, and price — so you can pick the right tool.",
+    h1: "Gamma vs Canva vs EXdeck",
+    datePublished: "2026-07-11",
+    readMins: 8,
+    lede:
+      "Three popular ways to make a presentation, three very different philosophies. Here's an honest look at Gamma, Canva, and EXdeck so you can choose based on what you actually need — a real PowerPoint, a design suite, or a fast AI draft.",
+    sections: [
+      {
+        h: "The short version",
+        list: [
+          "Gamma — beautiful web-native cards; export to true PowerPoint is limited.",
+          "Canva — a huge design suite; presentations are one of many formats, and AI is template-fill oriented.",
+          "EXdeck — a focused AI PPT maker that writes the deck from a prompt and exports a real, editable .pptx and PDF.",
+        ],
+      },
+      {
+        h: "Export: the deciding factor for most people",
+        p: [
+          "If you'll ever need to open your deck in PowerPoint, hand it to a colleague, or submit it, export fidelity matters more than anything. EXdeck is built to export a genuine .pptx with charts, themes, and text intact. Gamma's card model doesn't map cleanly to PowerPoint, and Canva's PPTX export can rasterize or shift layouts.",
+        ],
+      },
+      {
+        h: "Editing and speed",
+        p: [
+          "Canva gives the most manual design control but the least AI drafting. Gamma is fast but keeps you inside its card format. EXdeck drafts the whole deck in about ten seconds and then gives you a real slide editor — plus per-slide regeneration with your choice of AI model.",
+        ],
+      },
+      {
+        h: "Price",
+        p: [
+          "EXdeck has a free plan and Pro from $1.99/mo. Canva Pro and Gamma's paid tiers cost more. For students and small teams, that gap adds up.",
+        ],
+      },
+      {
+        h: "Which should you pick?",
+        p: [
+          "Need a real PowerPoint fast and cheap? EXdeck. Want an all-purpose design tool for social, print, and slides? Canva. Prefer a scrollable web deck and rarely need .pptx? Gamma.",
+        ],
+      },
+    ],
+    faq: [
+      { q: "Does EXdeck export better PowerPoint files than Gamma or Canva?", a: "EXdeck focuses on a faithful, editable .pptx export with charts and themes preserved, which tends to be cleaner than Gamma's card exports or Canva's rasterized PPTX." },
+      { q: "Is EXdeck free?", a: "Yes — a free plan with monthly credits, plus Pro from $1.99/mo." },
+    ],
+    related: ["exdeck-vs-gamma", "exdeck-vs-canva", "gamma-alternative"],
+  },
+  {
+    slug: "how-to-make-a-pitch-deck-that-gets-funded",
+    title: "How to Make a Pitch Deck That Gets Funded (2026 Guide)",
+    description:
+      "The slide-by-slide structure investors expect, common mistakes to avoid, and how to draft a fundable pitch deck fast with AI. Free template workflow inside.",
+    h1: "How to Make a Pitch Deck That Gets Funded",
+    datePublished: "2026-07-11",
+    readMins: 9,
+    lede:
+      "Investors see hundreds of decks. Yours has about three minutes to land. This is the structure that works, the mistakes that kill momentum, and a fast way to draft it with AI so you can spend your time on the story, not the slides.",
+    sections: [
+      {
+        h: "The 10 slides investors expect",
+        list: [
+          "Cover — company, one-line positioning",
+          "Problem — the painful, specific problem",
+          "Solution — how you solve it, simply",
+          "Product — a real look at what it does",
+          "Market — size and why now",
+          "Traction — the slide that matters most",
+          "Business model — how you make money",
+          "Competition — an honest landscape",
+          "Team — why you'll win",
+          "Ask — how much, and what it unlocks",
+        ],
+      },
+      {
+        h: "Lead with traction if you have it",
+        p: [
+          "Nothing de-risks a raise like evidence. If you have revenue, growth, or usage, move it earlier and put it on a clean chart. Numbers on a well-labeled bar or line chart beat three bullet points every time.",
+        ],
+      },
+      {
+        h: "Common mistakes that lose the room",
+        list: [
+          "Too much text — investors skim; one idea per slide",
+          "No clear ask — always state the amount and the use of funds",
+          "Vague market sizing — show a credible bottom-up number",
+          "Hiding the competition — acknowledge it, then differentiate",
+        ],
+      },
+      {
+        h: "Draft it fast, then refine",
+        p: [
+          "Describe your startup in a sentence and let an AI PPT maker build the ten-slide structure with placeholder charts. Then replace the numbers with your real data, tighten the story, and export a real .pptx to share.",
+        ],
+      },
+    ],
+    faq: [
+      { q: "How many slides should a pitch deck be?", a: "Ten to twelve for a first meeting. Keep one idea per slide and move detail to an appendix." },
+      { q: "Can AI build a pitch deck?", a: "Yes — EXdeck drafts the full structure and charts from a one-line brief; you then add your real numbers and export a real PowerPoint." },
+    ],
+    related: ["ai-pitch-deck-generator", "sales-deck-generator", "investor-update-presentation"],
+  },
+  {
+    slug: "how-to-add-charts-to-a-presentation",
+    title: "How to Add Charts to a Presentation (Without the Busywork)",
+    description:
+      "When to use bar, line, pie, and donut charts, how to keep them readable, and how AI can build real data charts on your slides automatically. Practical guide.",
+    h1: "How to Add Charts to a Presentation",
+    datePublished: "2026-07-11",
+    readMins: 6,
+    lede:
+      "A good chart makes a point in a second; a bad one buries it. Here's how to pick the right chart type, keep it clean, and skip the manual busywork by letting AI build data charts straight onto your slides.",
+    sections: [
+      {
+        h: "Pick the chart that fits the data",
+        list: [
+          "Bar — compare categories (revenue by region, features by plan)",
+          "Line / area — trends over time (users by month, growth)",
+          "Pie / donut — parts of a whole (market share, traffic sources)",
+          "Table — precise values people need to read exactly",
+        ],
+      },
+      {
+        h: "Keep it readable",
+        p: [
+          "One idea per chart. Label the axes, show the actual values, and use no more than a handful of data points. Color to match your theme, and give the chart a title that states the takeaway, not just the metric.",
+        ],
+      },
+      {
+        h: "Let AI build the chart for you",
+        p: [
+          "Modern AI presentation makers detect when your content is numeric and render a real, editable chart automatically — colored to your theme and exported as vectors to PowerPoint and PDF. EXdeck even renders charts in crisp 3D and lets you edit the data inline.",
+        ],
+      },
+      {
+        h: "Never fabricate numbers",
+        p: [
+          "A chart is a promise that the data is real. If you don't have the figures, use a table or bullets instead. Good tools won't invent data — they leave a slide text-only when there's nothing real to plot.",
+        ],
+      },
+    ],
+    faq: [
+      { q: "Can AI make charts from my numbers?", a: "Yes. EXdeck builds bar, line, pie, and donut charts from the real figures in your topic and lets you edit the data on the slide." },
+      { q: "Do the charts export to PowerPoint?", a: "Yes — they export as clean vectors to both .pptx and PDF." },
+    ],
+    related: ["ai-ppt-maker", "ai-ppt-generator", "text-to-ppt"],
+  },
+  {
+    slug: "how-many-slides-should-a-presentation-have",
+    title: "How Many Slides Should a Presentation Have?",
+    description:
+      "A simple rule for slide count by talk length and format — pitch decks, lectures, webinars, and sales calls — plus how to trim a deck that's gotten too long.",
+    h1: "How Many Slides Should a Presentation Have?",
+    datePublished: "2026-07-11",
+    readMins: 5,
+    lede:
+      "The honest answer is \"as few as possible,\" but that's not helpful when you're staring at a deadline. Here are practical ranges by format, and a fast way to hit the right length.",
+    sections: [
+      {
+        h: "Rough ranges by format",
+        list: [
+          "Pitch deck — 10–12 slides for a first meeting",
+          "Class / lecture — 1 slide per 1–2 minutes of talk",
+          "Sales call — 8–15, front-loaded with value",
+          "Webinar — 20–40 with lots of visuals, light text",
+          "Conference talk — fewer, bolder slides; ~1 per minute",
+        ],
+      },
+      {
+        h: "The real rule: one idea per slide",
+        p: [
+          "Slide count follows from your ideas, not the other way around. If a slide has two ideas, split it. If three slides say the same thing, merge them. Count is a symptom; clarity is the goal.",
+        ],
+      },
+      {
+        h: "Trimming a deck that's too long",
+        p: [
+          "Cut anything the audience doesn't need to reach the decision. Move detail to an appendix. When you generate with AI, set the slide count up front and pick a lower content density so you start lean instead of trimming later.",
+        ],
+      },
+    ],
+    faq: [
+      { q: "How long should each slide be on screen?", a: "Aim for one to two minutes per content slide. If you linger longer, the slide probably holds more than one idea." },
+      { q: "Can I set the slide count when generating with AI?", a: "Yes — EXdeck lets you choose the number of slides and the content density before it builds the deck." },
+    ],
+    related: ["ai-presentation-maker", "free-ppt-maker", "ai-slide-maker"],
+  },
+  {
+    slug: "how-to-present-a-pdf-without-powerpoint",
+    title: "How to Present a PDF Full-Screen Without PowerPoint",
+    description:
+      "Present any PDF like a slide deck — full-screen, with arrow-key navigation — no PowerPoint or Keynote needed. A quick guide plus a free browser tool.",
+    h1: "How to Present a PDF Without PowerPoint",
+    datePublished: "2026-07-11",
+    readMins: 4,
+    lede:
+      "You've got a PDF and a room full of people, but no PowerPoint installed. You don't need it — any PDF can be presented full-screen from the browser, with clean slide-by-slide navigation.",
+    sections: [
+      {
+        h: "Why not just open the PDF?",
+        p: [
+          "Default PDF viewers show scrollbars, toolbars, and page gaps — not a clean full-screen slide. A dedicated PDF presenter shows one page at a time, edge to edge, with keyboard navigation, so a PDF behaves exactly like a slideshow.",
+        ],
+      },
+      {
+        h: "How to do it in the browser",
+        list: [
+          "Open a PDF presenter in your browser",
+          "Drop in your PDF — it stays on your device",
+          "Go full-screen and use the arrow keys to move",
+          "Press Esc to exit when you're done",
+        ],
+      },
+      {
+        h: "Turn the PDF into editable slides instead",
+        p: [
+          "If you want to edit rather than just present, an AI tool can convert a PDF into a real, editable PowerPoint deck — so you can restructure, restyle, and add charts before you present.",
+        ],
+      },
+    ],
+    faq: [
+      { q: "Can I present a PDF without installing anything?", a: "Yes. EXdeck's PDF presenter runs in the browser and shows any PDF full-screen with arrow-key navigation." },
+      { q: "Can I convert the PDF into editable slides?", a: "Yes — EXdeck can turn a PDF into a real, editable PowerPoint you can restyle and export." },
+    ],
+    cta: { label: "Present a PDF full-screen, free", href: "/pdf-presenter" },
+    related: ["pdf-to-ppt", "ppt-generator-from-pdf", "ai-presentation-from-pdf"],
+  },
+  {
+    slug: "ai-presentation-tips-that-actually-work",
+    title: "9 AI Presentation Tips That Actually Work",
+    description:
+      "Get better decks from AI presentation makers: how to write the brief, when to regenerate a slide, choosing charts, and editing for your voice. Practical tips.",
+    h1: "9 AI Presentation Tips That Actually Work",
+    datePublished: "2026-07-11",
+    readMins: 7,
+    lede:
+      "AI can draft a deck in seconds, but the difference between a generic result and a great one is how you use it. These nine tips consistently produce better presentations.",
+    sections: [
+      {
+        h: "Get the input right",
+        list: [
+          "Name the audience and tone in your brief, not just the topic",
+          "Set the slide count and density before generating",
+          "Paste your own notes or a PDF when you have source material",
+        ],
+      },
+      {
+        h: "Use the AI as a collaborator",
+        list: [
+          "Regenerate a single weak slide instead of redoing the deck",
+          "Ask the AI to 'tighten every bullet' or 'add a competitor slide'",
+          "Try a different model on a slide that isn't landing",
+        ],
+      },
+      {
+        h: "Design for the room",
+        list: [
+          "One idea per slide; move detail to speaker notes",
+          "Use real charts for numbers, not bullet lists",
+          "Match the theme to your brand, then leave it alone",
+        ],
+      },
+      {
+        h: "Finish strong",
+        p: [
+          "Read the deck out loud once, cut anything that doesn't move the story, and export a real .pptx so you can present or keep editing anywhere.",
+        ],
+      },
+    ],
+    faq: [
+      { q: "What's the biggest lever for a better AI deck?", a: "The brief. Specifying audience, tone, slide count, and density up front changes the output more than any post-editing." },
+      { q: "Should I regenerate the whole deck if one slide is weak?", a: "No — regenerate just that slide (EXdeck lets you pick the model) and keep the rest." },
+    ],
+    related: ["ai-presentation-maker", "best-ai-presentation-maker", "ai-ppt-maker"],
+  },
+);
+
 export function getBlogPost(slug: string): BlogPost | undefined {
   return BLOG_POSTS.find((p) => p.slug === slug);
 }

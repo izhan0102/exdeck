@@ -51,6 +51,7 @@ export default function BottomBar(p: Props) {
         <button
           onClick={p.onToggleAi}
           aria-label="Ask AI"
+          data-tour="tour-ask-ai"
           className="group relative flex h-11 shrink-0 items-center gap-1.5 rounded-xl px-3 text-[13px] font-semibold transition-[transform] duration-200 ease-[cubic-bezier(.2,.85,.3,1)] will-change-transform hover:-translate-y-3 hover:scale-[1.15]"
           style={{ transformOrigin: "bottom center", background: p.aiActive ? "var(--ezd-button-strong)" : "var(--ezd-bg-hover)", color: p.aiActive ? "var(--ezd-button-strong-fg)" : "var(--ezd-fg-strong)" }}
         >
@@ -63,6 +64,7 @@ export default function BottomBar(p: Props) {
             key={it.key}
             onClick={it.onClick}
             aria-label={it.label}
+            data-tour={`tour-bb-${it.key}`}
             className="group relative grid h-11 w-11 shrink-0 place-items-center rounded-xl transition-[transform] duration-200 ease-[cubic-bezier(.2,.85,.3,1)] will-change-transform hover:-translate-y-3 hover:scale-[1.4]"
             style={{
               transformOrigin: "bottom center",

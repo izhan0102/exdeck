@@ -73,6 +73,26 @@ function alpha(hex: string, a: number): string {
   return `${hex}${v}`;
 }
 
+/* ------------------------------ 3D helpers ------------------------------- */
+/** Lighten a hex toward white by t (0..1). */
+function lighten(c: string, t: number): string { return mix(c, "#ffffff", t); }
+/** Darken a hex toward black by t (0..1). */
+function darken(c: string, t: number): string { return mix(c, "#000000", t); }
+
+/** A glossy vertical gradient def (light top → base → slightly dark bottom). */
+function vGrad(id: string, c: string): string {
+  return `<linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1">`
+    + `<stop offset="0" stop-color="${lighten(c, 0.30)}"/>`
+    + `<stop offset="0.55" stop-color="${c}"/>`
+    + `<stop offset="1" stop-color="${darken(c, 0.14)}"/></linearGradient>`;
+}
+/** A diagonal gloss gradient for pie/donut top faces. */
+function gGrad(id: string, c: string): string {
+  return `<linearGradient id="${id}" x1="0" y1="0" x2="1" y2="1">`
+    + `<stop offset="0" stop-color="${lighten(c, 0.26)}"/>`
+    + `<stop offset="1" stop-color="${darken(c, 0.10)}"/></linearGradient>`;
+}
+
 function rgbToHsl(r: number, g: number, b: number): [number, number, number] {
   r /= 255; g /= 255; b /= 255;
   const max = Math.max(r, g, b), min = Math.min(r, g, b);
@@ -220,20 +240,34 @@ function renderBarOrLine(spec: ChartSpec, theme: Theme, mode: "bar" | "line" | "
 
   let body = "";
   let labels = "";
+  let defs = "";
 
   if (mode === "bar") {
-    const bw = Math.min(slot * 0.62, 64);
+    const bw = Math.min(slot * 0.54, 56);
+    const depth = Math.max(6, Math.min(15, bw * 0.28)); // isometric depth
     data.forEach((d, i) => {
       const h = (d.value / niceMax) * plotH;
       const x = left + slot * i + (slot - bw) / 2;
       const y = baseY - h;
       const c = d.color || cols[i];
-      body += `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(0, h).toFixed(1)}" rx="4" fill="${c}"/>`;
-      body += `<text x="${(x + bw / 2).toFixed(1)}" y="${(y - 7).toFixed(1)}" text-anchor="middle" font-size="14" font-weight="700" fill="${theme.fg}">${fmt(d.value, spec.unit)}</text>`;
+      const gid = `bar${i}`;
+      defs += vGrad(gid, c);
+      const topC = lighten(c, 0.36);
+      const sideC = darken(c, 0.26);
+      if (h > 1) {
+        // top face (parallelogram going up-right into the scene)
+        body += `<polygon points="${x.toFixed(1)},${y.toFixed(1)} ${(x + bw).toFixed(1)},${y.toFixed(1)} ${(x + bw + depth).toFixed(1)},${(y - depth).toFixed(1)} ${(x + depth).toFixed(1)},${(y - depth).toFixed(1)}" fill="${topC}"/>`;
+        // right side face
+        body += `<polygon points="${(x + bw).toFixed(1)},${y.toFixed(1)} ${(x + bw + depth).toFixed(1)},${(y - depth).toFixed(1)} ${(x + bw + depth).toFixed(1)},${(baseY - depth).toFixed(1)} ${(x + bw).toFixed(1)},${baseY.toFixed(1)}" fill="${sideC}"/>`;
+      }
+      // front face
+      body += `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(0, h).toFixed(1)}" rx="2" fill="url(#${gid})"/>`;
+      body += `<text x="${(x + bw / 2 + depth / 2).toFixed(1)}" y="${(y - depth - 7).toFixed(1)}" text-anchor="middle" font-size="14" font-weight="700" fill="${theme.fg}">${fmt(d.value, spec.unit)}</text>`;
       labels += `<text x="${(left + slot * i + slot / 2).toFixed(1)}" y="${(baseY + 20).toFixed(1)}" text-anchor="middle" font-size="13" fill="${alpha(theme.fg, 0.75)}">${esc(clip(d.label, 11))}</text>`;
     });
+    body = `<defs>${defs}</defs>` + body;
   } else {
-    // line / area
+    // line / area with a glossy gradient fill + soft depth shadow
     const pts = data.map((d, i) => {
       const x = left + slot * i + slot / 2;
       const y = baseY - (d.value / niceMax) * plotH;
@@ -241,15 +275,23 @@ function renderBarOrLine(spec: ChartSpec, theme: Theme, mode: "bar" | "line" | "
     });
     const poly = pts.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(" ");
     if (mode === "area") {
+      defs += `<linearGradient id="areaFill" x1="0" y1="0" x2="0" y2="1">`
+        + `<stop offset="0" stop-color="${alpha(theme.accent, 0.55)}"/>`
+        + `<stop offset="1" stop-color="${alpha(theme.accent, 0.04)}"/></linearGradient>`;
       const area = `${left + slot / 2},${baseY} ${poly} ${left + slot * (n - 1) + slot / 2},${baseY}`;
-      body += `<polygon points="${area}" fill="${alpha(theme.accent, 0.22)}"/>`;
+      body += `<polygon points="${area}" fill="url(#areaFill)"/>`;
     }
-    body += `<polyline points="${poly}" fill="none" stroke="${theme.accent}" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>`;
+    // soft shadow under the line for depth
+    body += `<polyline points="${poly}" fill="none" stroke="${alpha(theme.fg, 0.18)}" stroke-width="6" stroke-linejoin="round" stroke-linecap="round" transform="translate(0,3)"/>`;
+    body += `<polyline points="${poly}" fill="none" stroke="${theme.accent}" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round"/>`;
     pts.forEach(([x, y], i) => {
-      body += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4.5" fill="${data[i].color || theme.accent}"/>`;
-      body += `<text x="${x.toFixed(1)}" y="${(y - 11).toFixed(1)}" text-anchor="middle" font-size="13" font-weight="700" fill="${theme.fg}">${fmt(data[i].value, spec.unit)}</text>`;
+      const c = data[i].color || theme.accent;
+      body += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="5.5" fill="#fff"/>`;
+      body += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4" fill="${c}"/>`;
+      body += `<text x="${x.toFixed(1)}" y="${(y - 12).toFixed(1)}" text-anchor="middle" font-size="13" font-weight="700" fill="${theme.fg}">${fmt(data[i].value, spec.unit)}</text>`;
       labels += `<text x="${x.toFixed(1)}" y="${(baseY + 20).toFixed(1)}" text-anchor="middle" font-size="13" fill="${alpha(theme.fg, 0.75)}">${esc(clip(data[i].label, 11))}</text>`;
     });
+    body = `<defs>${defs}</defs>` + body;
   }
 
   const axis = `<line x1="${left}" y1="${baseY}" x2="${left + plotW}" y2="${baseY}" stroke="${alpha(theme.fg, 0.4)}" stroke-width="1.5"/>`;
@@ -262,43 +304,84 @@ function renderPieOrDonut(spec: ChartSpec, theme: Theme, mode: "pie" | "donut"):
   const { svg: tSvg, top } = titleBlock(spec, theme);
 
   const total = data.reduce((a, d) => a + Math.max(0, d.value), 0) || 1;
-  const cx = 150, cy = top + (VH - top) / 2 - 4;
-  const r = Math.min(112, (VH - top) / 2 - 14);
-  const rIn = mode === "donut" ? r * 0.56 : 0;
+  const cx = 150;
+  const rx = Math.min(120, (VH - top) / 2 - 6);
+  const ry = rx * 0.62;                 // tilt (foreshorten vertically) for 3D
+  const cy = top + (VH - top) / 2 - 10;
+  const depth = Math.max(14, rx * 0.16); // disc thickness
+  const rxIn = mode === "donut" ? rx * 0.5 : 0;
+  const ryIn = mode === "donut" ? ry * 0.5 : 0;
 
+  // point on the tilted ellipse for angle a (radians)
+  const px = (a: number, R = rx) => cx + R * Math.cos(a);
+  const py = (a: number, R = ry, yc = cy) => yc + R * Math.sin(a);
+
+  let defs = "";
+  let sides = "";   // extruded side walls (drawn first, behind the top faces)
+  let tops = "";    // top faces
+  let labels3d = "";
+
+  // Build slices
   let acc = 0;
-  let segs = "";
   data.forEach((d, i) => {
     const frac = Math.max(0, d.value) / total;
     const a1 = acc * Math.PI * 2 - Math.PI / 2;
     const a2 = (acc + frac) * Math.PI * 2 - Math.PI / 2;
     acc += frac;
     const large = frac > 0.5 ? 1 : 0;
-    const x1 = cx + r * Math.cos(a1), y1 = cy + r * Math.sin(a1);
-    const x2 = cx + r * Math.cos(a2), y2 = cy + r * Math.sin(a2);
     const c = d.color || cols[i];
+    const gid = `pie${i}`;
+    defs += gGrad(gid, c);
+
+    const x1 = px(a1), y1 = py(a1);
+    const x2 = px(a2), y2 = py(a2);
+
     if (mode === "donut") {
-      const xi1 = cx + rIn * Math.cos(a1), yi1 = cy + rIn * Math.sin(a1);
-      const xi2 = cx + rIn * Math.cos(a2), yi2 = cy + rIn * Math.sin(a2);
-      segs += `<path d="M ${x1.toFixed(1)} ${y1.toFixed(1)} A ${r} ${r} 0 ${large} 1 ${x2.toFixed(1)} ${y2.toFixed(1)} L ${xi2.toFixed(1)} ${yi2.toFixed(1)} A ${rIn} ${rIn} 0 ${large} 0 ${xi1.toFixed(1)} ${yi1.toFixed(1)} Z" fill="${c}"/>`;
+      const xi1 = px(a1, rxIn), yi1 = py(a1, ryIn);
+      const xi2 = px(a2, rxIn), yi2 = py(a2, ryIn);
+      tops += `<path d="M ${x1.toFixed(1)} ${y1.toFixed(1)} A ${rx} ${ry} 0 ${large} 1 ${x2.toFixed(1)} ${y2.toFixed(1)} L ${xi2.toFixed(1)} ${yi2.toFixed(1)} A ${rxIn} ${ryIn} 0 ${large} 0 ${xi1.toFixed(1)} ${yi1.toFixed(1)} Z" fill="url(#${gid})" stroke="${darken(c, 0.12)}" stroke-width="0.5"/>`;
     } else {
-      segs += `<path d="M ${cx} ${cy} L ${x1.toFixed(1)} ${y1.toFixed(1)} A ${r} ${r} 0 ${large} 1 ${x2.toFixed(1)} ${y2.toFixed(1)} Z" fill="${c}"/>`;
+      tops += `<path d="M ${cx} ${cy} L ${x1.toFixed(1)} ${y1.toFixed(1)} A ${rx} ${ry} 0 ${large} 1 ${x2.toFixed(1)} ${y2.toFixed(1)} Z" fill="url(#${gid})" stroke="${darken(c, 0.12)}" stroke-width="0.5"/>`;
     }
   });
 
+  // Outer side wall: the front band between the top ellipse and the bottom
+  // (shifted down by `depth`). Only the FRONT half (angles 0..PI) is visible.
+  const wallGrad = "wallGrad";
+  defs += `<linearGradient id="${wallGrad}" x1="0" y1="0" x2="0" y2="1">`
+    + `<stop offset="0" stop-color="${darken(cols[0] || theme.accent, 0.18)}"/>`
+    + `<stop offset="1" stop-color="${darken(cols[0] || theme.accent, 0.42)}"/></linearGradient>`;
+  // front rim from left (angle PI) to right (angle 0), across the bottom
+  const lx = px(Math.PI), lyTop = py(Math.PI);
+  const rxr = px(0), ryTop = py(0);
+  sides += `<path d="M ${lx.toFixed(1)} ${lyTop.toFixed(1)} `
+    + `A ${rx} ${ry} 0 0 0 ${rxr.toFixed(1)} ${ryTop.toFixed(1)} `
+    + `L ${rxr.toFixed(1)} ${(ryTop + depth).toFixed(1)} `
+    + `A ${rx} ${ry} 0 0 1 ${lx.toFixed(1)} ${(lyTop + depth).toFixed(1)} Z" fill="url(#${wallGrad})"/>`;
+
+  // For donut, also add the inner front wall (a lighter shaded band).
+  if (mode === "donut") {
+    const ilx = px(Math.PI, rxIn), ilyTop = py(Math.PI, ryIn);
+    const irx = px(0, rxIn), iryTop = py(0, ryIn);
+    sides += `<path d="M ${ilx.toFixed(1)} ${ilyTop.toFixed(1)} `
+      + `A ${rxIn} ${ryIn} 0 0 0 ${irx.toFixed(1)} ${iryTop.toFixed(1)} `
+      + `L ${irx.toFixed(1)} ${(iryTop + depth).toFixed(1)} `
+      + `A ${rxIn} ${ryIn} 0 0 1 ${ilx.toFixed(1)} ${(ilyTop + depth).toFixed(1)} Z" fill="${darken(cols[0] || theme.accent, 0.5)}"/>`;
+  }
+
   // legend on the right
   let legend = "";
-  const lx = 300;
+  const legX = 300;
   const lh = 26;
   const startY = cy - (data.length * lh) / 2 + 8;
   data.forEach((d, i) => {
     const y = startY + i * lh;
     const pct = Math.round((Math.max(0, d.value) / total) * 100);
-    legend += `<rect x="${lx}" y="${(y - 11).toFixed(1)}" width="14" height="14" rx="3" fill="${d.color || cols[i]}"/>`;
-    legend += `<text x="${lx + 22}" y="${y.toFixed(1)}" font-size="14" fill="${theme.fg}">${esc(clip(d.label, 14))} <tspan fill="${alpha(theme.fg, 0.6)}" font-weight="700">${pct}%</tspan></text>`;
+    legend += `<rect x="${legX}" y="${(y - 11).toFixed(1)}" width="14" height="14" rx="3" fill="${d.color || cols[i]}"/>`;
+    legend += `<text x="${legX + 22}" y="${y.toFixed(1)}" font-size="14" fill="${theme.fg}">${esc(clip(d.label, 14))} <tspan fill="${alpha(theme.fg, 0.6)}" font-weight="700">${pct}%</tspan></text>`;
   });
 
-  return svgWrap(tSvg + segs + legend + noteBlock(spec, theme));
+  return svgWrap(`<defs>${defs}</defs>` + tSvg + sides + tops + labels3d + legend + noteBlock(spec, theme));
 }
 
 /* -------------------------------- public API ------------------------------ */

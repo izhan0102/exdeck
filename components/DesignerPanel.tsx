@@ -1,7 +1,8 @@
 "use client";
+import { useState } from "react";
 import type { Slide, UploadedImage, Deck } from "@/lib/types";
 import type { Theme } from "@/lib/themes";
-import { Eye, ImageIcon, Loader2, Maximize2, Palette, Shapes, Trash2 } from "lucide-react";
+import { Eye, ImageIcon, Loader2, Maximize2, Palette, Shapes, Trash2, Type } from "lucide-react";
 import { getDecoration } from "@/lib/decorations";
 import type { PexelsPhoto } from "@/lib/pexels";
 import StyleVariants from "./StyleVariants";
@@ -16,7 +17,7 @@ const ELEMENTS: { id: keyof NonNullable<Slide["elementHidden"]>; label: string }
 ];
 
 export default function DesignerPanel({
-  slide, theme, deck, onUpdate, onReplace,
+  slide, theme, deck, onUpdate, onReplace, onUpdateAll,
   selectedImageId, onDeselectImage,
   relatedImages, relatedLoading, onReplaceImage, onSearchImages,
   hideStyleVariants,
@@ -26,6 +27,8 @@ export default function DesignerPanel({
   deck: Deck;
   onUpdate: (patch: Partial<Slide>) => void;
   onReplace?: (next: Slide) => void;
+  /** Apply a patch to EVERY slide in the deck (used by "apply to all slides"). */
+  onUpdateAll?: (patch: Partial<Slide>) => void;
   selectedImageId?: string | null;
   onDeselectImage?: () => void;
   /** Related Pexels images for the selected photo (one-click replace). */
@@ -84,6 +87,7 @@ export default function DesignerPanel({
         }}
       />
       )}
+      <TextColorsSection slide={slide} theme={theme} onUpdate={onUpdate} onUpdateAll={onUpdateAll} />
       {slide.layout === "chart" && slide.chart && (
         <ChartSizeRow
           value={typeof slide.chartScale === "number" ? slide.chartScale : 1}
@@ -407,6 +411,60 @@ function ColorRow({
 function normalizeHex(v: string): string {
   if (/^#[0-9a-fA-F]{6}$/.test(v)) return v;
   return "#000000";
+}
+
+/** Title & body text-color controls (fixes odd contrast after a template
+ *  swap). Body color also recolors the on-slide markers/icons. Optional
+ *  "apply to all slides" writes the same override to every slide. */
+function TextColorsSection({
+  slide, theme, onUpdate, onUpdateAll,
+}: {
+  slide: Slide;
+  theme: Theme;
+  onUpdate: (patch: Partial<Slide>) => void;
+  onUpdateAll?: (patch: Partial<Slide>) => void;
+}) {
+  const [applyAll, setApplyAll] = useState(false);
+  const apply = (patch: Partial<Slide>) => {
+    if (applyAll && onUpdateAll) onUpdateAll(patch);
+    else onUpdate(patch);
+  };
+  return (
+    <div className="rounded-xl border border-white/10 bg-white/5 p-3">
+      <div className="mb-3 flex items-center gap-2 text-xs uppercase tracking-wider text-white/50">
+        <Type size={12} /> Text colors
+      </div>
+
+      <div className="space-y-4">
+        <ColorRow
+          label="Header / title"
+          value={slide.titleColorOverride || theme.fg}
+          isOverride={!!slide.titleColorOverride}
+          themeColor={theme.fg}
+          onChange={(v) => apply({ titleColorOverride: v })}
+          onReset={() => apply({ titleColorOverride: undefined })}
+        />
+        <ColorRow
+          label="Body & icons"
+          value={slide.bodyColorOverride || theme.fg}
+          isOverride={!!slide.bodyColorOverride}
+          themeColor={theme.fg}
+          onChange={(v) => apply({ bodyColorOverride: v })}
+          onReset={() => apply({ bodyColorOverride: undefined })}
+        />
+      </div>
+
+      <label className="mt-3 flex cursor-pointer items-center gap-2 text-[11px] text-white/70">
+        <input
+          type="checkbox"
+          checked={applyAll}
+          onChange={(e) => setApplyAll(e.target.checked)}
+          className="h-3.5 w-3.5 accent-cyan-400"
+        />
+        Apply to all slides
+      </label>
+    </div>
+  );
 }
 
 /** Size slider + quick presets for a chart slide's chart. */

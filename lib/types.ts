@@ -132,6 +132,11 @@ export type Slide = {
   textColorOverride?: string;
   accentColorOverride?: string;
   backgroundColorOverride?: string;
+  /** Per-slide TITLE (header) text color. Overrides the theme for the title only. */
+  titleColorOverride?: string;
+  /** Per-slide BODY text color — applies to bullets/body text and the
+   *  decorative markers/icons that sit on the slide background. */
+  bodyColorOverride?: string;
 
   // Per-element offsets (drag), scales (size menu), and hidden flags
   elementOffsets?: Partial<Record<ElementId, ElementOffset>>;

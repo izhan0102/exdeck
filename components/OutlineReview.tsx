@@ -3,11 +3,35 @@ import { useRef, useState } from "react";
 import {
   Plus, Trash2, X, Sparkles, ArrowRight, ArrowLeft,
   ChevronUp, ChevronDown, Wand2, Loader2,
+  LayoutList, BarChart3, Table2, Quote, Flag, ListChecks, BookMarked, Presentation, Columns2,
 } from "lucide-react";
 import type { Deck, Slide, Reference, TableData } from "@/lib/types";
 import type { Theme } from "@/lib/themes";
 import { getIdToken } from "@/lib/auth";
 import { renderChartSvg } from "@/lib/charts";
+
+/**
+ * The outline step is intentionally MONOCHROME — it uses the site's black/white
+ * theme tokens, never a colored accent, so it looks identical for every
+ * template (design/theme is chosen later). `accent` maps to the theme's strong
+ * foreground; tinted surfaces use the neutral --ezd tokens.
+ */
+const OUTLINE_ACCENT = "var(--ezd-fg-strong)";
+
+/** Icon + label for a slide's structural role. */
+function roleMeta(layout: Slide["layout"]): { label: string; Icon: typeof LayoutList } {
+  switch (layout) {
+    case "title-hero": return { label: "Intro", Icon: Presentation };
+    case "closing": return { label: "Closing", Icon: Flag };
+    case "section": return { label: "Section", Icon: LayoutList };
+    case "chart": return { label: "Chart", Icon: BarChart3 };
+    case "table": return { label: "Table", Icon: Table2 };
+    case "references": return { label: "References", Icon: BookMarked };
+    case "two-column": return { label: "Comparison", Icon: Columns2 };
+    case "quote": return { label: "Quote", Icon: Quote };
+    default: return { label: "Content", Icon: ListChecks };
+  }
+}
 
 /**
  * Outline review step.
@@ -27,29 +51,18 @@ export default function OutlineReview({
   onConfirm: () => void;
   onBack: () => void;
 }) {
-  const accent = theme.accent || "#7C5CFF";
+  const accent = OUTLINE_ACCENT;
 
   // Only content slides are editable in the outline; the hero/closing keep
   // their role but we still show their title so the structure reads clearly.
   const slides = deck.slides;
-  const slidesWithNotes = slides.filter(
-  (slide) => slide.notes && slide.notes.trim().length > 0
-);
 
-const coveragePercentage =
-  slides.length > 0
-    ? Math.round((slidesWithNotes.length / slides.length) * 100)
-    : 0;
-
-const missingSlides = slides
-  .map((slide, index) => ({
-    slide,
-    number: index + 1,
-  }))
-  .filter(
-    ({ slide }) =>
-      !slide.notes || slide.notes.trim().length === 0
-  );
+  // Quick structural stats for the header.
+  const chartCount = slides.filter((s) => s.layout === "chart").length;
+  const tableCount = slides.filter((s) => s.layout === "table").length;
+  const contentCount = slides.filter(
+    (s) => s.layout === "bullets" || s.layout === "two-column" || s.layout === "section",
+  ).length;
 
   const setSlide = (i: number, patch: Partial<Slide>) => {
     const next = slides.map((s, idx) => (idx === i ? { ...s, ...patch } : s));
@@ -95,91 +108,60 @@ const missingSlides = slides
   const setReferences = (refs: Reference[]) => setDeck({ ...deck, references: refs });
 
   return (
-    <main className="min-h-screen pb-32" style={{ background: "var(--ezd-bg-page)", color: "var(--ezd-fg)" }}>
-      {/* Hero header */}
+    <main className="min-h-screen pb-36" style={{ background: "var(--ezd-bg-page)", color: "var(--ezd-fg)" }}>
+      {/* ── Hero header ─────────────────────────────────────────────── */}
       <header className="relative overflow-hidden border-b" style={{ borderColor: "var(--ezd-divider)" }}>
+        {/* layered glow + grid */}
         <div
-          className="pointer-events-none absolute inset-0 opacity-[0.18]"
-          style={{ background: `radial-gradient(60% 120% at 50% 0%, ${accent}, transparent 70%)` }}
+          className="pointer-events-none absolute inset-0"
+          style={{ background: `radial-gradient(70% 130% at 50% -10%, var(--ezd-bg-hover), transparent 60%)` }}
         />
-        <div className="relative mx-auto max-w-3xl px-6 py-10 text-center">
-          <span
-            className="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em]"
-            style={{ borderColor: `${accent}55`, color: accent, background: `${accent}14` }}
-          >
-            <Sparkles size={12} /> Step 1 · Outline
-          </span>
-          <h1 className="mt-4 text-[30px] font-bold leading-tight tracking-tight sm:text-[38px]">
-            Shape your story first
-          </h1>
-          <p className="mx-auto mt-3 max-w-xl text-[14.5px] leading-relaxed" style={{ color: "var(--ezd-fg-muted)" }}>
-            This is the outline — just the words, no design yet. Edit any slide, ask AI to rewrite one,
-            or add and remove slides. When it reads right, hit <b>Design my deck</b> and EXdeck does the magic.
-          </p>
-          <div className="mt-4 inline-flex items-center gap-2 text-[12px]" style={{ color: "var(--ezd-fg-quiet)" }}>
-            <span className="tabular-nums">{slides.length} slides</span>
-            <span aria-hidden>·</span>
-            <span>Editable · text-only</span>
+        <div
+          className="pointer-events-none absolute inset-0 opacity-[0.5]"
+          style={{
+            backgroundImage:
+              "linear-gradient(var(--ezd-divider) 1px, transparent 1px), linear-gradient(90deg, var(--ezd-divider) 1px, transparent 1px)",
+            backgroundSize: "44px 44px",
+            maskImage: "radial-gradient(70% 80% at 50% 0%, black, transparent 75%)",
+            WebkitMaskImage: "radial-gradient(70% 80% at 50% 0%, black, transparent 75%)",
+          }}
+        />
+        <div className="relative mx-auto max-w-3xl px-6 py-14 text-center">
+          {/* step indicator */}
+          <div className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.22em]">
+            <span className="inline-flex items-center gap-1.5 rounded-full border px-3 py-1"
+              style={{ borderColor: "var(--ezd-hairline)", color: "var(--ezd-fg-strong)", background: "var(--ezd-bg-card)" }}>
+              <span className="grid h-4 w-4 place-items-center rounded-full text-[10px]" style={{ background: "var(--ezd-fg-strong)", color: "var(--ezd-bg-page)" }}>1</span>
+              Outline
+            </span>
+            <ArrowRight size={13} style={{ color: "var(--ezd-fg-quiet)" }} />
+            <span className="rounded-full border px-3 py-1" style={{ borderColor: "var(--ezd-divider)", color: "var(--ezd-fg-quiet)" }}>
+              2 · Design
+            </span>
           </div>
-          <div
-  className="mx-auto mt-6 max-w-xl rounded-2xl border p-4 text-left"
-  style={{
-    borderColor: "var(--ezd-divider)",
-    background: "var(--ezd-bg-card)",
-  }}
->
-  <h3
-    className="text-sm font-semibold"
-    style={{ color: "var(--ezd-fg)" }}
-  >
-    Speaker Notes Coverage
-  </h3>
 
-  <p
-    className="mt-2 text-sm"
-    style={{ color: "var(--ezd-fg-muted)" }}
-  >
-    {slidesWithNotes.length} / {slides.length} slides ({coveragePercentage}%)
-  </p>
+          <h1 className="mt-6 text-[34px] font-extrabold leading-[1.03] tracking-tight sm:text-[46px]" style={{ color: "var(--ezd-fg-strong)" }}>
+            Shape your story,
+            <br />
+            <span style={{ color: accent }}>then we design it.</span>
+          </h1>
+          <p className="mx-auto mt-4 max-w-lg text-[15px] leading-relaxed" style={{ color: "var(--ezd-fg-muted)" }}>
+            This is the content outline — words only, no design yet. Edit any slide inline, ask AI to
+            rewrite one, reorder, or add and remove. When it reads right, hit <b style={{ color: "var(--ezd-fg)" }}>Design my deck</b>.
+          </p>
 
-  {missingSlides.length > 0 ? (
-    <div className="mt-3">
-      <p
-        className="text-xs font-medium"
-        style={{ color: "var(--ezd-fg-muted)" }}
-      >
-        Missing notes:
-      </p>
-
-      <div className="mt-2 flex flex-wrap gap-2">
-        {missingSlides.map(({ number }) => (
-          <span
-            key={number}
-            className="rounded-full px-2 py-1 text-xs"
-            style={{
-              background: `${accent}15`,
-              color: accent,
-            }}
-          >
-            Slide {number}
-          </span>
-        ))}
-      </div>
-    </div>
-  ) : (
-    <p
-      className="mt-3 text-xs font-medium"
-      style={{ color: "#22c55e" }}
-    >
-      All slides have speaker notes.
-    </p>
-  )}
-</div>
+          {/* stat pills */}
+          <div className="mt-7 flex flex-wrap items-center justify-center gap-2.5">
+            <StatPill icon={<Presentation size={13} />} value={slides.length} label={slides.length === 1 ? "slide" : "slides"} accent={accent} strong />
+            {contentCount > 0 && <StatPill icon={<ListChecks size={13} />} value={contentCount} label="content" accent={accent} />}
+            {chartCount > 0 && <StatPill icon={<BarChart3 size={13} />} value={chartCount} label={chartCount === 1 ? "chart" : "charts"} accent={accent} />}
+            {tableCount > 0 && <StatPill icon={<Table2 size={13} />} value={tableCount} label={tableCount === 1 ? "table" : "tables"} accent={accent} />}
+          </div>
         </div>
       </header>
 
       {/* Slide cards */}
-      <div className="mx-auto max-w-3xl px-4 sm:px-6">
+      <div className="mx-auto max-w-3xl px-4 pt-2 sm:px-6">
         {slides.map((s, i) => (
           <div key={i}>
             <SlideOutlineCard
@@ -202,10 +184,10 @@ const missingSlides = slides
               onApplyAi={(updated) => setSlide(i, updated)}
             />
             {/* Insert-between control */}
-            <div className="relative my-1 flex justify-center">
+            <div className="relative my-2 flex justify-center">
               <button
                 onClick={() => addSlideAfter(i)}
-                className="group inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[11.5px] font-medium transition hover:scale-[1.03]"
+                className="group inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[11.5px] font-medium opacity-60 transition hover:opacity-100"
                 style={{ borderColor: "var(--ezd-divider)", background: "var(--ezd-bg-card)", color: "var(--ezd-fg-muted)" }}
               >
                 <Plus size={12} /> Add slide
@@ -217,27 +199,51 @@ const missingSlides = slides
 
       {/* Sticky confirm bar */}
       <div
-        className="fixed inset-x-0 bottom-0 z-30 border-t backdrop-blur"
+        className="fixed inset-x-0 bottom-0 z-30 border-t backdrop-blur-xl"
         style={{ borderColor: "var(--ezd-divider)", background: "var(--ezd-nav-bg)" }}
       >
         <div className="mx-auto flex max-w-3xl items-center justify-between gap-3 px-5 py-3.5">
           <button
             onClick={onBack}
-            className="inline-flex items-center gap-1.5 rounded-full border px-4 py-2 text-[13px] font-medium transition hover:opacity-90"
+            className="inline-flex items-center gap-1.5 rounded-full border px-4 py-2.5 text-[13px] font-medium transition hover:opacity-90"
             style={{ borderColor: "var(--ezd-divider)", color: "var(--ezd-fg-muted)" }}
           >
             <ArrowLeft size={14} /> Back
           </button>
+          <span className="hidden text-[12.5px] sm:block" style={{ color: "var(--ezd-fg-quiet)" }}>
+            {slides.length} slides ready · edit anything before you design
+          </span>
           <button
             onClick={onConfirm}
-            className="inline-flex items-center gap-2 rounded-full px-6 py-2.5 text-[14px] font-semibold shadow-lg transition hover:scale-[1.02]"
-            style={{ background: accent, color: "#fff", boxShadow: `0 10px 30px -8px ${accent}` }}
+            className="group inline-flex items-center gap-2 rounded-full px-6 py-2.5 text-[14px] font-semibold shadow-lg transition hover:scale-[1.02] hover:opacity-90"
+            style={{ background: "var(--ezd-button-strong)", color: "var(--ezd-button-strong-fg)" }}
           >
-            <Wand2 size={15} /> Design my deck <ArrowRight size={15} />
+            <Wand2 size={15} /> Design my deck
+            <ArrowRight size={15} className="transition group-hover:translate-x-0.5" />
           </button>
         </div>
       </div>
     </main>
+  );
+}
+
+/** Small stat pill for the outline hero. */
+function StatPill({
+  icon, value, label, accent, strong,
+}: { icon: React.ReactNode; value: number; label: string; accent: string; strong?: boolean }) {
+  return (
+    <span
+      className="inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[12.5px] font-medium"
+      style={
+        strong
+          ? { borderColor: "var(--ezd-hairline)", background: "var(--ezd-bg-hover)", color: "var(--ezd-fg-strong)" }
+          : { borderColor: "var(--ezd-divider)", background: "var(--ezd-bg-card)", color: "var(--ezd-fg-muted)" }
+      }
+    >
+      {icon}
+      <span className="tabular-nums font-semibold" style={{ color: strong ? accent : "var(--ezd-fg)" }}>{value}</span>
+      {label}
+    </span>
   );
 }
 
@@ -273,13 +279,7 @@ function SlideOutlineCard({
 
   const isHero = slide.layout === "title-hero";
   const isClosing = slide.layout === "closing";
-  const roleLabel =
-    isHero ? "Intro" : isClosing ? "Closing" :
-    slide.layout === "section" ? "Section" :
-    slide.layout === "chart" ? "Chart" :
-    slide.layout === "table" ? "Table" :
-    slide.layout === "references" ? "References" :
-    slide.layout === "two-column" ? "Comparison" : "Content";
+  const { label: roleLabel, Icon: RoleIcon } = roleMeta(slide.layout);
 
   const runAi = async () => {
     const text = instruction.trim();
@@ -329,16 +329,17 @@ function SlideOutlineCard({
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-3">
             <div
-              className="grid h-9 w-9 shrink-0 place-items-center rounded-xl text-[13px] font-extrabold tabular-nums text-white"
-              style={{ background: accent }}
+              className="grid h-9 w-9 shrink-0 place-items-center rounded-xl text-[13px] font-extrabold tabular-nums"
+              style={{ background: "var(--ezd-fg-strong)", color: "var(--ezd-bg-page)" }}
             >
               {index + 1}
             </div>
-            <div>
-              <div className="text-[10px] font-semibold uppercase tracking-[0.2em]" style={{ color: "var(--ezd-fg-quiet)" }}>
-                Slide {index + 1} · {roleLabel}
-              </div>
-            </div>
+            <span
+              className="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10.5px] font-semibold uppercase tracking-[0.14em]"
+              style={{ borderColor: "var(--ezd-hairline)", color: "var(--ezd-fg-muted)", background: "var(--ezd-bg-hover)" }}
+            >
+              <RoleIcon size={12} /> {roleLabel}
+            </span>
           </div>
           <div className="flex items-center gap-1 opacity-70 transition group-hover:opacity-100">
             <IconBtn label="Move up" disabled={index === 0} onClick={onMoveUp}><ChevronUp size={15} /></IconBtn>
@@ -421,7 +422,7 @@ function SlideOutlineCard({
             <button
               onClick={() => { setChatOpen(true); setTimeout(() => inputRef.current?.focus(), 30); }}
               className="inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[12px] font-medium transition hover:opacity-90"
-              style={{ borderColor: `${accent}40`, color: accent, background: `${accent}0f` }}
+              style={{ borderColor: "var(--ezd-hairline)", color: "var(--ezd-fg)", background: "var(--ezd-bg-hover)" }}
             >
               <Sparkles size={12} /> Ask AI to edit this slide
             </button>
@@ -443,8 +444,8 @@ function SlideOutlineCard({
                 <button
                   onClick={runAi}
                   disabled={busy || !instruction.trim()}
-                  className="grid h-7 w-7 place-items-center rounded-lg text-white transition disabled:opacity-40"
-                  style={{ background: accent }}
+                  className="grid h-7 w-7 place-items-center rounded-lg transition disabled:opacity-40"
+                  style={{ background: "var(--ezd-fg-strong)", color: "var(--ezd-bg-page)" }}
                   aria-label="Send"
                 >
                   {busy ? <Loader2 size={14} className="animate-spin" /> : <ArrowRight size={14} />}
@@ -548,7 +549,7 @@ function TableOutline({ table, accent }: { table: TableData; accent: string }) {
     <div className="mt-3 overflow-x-auto rounded-xl border" style={{ borderColor: "var(--ezd-divider)" }}>
       <table className="w-full border-collapse text-[12.5px]">
         <thead>
-          <tr style={{ background: `${accent}14` }}>
+          <tr style={{ background: "var(--ezd-bg-hover)" }}>
             {table.headers.map((h, i) => (
               <th key={i} className="px-3 py-2 text-left font-semibold" style={{ color: accent }}>{h}</th>
             ))}

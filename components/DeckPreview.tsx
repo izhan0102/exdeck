@@ -40,6 +40,7 @@ import { signalCreditsBlocked } from "@/lib/creditsClient";
 import { type PlanId, planHasFeature, planShowsWatermark } from "@/lib/plans";
 import TrialDialog from "./TrialDialog";
 import BottomBar from "./BottomBar";
+import DeckTour from "./DeckTour";
 import GenerateOverlay from "./GenerateOverlay";
 import AutoPresent from "./AutoPresent";
 import TemplateGallery from "./TemplateGallery";
@@ -1955,7 +1956,58 @@ export default function DeckPreview({ deck, setDeck, theme, setTheme, onRestart,
             >
               <ChevronLeft size={14} /> Prev
             </button>
-            <span className="text-xs text-white/50">Slide {active + 1} / {deck.slides.length}</span>
+            <div className="relative" data-tour="tour-regenerate">
+              <button
+                onClick={(e) => {
+                  const r = (e.currentTarget as HTMLElement).getBoundingClientRect();
+                  setRegenMenuUp(window.innerHeight - r.bottom < 360);
+                  setRegenMenuOpen((v) => !v);
+                }}
+                disabled={regeneratingIdx !== null}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-white/15 bg-white/5 px-3 py-1.5 text-sm text-white/80 transition hover:bg-white/10 disabled:opacity-50"
+                style={{ touchAction: "manipulation", minHeight: "44px" }}
+                title="Regenerate this slide's content with an AI model"
+              >
+                {regeneratingIdx === active
+                  ? <><Loader2 size={14} className="animate-spin" /> Regenerating…</>
+                  : <><Sparkles size={14} /> Regenerate <ChevronDown size={13} className="opacity-70" /></>}
+              </button>
+              {regenMenuOpen && regeneratingIdx === null && (
+                <>
+                  <div className="fixed inset-0 z-40" onClick={() => setRegenMenuOpen(false)} />
+                  <div
+                    style={{ background: "var(--ezd-bg-elev)", color: "var(--ezd-fg)", borderColor: "var(--ezd-hairline)" }}
+                    className={`absolute left-1/2 z-50 flex max-h-[min(340px,55vh)] w-[230px] -translate-x-1/2 flex-col rounded-xl border p-1 shadow-2xl backdrop-blur ${
+                      regenMenuUp ? "bottom-full mb-2" : "top-full mt-2"
+                    }`}
+                  >
+                    <div className="px-2 pb-1 pt-1.5 text-[10px] font-semibold uppercase tracking-wide opacity-60">
+                      Regenerate slide {active + 1} with
+                    </div>
+                    <div className="min-h-0 flex-1 overflow-y-auto">
+                      {MODEL_ORDER.map((id) => {
+                        const m = MODELS[id];
+                        return (
+                          <button
+                            key={id}
+                            onClick={() => { setRegenMenuOpen(false); regenerateSlide(active, id); }}
+                            className="flex w-full items-center justify-between gap-2 rounded-lg px-2 py-1.5 text-left transition hover:bg-white/10"
+                          >
+                            <span className="min-w-0">
+                              <span className="block truncate text-[12px]">{m.label}</span>
+                              <span className="block truncate text-[9.5px] opacity-55">{m.provider}</span>
+                            </span>
+                            <span className="shrink-0 rounded px-1 py-0.5 text-[9.5px] font-semibold opacity-70" style={{ background: "var(--ezd-hairline)" }}>
+                              {m.multiplier}×
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
             <button
               onClick={goNext}
               disabled={active === deck.slides.length - 1}
@@ -1964,61 +2016,6 @@ export default function DeckPreview({ deck, setDeck, theme, setTheme, onRestart,
             >
               Next <ChevronRight size={14} />
             </button>
-          </div>
-
-          {/* Regenerate this slide with a chosen model (matches the deck's B/W theme) */}
-          <div className="relative mt-2 flex justify-center">
-            <button
-              onClick={(e) => {
-                const r = (e.currentTarget as HTMLElement).getBoundingClientRect();
-                // Open upward unless there's clearly more room below.
-                setRegenMenuUp(window.innerHeight - r.bottom < 360);
-                setRegenMenuOpen((v) => !v);
-              }}
-              disabled={regeneratingIdx !== null}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-white/15 bg-white/5 px-3 py-1.5 text-sm text-white/80 transition hover:bg-white/10 disabled:opacity-50"
-              style={{ touchAction: "manipulation", minHeight: "40px" }}
-              title="Regenerate this slide's content with an AI model"
-            >
-              {regeneratingIdx === active
-                ? <><Loader2 size={14} className="animate-spin" /> Regenerating…</>
-                : <><Sparkles size={14} /> Regenerate slide <ChevronDown size={13} className="opacity-70" /></>}
-            </button>
-            {regenMenuOpen && regeneratingIdx === null && (
-              <>
-                <div className="fixed inset-0 z-40" onClick={() => setRegenMenuOpen(false)} />
-                <div
-                  style={{ background: "var(--ezd-bg-elev)", color: "var(--ezd-fg)", borderColor: "var(--ezd-hairline)" }}
-                  className={`absolute left-1/2 z-50 flex max-h-[min(340px,55vh)] w-[230px] -translate-x-1/2 flex-col rounded-xl border p-1 shadow-2xl backdrop-blur ${
-                    regenMenuUp ? "bottom-full mb-2" : "top-full mt-2"
-                  }`}
-                >
-                  <div className="px-2 pb-1 pt-1.5 text-[10px] font-semibold uppercase tracking-wide opacity-60">
-                    Regenerate slide {active + 1} with
-                  </div>
-                  <div className="min-h-0 flex-1 overflow-y-auto">
-                    {MODEL_ORDER.map((id) => {
-                      const m = MODELS[id];
-                      return (
-                        <button
-                          key={id}
-                          onClick={() => { setRegenMenuOpen(false); regenerateSlide(active, id); }}
-                          className="flex w-full items-center justify-between gap-2 rounded-lg px-2 py-1.5 text-left transition hover:bg-white/10"
-                        >
-                          <span className="min-w-0">
-                            <span className="block truncate text-[12px]">{m.label}</span>
-                            <span className="block truncate text-[9.5px] opacity-55">{m.provider}</span>
-                          </span>
-                          <span className="shrink-0 rounded px-1 py-0.5 text-[9.5px] font-semibold opacity-70" style={{ background: "var(--ezd-hairline)" }}>
-                            {m.multiplier}×
-                          </span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              </>
-            )}
           </div>
 
           {deck.slides[active]?.notes && (
@@ -2036,6 +2033,7 @@ export default function DeckPreview({ deck, setDeck, theme, setTheme, onRestart,
             deck={deck}
             onUpdate={updateActive}
             onReplace={replaceActive}
+            onUpdateAll={(patch) => setDeck({ ...deck, slides: deck.slides.map((s) => ({ ...s, ...patch })) })}
             hideStyleVariants={false}
             selectedImageId={selectedImageId}
             onDeselectImage={() => setSelectedImageId(null)}
@@ -2178,6 +2176,10 @@ export default function DeckPreview({ deck, setDeck, theme, setTheme, onRestart,
         onOpenTheme={() => setThemeTransferOpen(true)}
         onOpenPattern={() => setPatternOpen(true)}
       />
+
+      {/* One-time editor onboarding tour (spotlights AI, tools, styles,
+          regenerate, and template). Shows once per browser for every user. */}
+      <DeckTour />
 
       {changesOpen && (
         <div className="fixed inset-0 z-[110] flex justify-end bg-black/45 backdrop-blur-sm" onClick={() => setChangesOpen(false)}>

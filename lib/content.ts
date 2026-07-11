@@ -2067,6 +2067,906 @@ LANDING_PAGES.push(
   },
 );
 
+/* -------------------------------------------------------------------------- */
+/*  Brand, head-to-head comparison, alternative & use-case pages (2026)       */
+/* -------------------------------------------------------------------------- */
+
+LANDING_PAGES.push(
+  {
+    slug: "exdeck",
+    keyword: "EXdeck",
+    title: "EXdeck — Free AI PPT Maker & Presentation Generator",
+    description:
+      "EXdeck (exdeck.xyz) is a free AI PPT maker. Type a topic and get a fully editable PowerPoint in seconds — real charts, 45 themes, and one-click PPTX & PDF export.",
+    h1: "EXdeck — the free AI PPT maker",
+    lede:
+      "You found the official EXdeck. EXdeck turns a one-line brief into a complete, editable PowerPoint deck in about ten seconds — with real data charts, premium themes, speaker notes, and genuine .pptx and PDF export. Free to start, no card needed.",
+    sections: [
+      {
+        h: "What is EXdeck?",
+        p: [
+          "EXdeck is an AI presentation maker at exdeck.xyz. You describe your topic, pick a template, and the AI writes and designs every slide for you. Everything after that is a full inline editor — drag text, recolor charts, switch themes, ask the AI to rewrite a slide, and regenerate any slide with a different model.",
+          "Beyond slides, the same workspace makes AI documents, spreadsheets, and resumes, analyses PDFs, and converts files — one account, every tool.",
+        ],
+      },
+      {
+        h: "Why people choose EXdeck",
+        list: [
+          "Free plan with monthly AI credits — generate, edit, present, and export",
+          "Real Microsoft PowerPoint (.pptx) and high-resolution PDF export, no lock-in",
+          "AI data charts (bar, line, pie, donut) built from your real numbers, in 3D",
+          "45 themes, 28 fonts, 200,000+ icons, and premium Canva/Gamma-grade designs",
+          "Per-slide regenerate with your choice of AI model (Llama, Qwen, GPT-OSS)",
+          "Pro from $1.99/mo, plus Team and Organisation plans",
+        ],
+      },
+      {
+        h: "Start in seconds",
+        p: [
+          "Open the editor, type what your deck is about, answer a couple of quick questions, and EXdeck builds the whole thing. Then refine and export. Most people go from a blank brief to a finished, downloaded deck in under a minute.",
+        ],
+      },
+    ],
+    faq: [
+      { q: "Is EXdeck free?", a: "Yes. EXdeck has a free plan with monthly AI credits to generate and edit decks and export to PowerPoint and PDF (free exports carry a small watermark). Pro removes it and adds far more credits." },
+      { q: "What is the official EXdeck website?", a: "EXdeck lives at exdeck.xyz. Open /app to start building a presentation for free." },
+      { q: "Does EXdeck export real PowerPoint files?", a: "Yes — a genuine .pptx that opens in PowerPoint, Keynote, and Google Slides, plus a high-resolution PDF." },
+      { q: "What else can EXdeck do?", a: "Alongside AI presentations, EXdeck makes documents, spreadsheets, and resumes, analyses documents, and converts files — all in one place." },
+    ],
+    related: ["exdeck-ppt", "ai-ppt-maker", "free-ppt-maker", "best-ai-presentation-maker"],
+  },
+  {
+    slug: "exdeck-ppt",
+    keyword: "EXdeck PPT",
+    title: "EXdeck PPT — Make a PowerPoint with AI (Free) | exdeck.xyz",
+    description:
+      "EXdeck PPT is the free AI PowerPoint maker at exdeck.xyz. Turn text into an editable PPT with real charts and themes, then export a real .pptx or PDF in one click.",
+    h1: "EXdeck PPT",
+    lede:
+      "Searching for EXdeck PPT? This is it. EXdeck makes PowerPoint presentations from a single line of text — the AI writes the content and designs the slides, and you get a real, editable .pptx you can download instantly.",
+    sections: [
+      {
+        h: "Make a PPT with EXdeck",
+        list: [
+          "Type a one-line brief describing your topic and audience",
+          "Pick a template — it sets the theme, fonts, and layout",
+          "The AI generates a full deck; edit anything inline",
+          "Export a real PowerPoint (.pptx) or a high-res PDF",
+        ],
+      },
+      {
+        h: "A real PPT, not a locked preview",
+        p: [
+          "EXdeck exports a genuine Microsoft PowerPoint file with your text, charts, themes, and images intact — it opens and edits normally in PowerPoint, Keynote, and Google Slides. There's no watermark on Pro and no vendor lock-in.",
+        ],
+      },
+      {
+        h: "Charts, themes, and speaker notes included",
+        p: [
+          "When your topic has real numbers, EXdeck builds clean 3D bar, line, pie, and donut charts colored to your theme. Add speaker notes for the teleprompter, translate the whole deck, or regenerate a single slide with a different AI model.",
+        ],
+      },
+    ],
+    faq: [
+      { q: "How do I make a PPT with EXdeck?", a: "Open exdeck.xyz/app, type a one-line brief, pick a template, and the AI builds an editable PowerPoint in about ten seconds. Then export to .pptx or PDF." },
+      { q: "Is EXdeck PPT free?", a: "Yes — a free plan lets you generate, edit, and export within a monthly credit limit. Pro raises limits and removes the export watermark." },
+      { q: "Can I edit the PPT after it's generated?", a: "Yes. EXdeck is a full inline editor: drag text, recolor charts, switch themes, and rewrite slides with AI." },
+    ],
+    related: ["exdeck", "text-to-ppt", "ai-ppt-maker", "powerpoint-generator"],
+  },
+  {
+    slug: "exdeck-vs-gamma",
+    keyword: "EXdeck vs Gamma",
+    title: "EXdeck vs Gamma — Which AI Presentation Maker Is Better?",
+    description:
+      "EXdeck vs Gamma compared: real PowerPoint export, pricing, editing, charts, and lock-in. See why EXdeck is a strong free Gamma alternative for making PPTs.",
+    h1: "EXdeck vs Gamma",
+    lede:
+      "Both EXdeck and Gamma turn a prompt into a presentation, but they take different approaches to export, editing, and price. Here's an honest head-to-head so you can pick the right one.",
+    sections: [
+      {
+        h: "The quick comparison",
+        list: [
+          "PowerPoint export: EXdeck exports a real, editable .pptx and PDF with charts intact; Gamma's PPTX export is more limited and card-based.",
+          "Editing: EXdeck is a full slide editor (drag, recolor, per-element control); Gamma uses a card/block model that can feel less like PowerPoint.",
+          "Charts: EXdeck builds real data charts (bar/line/pie/donut) in 3D from your numbers.",
+          "Price: EXdeck has a free plan and Pro from $1.99/mo; Gamma's paid tiers are higher.",
+          "Scope: EXdeck also makes documents, spreadsheets, resumes, and converts files.",
+        ],
+      },
+      {
+        h: "When EXdeck is the better pick",
+        p: [
+          "If you need a genuine PowerPoint file that opens cleanly in PowerPoint or Google Slides, real charts from your data, and a familiar slide editor at a low price, EXdeck fits. It's built around exporting real .pptx, not keeping you inside one app.",
+        ],
+      },
+      {
+        h: "When Gamma might suit you",
+        p: [
+          "Gamma's card format is nice for web-first documents and quick scrolling pages. If you rarely need a true PowerPoint file and prefer a webpage-style deck, it's a reasonable choice.",
+        ],
+      },
+    ],
+    faq: [
+      { q: "Is EXdeck a free Gamma alternative?", a: "Yes. EXdeck has a free plan and focuses on real PowerPoint/PDF export and a full slide editor, which makes it a strong Gamma alternative." },
+      { q: "Does EXdeck export better PowerPoint files than Gamma?", a: "EXdeck is built to export a genuine, editable .pptx with your charts and themes preserved, which many users find cleaner than card-based exports." },
+      { q: "How much does EXdeck cost?", a: "There's a free plan; Pro starts at $1.99/mo with Team and Organisation options." },
+    ],
+    related: ["gamma-alternative", "exdeck-vs-canva", "best-gamma-alternatives", "exdeck"],
+  },
+  {
+    slug: "exdeck-vs-canva",
+    keyword: "EXdeck vs Canva",
+    title: "EXdeck vs Canva — AI Presentation Maker Comparison",
+    description:
+      "EXdeck vs Canva for presentations: AI generation from text, real PowerPoint export, charts, and price. See when EXdeck beats Canva for making a PPT fast.",
+    h1: "EXdeck vs Canva",
+    lede:
+      "Canva is a broad design suite; EXdeck is a focused AI presentation maker. For turning a topic into a finished, exportable PowerPoint quickly, the two feel very different.",
+    sections: [
+      {
+        h: "The quick comparison",
+        list: [
+          "AI generation: EXdeck writes and designs a full deck from one line of text; Canva's AI is more template-fill oriented.",
+          "PowerPoint export: EXdeck exports a real editable .pptx; Canva export to PPTX can rasterize or shift layouts.",
+          "Speed: EXdeck produces a first draft in about ten seconds with the content already written.",
+          "Charts: EXdeck generates real data charts from your numbers.",
+          "Price: EXdeck free plan and Pro from $1.99/mo; Canva Pro is higher and design-suite-wide.",
+        ],
+      },
+      {
+        h: "When EXdeck is the better pick",
+        p: [
+          "If your goal is a written, structured presentation fast — with real charts and a true PowerPoint download — EXdeck gets you there without hunting templates or arranging every element by hand.",
+        ],
+      },
+      {
+        h: "When Canva might suit you",
+        p: [
+          "Canva shines for social graphics, print, and heavy visual branding across many formats. If you want an all-purpose design tool and presentations are just one use, Canva covers more surface area.",
+        ],
+      },
+    ],
+    faq: [
+      { q: "Is EXdeck a good Canva alternative for presentations?", a: "For AI-generated, text-to-PowerPoint decks with real charts and clean .pptx export, yes — EXdeck is purpose-built for it." },
+      { q: "Does EXdeck export to PowerPoint better than Canva?", a: "EXdeck focuses on a faithful, editable .pptx export, which avoids the layout shifts some Canva PPTX exports produce." },
+      { q: "Is EXdeck cheaper than Canva?", a: "EXdeck has a free plan and Pro from $1.99/mo, which is lower than Canva Pro." },
+    ],
+    related: ["canva-presentation-alternative", "best-canva-alternatives", "exdeck-vs-gamma", "exdeck"],
+  },
+  {
+    slug: "exdeck-vs-beautiful-ai",
+    keyword: "EXdeck vs Beautiful.ai",
+    title: "EXdeck vs Beautiful.ai — AI Presentation Tools Compared",
+    description:
+      "EXdeck vs Beautiful.ai: text-to-deck AI, real PowerPoint export, editing freedom, and price. A clear comparison to help you choose an AI presentation maker.",
+    h1: "EXdeck vs Beautiful.ai",
+    lede:
+      "Beautiful.ai auto-arranges slides with smart templates; EXdeck writes and designs the whole deck from a prompt and exports a real PowerPoint. Here's how they differ.",
+    sections: [
+      {
+        h: "The quick comparison",
+        list: [
+          "Content: EXdeck writes your slide content from a brief; Beautiful.ai focuses on auto-layout of content you supply.",
+          "Editing: EXdeck gives full manual control per element; Beautiful.ai constrains layouts to keep them tidy.",
+          "Export: EXdeck exports a real editable .pptx and PDF.",
+          "Price: EXdeck free plan and Pro from $1.99/mo; Beautiful.ai is subscription-only and pricier.",
+        ],
+      },
+      {
+        h: "When EXdeck is the better pick",
+        p: [
+          "If you want the AI to actually write the deck (not just arrange it), export a true PowerPoint, and pay little or nothing to start, EXdeck is the stronger fit.",
+        ],
+      },
+    ],
+    faq: [
+      { q: "Is EXdeck a Beautiful.ai alternative?", a: "Yes — and a free one. EXdeck writes and designs decks from a prompt and exports real .pptx files." },
+      { q: "Does Beautiful.ai have a free plan?", a: "Beautiful.ai is subscription-based; EXdeck offers a free plan plus Pro from $1.99/mo." },
+    ],
+    related: ["beautiful-ai-alternative", "best-beautiful-ai-alternatives", "exdeck-vs-gamma", "exdeck"],
+  },
+  {
+    slug: "exdeck-vs-tome",
+    keyword: "EXdeck vs Tome",
+    title: "EXdeck vs Tome — Which AI Deck Maker to Use in 2026",
+    description:
+      "EXdeck vs Tome compared: PowerPoint export, editing, charts, and pricing. See why EXdeck is a practical Tome alternative for real, exportable presentations.",
+    h1: "EXdeck vs Tome",
+    lede:
+      "Tome pioneered AI storytelling pages; EXdeck focuses on real, editable presentations you can export to PowerPoint. If you need a deck you can hand off as a .pptx, the difference matters.",
+    sections: [
+      {
+        h: "The quick comparison",
+        list: [
+          "Output: EXdeck produces classic editable slides and a real .pptx; Tome leans toward web-native narrative pages.",
+          "Export: EXdeck exports genuine PowerPoint and PDF; web-first tools often limit true PPTX fidelity.",
+          "Charts: EXdeck builds real data charts from your numbers.",
+          "Price: EXdeck free plan and Pro from $1.99/mo.",
+        ],
+      },
+      {
+        h: "When EXdeck is the better pick",
+        p: [
+          "Choose EXdeck when the deliverable is an actual presentation file — for a class, a client, or a boardroom — rather than a shareable web page.",
+        ],
+      },
+    ],
+    faq: [
+      { q: "Is EXdeck a Tome alternative?", a: "Yes. EXdeck makes editable slides and exports real PowerPoint and PDF, with a free plan to start." },
+      { q: "Does EXdeck export to PowerPoint?", a: "Yes — a real, editable .pptx plus a high-resolution PDF." },
+    ],
+    related: ["tome-alternative", "exdeck-vs-gamma", "best-ai-presentation-maker", "exdeck"],
+  },
+  {
+    slug: "exdeck-vs-presentations-ai",
+    keyword: "EXdeck vs Presentations.ai",
+    title: "EXdeck vs Presentations.ai — AI PPT Maker Comparison",
+    description:
+      "EXdeck vs Presentations.ai: generation quality, real PowerPoint export, editing, and price. Compare two AI PPT makers and pick the right one for you.",
+    h1: "EXdeck vs Presentations.ai",
+    lede:
+      "Both generate decks from a prompt. EXdeck differentiates on real .pptx export, a full slide editor, genuine data charts, and a low starting price.",
+    sections: [
+      {
+        h: "The quick comparison",
+        list: [
+          "Export: EXdeck exports a real editable .pptx and PDF with charts preserved.",
+          "Editing: EXdeck offers per-element control plus per-slide AI regeneration with model choice.",
+          "Charts: EXdeck builds real 3D data charts from your figures.",
+          "Price: EXdeck free plan and Pro from $1.99/mo.",
+        ],
+      },
+      {
+        h: "Why EXdeck stands out",
+        p: [
+          "EXdeck pairs fast generation with a real editor and honest export. You aren't locked into a viewer — you get a PowerPoint file you own.",
+        ],
+      },
+    ],
+    faq: [
+      { q: "Is EXdeck a Presentations.ai alternative?", a: "Yes — a free-to-start one with real PowerPoint export and a full editor." },
+      { q: "Which is cheaper?", a: "EXdeck has a free plan and Pro from $1.99/mo." },
+    ],
+    related: ["presentations-ai-alternative", "exdeck-vs-gamma", "best-ai-presentation-maker", "exdeck"],
+  },
+  {
+    slug: "exdeck-vs-powerpoint-copilot",
+    keyword: "EXdeck vs PowerPoint Copilot",
+    title: "EXdeck vs PowerPoint Copilot — Free AI Deck Maker vs Microsoft 365",
+    description:
+      "EXdeck vs Microsoft PowerPoint Copilot: price, access, generation from text, and export. See why EXdeck is a free, no-subscription way to make AI PowerPoints.",
+    h1: "EXdeck vs PowerPoint Copilot",
+    lede:
+      "Copilot lives inside Microsoft 365 and needs a paid subscription; EXdeck runs in any browser with a free plan. Both make slides with AI, but access and price differ sharply.",
+    sections: [
+      {
+        h: "The quick comparison",
+        list: [
+          "Access: EXdeck works in any browser, no Microsoft 365 needed; Copilot requires a qualifying paid M365 plan.",
+          "Price: EXdeck is free to start (Pro $1.99/mo); Copilot adds a significant per-seat cost on top of M365.",
+          "Export: EXdeck exports a real .pptx you can open in PowerPoint anyway.",
+          "Scope: EXdeck also does documents, spreadsheets, resumes, and file conversion.",
+        ],
+      },
+      {
+        h: "When EXdeck is the better pick",
+        p: [
+          "If you don't have (or don't want to pay for) Microsoft 365 Copilot, EXdeck gives you AI slide generation and a real PowerPoint download for free or a fraction of the price.",
+        ],
+      },
+    ],
+    faq: [
+      { q: "Do I need Microsoft 365 to use EXdeck?", a: "No. EXdeck is web-based and free to start. You can still export a real .pptx and open it in PowerPoint." },
+      { q: "Is EXdeck cheaper than PowerPoint Copilot?", a: "Yes — EXdeck has a free plan and Pro from $1.99/mo, versus Copilot's per-seat add-on to a paid Microsoft 365 subscription." },
+    ],
+    related: ["powerpoint-copilot-alternative", "ai-powerpoint-generator", "exdeck", "exdeck-vs-google-slides"],
+  },
+  {
+    slug: "exdeck-vs-google-slides",
+    keyword: "EXdeck vs Google Slides",
+    title: "EXdeck vs Google Slides — Generate Slides with AI, Free",
+    description:
+      "EXdeck vs Google Slides: AI generation from text, real charts, themes, and PowerPoint export. See how EXdeck drafts a full deck Google Slides can't auto-write.",
+    h1: "EXdeck vs Google Slides",
+    lede:
+      "Google Slides is a solid free editor, but you still write and design every slide yourself. EXdeck writes and designs the deck for you, then exports to PowerPoint and PDF.",
+    sections: [
+      {
+        h: "The quick comparison",
+        list: [
+          "Generation: EXdeck writes the content and builds the slides from a one-line brief; Google Slides starts blank.",
+          "Charts: EXdeck auto-builds real data charts; Slides requires manual chart insertion.",
+          "Export: EXdeck exports .pptx and PDF; you can import into Slides too.",
+          "Price: both have free options; EXdeck's edge is the AI drafting.",
+        ],
+      },
+      {
+        h: "Use them together",
+        p: [
+          "Many people generate a first draft in EXdeck, export the .pptx, and finish collaboratively in Google Slides. You get the speed of AI drafting plus the collaboration you already know.",
+        ],
+      },
+    ],
+    faq: [
+      { q: "Can EXdeck decks open in Google Slides?", a: "Yes. Export the .pptx and import it into Google Slides, or use the PDF." },
+      { q: "Is EXdeck free like Google Slides?", a: "EXdeck has a free plan; the difference is that EXdeck writes and designs the deck for you with AI." },
+    ],
+    related: ["ai-powerpoint-generator", "exdeck-vs-powerpoint-copilot", "text-to-ppt", "exdeck"],
+  },
+  {
+    slug: "tome-alternative",
+    keyword: "Tome alternative",
+    title: "Best Tome Alternative (Free) — EXdeck AI Presentation Maker",
+    description:
+      "Looking for a Tome alternative? EXdeck is a free AI presentation maker with real PowerPoint & PDF export, a full slide editor, and data charts. Start free.",
+    h1: "The free Tome alternative",
+    lede:
+      "If you liked generating decks with Tome but need real, exportable PowerPoint files and a familiar slide editor, EXdeck is a practical alternative — free to start.",
+    sections: [
+      {
+        h: "Why switch to EXdeck",
+        list: [
+          "Real editable .pptx and PDF export, not just a web page",
+          "A full slide editor — drag, recolor, restyle every element",
+          "AI data charts built from your real numbers",
+          "Per-slide regenerate with your choice of AI model",
+          "Free plan; Pro from $1.99/mo",
+        ],
+      },
+      {
+        h: "Made for real presentations",
+        p: [
+          "EXdeck outputs classic slides you can hand off as a PowerPoint file — ideal for class, clients, and boardrooms where a .pptx or PDF is expected.",
+        ],
+      },
+    ],
+    faq: [
+      { q: "Is EXdeck a free Tome alternative?", a: "Yes. EXdeck has a free plan and exports real PowerPoint and PDF files." },
+      { q: "Can I edit slides fully in EXdeck?", a: "Yes — it's a complete inline editor, not a one-shot generator." },
+    ],
+    related: ["exdeck-vs-tome", "gamma-alternative", "best-ai-presentation-maker", "exdeck"],
+  },
+  {
+    slug: "powerpoint-copilot-alternative",
+    keyword: "PowerPoint Copilot alternative",
+    title: "PowerPoint Copilot Alternative (Free) — EXdeck AI PPT Maker",
+    description:
+      "A free PowerPoint Copilot alternative with no Microsoft 365 required. EXdeck generates editable PPTs from text and exports real .pptx & PDF. Start free.",
+    h1: "The free PowerPoint Copilot alternative",
+    lede:
+      "Don't want to pay for Microsoft 365 Copilot just to generate slides? EXdeck makes AI PowerPoints in any browser, free to start, and exports a real .pptx you can open in PowerPoint.",
+    sections: [
+      {
+        h: "Why EXdeck instead of Copilot",
+        list: [
+          "No Microsoft 365 subscription or Copilot add-on required",
+          "Free plan; Pro from $1.99/mo instead of per-seat enterprise pricing",
+          "Generates full decks from a one-line brief, with real charts",
+          "Exports a genuine .pptx that opens in PowerPoint",
+          "Also makes documents, spreadsheets, and resumes",
+        ],
+      },
+      {
+        h: "Open it anywhere",
+        p: [
+          "EXdeck runs in the browser on any device. Generate, edit, and export without installing Office or paying for a Copilot license.",
+        ],
+      },
+    ],
+    faq: [
+      { q: "Do I need Office or Microsoft 365?", a: "No. EXdeck is web-based and free to start, and still exports a real .pptx." },
+      { q: "Is it cheaper than Copilot?", a: "Yes — a free plan and Pro from $1.99/mo, versus Copilot's paid add-on to Microsoft 365." },
+    ],
+    related: ["exdeck-vs-powerpoint-copilot", "ai-powerpoint-generator", "free-ppt-maker", "exdeck"],
+  },
+  {
+    slug: "slidesai-alternative",
+    keyword: "SlidesAI alternative",
+    title: "SlidesAI Alternative (Free) — EXdeck AI Presentation Maker",
+    description:
+      "A free SlidesAI alternative that generates full decks from text with real charts and exports genuine PowerPoint & PDF — no add-on required. Start free.",
+    h1: "The free SlidesAI alternative",
+    lede:
+      "SlidesAI works as a Google Slides add-on; EXdeck is a standalone AI presentation maker that writes and designs the whole deck and exports a real PowerPoint. Free to start.",
+    sections: [
+      {
+        h: "Why choose EXdeck",
+        list: [
+          "Standalone app — no add-on or Google Slides required",
+          "Writes content and designs slides, with real data charts",
+          "Exports real .pptx and PDF; import into Slides if you like",
+          "Free plan; Pro from $1.99/mo",
+        ],
+      },
+      {
+        h: "From prompt to deck",
+        p: [
+          "Type a brief, pick a template, and EXdeck builds a complete, editable presentation in about ten seconds — then export or continue editing anywhere.",
+        ],
+      },
+    ],
+    faq: [
+      { q: "Is EXdeck a free SlidesAI alternative?", a: "Yes — a standalone free-to-start app with real PowerPoint and PDF export." },
+      { q: "Does it work without Google Slides?", a: "Yes. EXdeck is its own editor; you can still export to .pptx and import into Slides." },
+    ],
+    related: ["exdeck-vs-google-slides", "ai-slide-maker", "text-to-ppt", "exdeck"],
+  },
+  {
+    slug: "decktopus-alternative",
+    keyword: "Decktopus alternative",
+    title: "Decktopus Alternative (Free) — EXdeck AI PPT Maker",
+    description:
+      "A free Decktopus alternative: EXdeck generates editable presentations from text with real charts and exports genuine PowerPoint & PDF. Start free, no card.",
+    h1: "The free Decktopus alternative",
+    lede:
+      "Want Decktopus-style quick decks but with real PowerPoint export and a fuller editor? EXdeck generates and designs your slides and hands you a genuine .pptx — free to start.",
+    sections: [
+      {
+        h: "Why EXdeck",
+        list: [
+          "Real editable .pptx and PDF export",
+          "Full slide editor with per-element control",
+          "AI data charts and 200,000+ icons",
+          "Free plan; Pro from $1.99/mo",
+        ],
+      },
+    ],
+    faq: [
+      { q: "Is EXdeck free?", a: "Yes — a free plan with monthly credits, plus Pro from $1.99/mo." },
+      { q: "Does EXdeck export PowerPoint?", a: "Yes, a real editable .pptx plus a high-resolution PDF." },
+    ],
+    related: ["gamma-alternative", "best-ai-presentation-maker", "ai-ppt-maker", "exdeck"],
+  },
+  {
+    slug: "sales-deck-generator",
+    keyword: "sales deck generator",
+    title: "AI Sales Deck Generator (Free) — Make a Sales Deck Fast | EXdeck",
+    description:
+      "Generate a persuasive sales deck with AI in seconds. EXdeck writes and designs your slides with real charts, then exports a real PowerPoint & PDF. Free to start.",
+    h1: "AI sales deck generator",
+    lede:
+      "Turn your value proposition into a polished sales deck in seconds. Describe your product and audience, and EXdeck builds a structured, persuasive deck you can edit and export.",
+    sections: [
+      {
+        h: "A sales deck that flows",
+        list: [
+          "Problem, solution, proof, and call-to-action structured for you",
+          "Real data charts for traction, ROI, and market size",
+          "On-brand themes, fonts, and icons",
+          "Export a real .pptx for your team, or a PDF to send",
+        ],
+      },
+      {
+        h: "Edit and iterate fast",
+        p: [
+          "Tweak any slide inline, ask the AI to tighten the pitch, or regenerate a slide with a different model until it lands. Then export and present.",
+        ],
+      },
+    ],
+    faq: [
+      { q: "Can EXdeck make a sales deck for free?", a: "Yes. Generate and edit on the free plan, and export to PowerPoint or PDF (free exports carry a small watermark)." },
+      { q: "Does it include charts for metrics?", a: "Yes — real bar, line, pie, and donut charts built from your numbers." },
+    ],
+    related: ["ai-pitch-deck-generator", "investor-update-presentation", "ai-ppt-maker", "exdeck"],
+  },
+  {
+    slug: "investor-update-presentation",
+    keyword: "investor update presentation",
+    title: "Investor Update Presentation Maker (AI, Free) — EXdeck",
+    description:
+      "Create a clean investor update deck with AI: traction, KPIs, financials, and asks — with real charts and a real PowerPoint export. Free to start with EXdeck.",
+    h1: "AI investor update presentation maker",
+    lede:
+      "Keep investors informed with a crisp, data-driven update deck. Describe your quarter and EXdeck structures the metrics, highlights, and asks into an editable presentation.",
+    sections: [
+      {
+        h: "Everything an update needs",
+        list: [
+          "Headline metrics and KPI charts (MRR, growth, churn, runway)",
+          "Wins, lowlights, and what's next — structured clearly",
+          "Your ask, spelled out",
+          "Export a real .pptx or PDF to send to your cap table",
+        ],
+      },
+    ],
+    faq: [
+      { q: "Does EXdeck build the KPI charts?", a: "Yes — enter your figures and EXdeck renders clean data charts colored to your theme." },
+      { q: "Is it free?", a: "There's a free plan; Pro raises limits and removes the export watermark." },
+    ],
+    related: ["sales-deck-generator", "ai-pitch-deck-generator", "ai-presentation-for-business", "exdeck"],
+  },
+  {
+    slug: "presentation-maker-for-students",
+    keyword: "presentation maker for students",
+    title: "AI Presentation Maker for Students (Free) — EXdeck",
+    description:
+      "Free AI presentation maker for students. Turn a topic or your notes into a full, editable PowerPoint in seconds — real charts, themes, and PPTX/PDF export.",
+    h1: "AI presentation maker for students",
+    lede:
+      "Assignments, class projects, and seminar talks — describe the topic (or paste your notes) and EXdeck builds a clean, editable deck you can hand in. Free to start.",
+    sections: [
+      {
+        h: "Built for coursework",
+        list: [
+          "Type a topic or paste your notes/PDF to turn into slides",
+          "Automatic references slide when you want citations",
+          "Real charts for data-driven topics",
+          "Export a real .pptx or PDF to submit or present",
+        ],
+      },
+      {
+        h: "Fast, and free to start",
+        p: [
+          "Generate a first draft in about ten seconds, then edit anything inline. The free plan covers most student needs; Pro adds more credits for heavy weeks.",
+        ],
+      },
+    ],
+    faq: [
+      { q: "Is EXdeck free for students?", a: "Yes — a free plan with monthly credits to generate, edit, and export presentations." },
+      { q: "Can I turn my notes into slides?", a: "Yes. Paste text or upload a PDF and EXdeck organizes it into a deck." },
+    ],
+    related: ["ai-presentation-software-for-students", "ai-presentation-from-pdf", "free-ppt-maker", "exdeck"],
+  },
+);
+
+/* -------------------------------------------------------------------------- */
+/*  Wave 2: more comparisons, alternatives & use-case pages (2026)            */
+/* -------------------------------------------------------------------------- */
+
+LANDING_PAGES.push(
+  {
+    slug: "exdeck-vs-genially",
+    keyword: "EXdeck vs Genially",
+    title: "EXdeck vs Genially — AI Presentation Maker Comparison",
+    description:
+      "EXdeck vs Genially: AI generation from text, real PowerPoint export, editing, and price. See which tool fits your presentation workflow best.",
+    h1: "EXdeck vs Genially",
+    lede:
+      "Genially specializes in interactive, animated content; EXdeck focuses on generating real, editable presentations from a prompt and exporting a true PowerPoint. Here's how they compare.",
+    sections: [
+      {
+        h: "The quick comparison",
+        list: [
+          "Generation: EXdeck writes and designs a full deck from one line of text; Genially centers on interactive templates.",
+          "Export: EXdeck exports a real editable .pptx and PDF; Genially is web-first.",
+          "Charts: EXdeck builds real data charts from your numbers.",
+          "Price: EXdeck free plan and Pro from $1.99/mo.",
+        ],
+      },
+      {
+        h: "When EXdeck is the better pick",
+        p: [
+          "Choose EXdeck when you need a fast, written first draft and a real PowerPoint file rather than an interactive web experience.",
+        ],
+      },
+    ],
+    faq: [
+      { q: "Is EXdeck a Genially alternative?", a: "Yes — a free-to-start one focused on real PowerPoint export and AI drafting." },
+      { q: "Does EXdeck export PowerPoint?", a: "Yes, a real editable .pptx plus PDF." },
+    ],
+    related: ["genially-alternative", "exdeck-vs-gamma", "best-ai-presentation-maker", "exdeck"],
+  },
+  {
+    slug: "exdeck-vs-pitch",
+    keyword: "EXdeck vs Pitch",
+    title: "EXdeck vs Pitch — Which AI Deck Tool to Use",
+    description:
+      "EXdeck vs Pitch (pitch.com): AI generation, real PowerPoint export, collaboration, and price. A clear comparison for teams choosing a deck tool.",
+    h1: "EXdeck vs Pitch",
+    lede:
+      "Pitch is a polished collaborative deck tool; EXdeck is an AI-first presentation maker that drafts the whole deck and exports a real PowerPoint. Here's the difference.",
+    sections: [
+      {
+        h: "The quick comparison",
+        list: [
+          "AI drafting: EXdeck writes the deck from a prompt; Pitch is template + collaboration first.",
+          "Export: EXdeck exports a real editable .pptx and PDF.",
+          "Charts: EXdeck builds real data charts automatically.",
+          "Price: EXdeck free plan and Pro from $1.99/mo.",
+        ],
+      },
+      {
+        h: "When EXdeck is the better pick",
+        p: [
+          "If you want the AI to produce the first draft in seconds and hand you a genuine PowerPoint, EXdeck is the faster path.",
+        ],
+      },
+    ],
+    faq: [
+      { q: "Is EXdeck a Pitch alternative?", a: "Yes — with stronger AI drafting and real .pptx export, free to start." },
+    ],
+    related: ["pitch-alternative", "exdeck-vs-gamma", "sales-deck-generator", "exdeck"],
+  },
+  {
+    slug: "exdeck-vs-slidebean",
+    keyword: "EXdeck vs Slidebean",
+    title: "EXdeck vs Slidebean — AI Pitch Deck Tools Compared",
+    description:
+      "EXdeck vs Slidebean for pitch decks: AI generation, editing control, real PowerPoint export, and price. See which is right for founders.",
+    h1: "EXdeck vs Slidebean",
+    lede:
+      "Slidebean auto-designs pitch decks with a template-driven flow; EXdeck writes and designs the whole deck from a prompt and exports a real PowerPoint. Here's the comparison.",
+    sections: [
+      {
+        h: "The quick comparison",
+        list: [
+          "Control: EXdeck gives full manual editing; Slidebean constrains layout to its templates.",
+          "Export: EXdeck exports a real editable .pptx and PDF.",
+          "Price: EXdeck free plan and Pro from $1.99/mo; Slidebean is subscription-based.",
+        ],
+      },
+      {
+        h: "When EXdeck is the better pick",
+        p: [
+          "Founders who want a fast draft, real editing, and a true PowerPoint file at a low price will find EXdeck a strong fit.",
+        ],
+      },
+    ],
+    faq: [
+      { q: "Is EXdeck a Slidebean alternative?", a: "Yes — a free-to-start AI pitch deck tool with real PowerPoint export." },
+    ],
+    related: ["slidebean-alternative", "ai-pitch-deck-generator", "sales-deck-generator", "exdeck"],
+  },
+  {
+    slug: "genially-alternative",
+    keyword: "Genially alternative",
+    title: "Genially Alternative (Free) — EXdeck AI Presentation Maker",
+    description:
+      "A free Genially alternative: EXdeck generates editable presentations from text with real charts and exports genuine PowerPoint & PDF. Start free.",
+    h1: "The free Genially alternative",
+    lede:
+      "Want a simpler path to a real, editable presentation than Genially's interactive builder? EXdeck writes and designs the deck for you and exports a true PowerPoint — free to start.",
+    sections: [
+      {
+        h: "Why EXdeck",
+        list: [
+          "AI drafts the whole deck from a one-line brief",
+          "Real editable .pptx and PDF export",
+          "Real data charts and 200,000+ icons",
+          "Free plan; Pro from $1.99/mo",
+        ],
+      },
+    ],
+    faq: [
+      { q: "Is EXdeck free?", a: "Yes — a free plan plus Pro from $1.99/mo." },
+      { q: "Does it export PowerPoint?", a: "Yes, a real editable .pptx and PDF." },
+    ],
+    related: ["exdeck-vs-genially", "gamma-alternative", "best-ai-presentation-maker", "exdeck"],
+  },
+  {
+    slug: "pitch-alternative",
+    keyword: "Pitch alternative",
+    title: "Pitch Alternative (Free) — EXdeck AI Presentation Maker",
+    description:
+      "A free Pitch (pitch.com) alternative: EXdeck drafts decks from text with AI, exports real PowerPoint & PDF, and starts free. Compare and switch.",
+    h1: "The free Pitch alternative",
+    lede:
+      "If you like Pitch's polish but want AI to draft the deck and a real PowerPoint export, EXdeck is a practical, free-to-start alternative.",
+    sections: [
+      {
+        h: "Why EXdeck",
+        list: [
+          "AI writes and designs the deck from a prompt",
+          "Real editable .pptx and PDF export",
+          "Free plan; Pro from $1.99/mo",
+        ],
+      },
+    ],
+    faq: [
+      { q: "Is EXdeck a free Pitch alternative?", a: "Yes — with AI drafting and real PowerPoint export." },
+    ],
+    related: ["exdeck-vs-pitch", "gamma-alternative", "sales-deck-generator", "exdeck"],
+  },
+  {
+    slug: "slidebean-alternative",
+    keyword: "Slidebean alternative",
+    title: "Slidebean Alternative (Free) — EXdeck AI Pitch Deck Maker",
+    description:
+      "A free Slidebean alternative for pitch decks: EXdeck generates and designs decks from text, exports real PowerPoint & PDF, and starts free.",
+    h1: "The free Slidebean alternative",
+    lede:
+      "EXdeck is a free-to-start Slidebean alternative that drafts your pitch deck from a one-line brief and hands you a real, editable PowerPoint.",
+    sections: [
+      {
+        h: "Why EXdeck",
+        list: [
+          "Full pitch-deck structure generated for you",
+          "Real data charts for traction and market size",
+          "Real editable .pptx and PDF export",
+          "Free plan; Pro from $1.99/mo",
+        ],
+      },
+    ],
+    faq: [
+      { q: "Is EXdeck free?", a: "Yes — a free plan plus Pro from $1.99/mo." },
+    ],
+    related: ["exdeck-vs-slidebean", "ai-pitch-deck-generator", "sales-deck-generator", "exdeck"],
+  },
+  {
+    slug: "slidesgo-alternative",
+    keyword: "Slidesgo alternative",
+    title: "Slidesgo Alternative (Free) — Generate Slides with AI | EXdeck",
+    description:
+      "A free Slidesgo alternative: instead of hunting templates, EXdeck writes and designs your slides with AI and exports real PowerPoint & PDF. Start free.",
+    h1: "The free Slidesgo alternative",
+    lede:
+      "Slidesgo gives you templates to fill in; EXdeck writes and designs the whole deck from a prompt, so you skip the blank-template stage entirely. Free to start.",
+    sections: [
+      {
+        h: "Why EXdeck",
+        list: [
+          "AI drafts content and design — no template hunting",
+          "Real data charts, 45 themes, 200,000+ icons",
+          "Real editable .pptx and PDF export",
+          "Free plan; Pro from $1.99/mo",
+        ],
+      },
+    ],
+    faq: [
+      { q: "Is EXdeck a free Slidesgo alternative?", a: "Yes — and it writes the deck for you instead of giving you an empty template." },
+    ],
+    related: ["gamma-alternative", "free-ppt-maker", "ai-slide-maker", "exdeck"],
+  },
+  {
+    slug: "magicslides-alternative",
+    keyword: "MagicSlides alternative",
+    title: "MagicSlides Alternative (Free) — EXdeck AI PPT Maker",
+    description:
+      "A free MagicSlides alternative: EXdeck generates full editable presentations from text with real charts and exports genuine PowerPoint & PDF. Start free.",
+    h1: "The free MagicSlides alternative",
+    lede:
+      "MagicSlides works as an add-on; EXdeck is a standalone AI presentation maker that writes and designs the whole deck and exports a real PowerPoint. Free to start.",
+    sections: [
+      {
+        h: "Why EXdeck",
+        list: [
+          "Standalone app — no add-on required",
+          "Full slide editor with per-element control",
+          "Real editable .pptx and PDF export",
+          "Free plan; Pro from $1.99/mo",
+        ],
+      },
+    ],
+    faq: [
+      { q: "Is EXdeck a MagicSlides alternative?", a: "Yes — a standalone, free-to-start app with real PowerPoint export." },
+    ],
+    related: ["slidesai-alternative", "ai-ppt-maker", "text-to-ppt", "exdeck"],
+  },
+  {
+    slug: "chatgpt-ppt-maker",
+    keyword: "ChatGPT PPT maker",
+    title: "Make a PPT with ChatGPT? Use EXdeck for Real PowerPoint Export",
+    description:
+      "ChatGPT can outline slides, but it can't design or export a real PowerPoint. EXdeck turns a prompt into a designed, editable .pptx in seconds. Free to start.",
+    h1: "From ChatGPT text to a real PowerPoint",
+    lede:
+      "ChatGPT is great for drafting slide text, but it won't design the slides or hand you a .pptx. EXdeck takes it the rest of the way — paste your outline (or just a topic) and get a designed, editable PowerPoint with charts.",
+    sections: [
+      {
+        h: "Why not just use ChatGPT?",
+        p: [
+          "ChatGPT produces text, not a designed, exportable deck. You'd still have to build every slide by hand in PowerPoint. EXdeck writes and designs the slides and exports a real .pptx and PDF automatically.",
+        ],
+      },
+      {
+        h: "Paste your ChatGPT outline",
+        list: [
+          "Paste an outline or notes, or start from a one-line topic",
+          "EXdeck structures it into slides and adds real charts",
+          "Edit anything inline, then export a real PowerPoint",
+        ],
+      },
+    ],
+    faq: [
+      { q: "Can ChatGPT make a PowerPoint file?", a: "Not directly — it produces text. EXdeck turns that text into a designed, editable .pptx." },
+      { q: "Can I paste my ChatGPT outline into EXdeck?", a: "Yes. Paste text or upload a file and EXdeck organizes it into a deck." },
+    ],
+    related: ["text-to-ppt", "ai-presentation-from-word", "ai-ppt-maker", "exdeck"],
+  },
+  {
+    slug: "webinar-presentation-maker",
+    keyword: "webinar presentation maker",
+    title: "AI Webinar Presentation Maker (Free) — EXdeck",
+    description:
+      "Create an engaging webinar deck with AI: visual slides, real charts, speaker notes, and a real PowerPoint export. Free to start with EXdeck.",
+    h1: "AI webinar presentation maker",
+    lede:
+      "Webinars need visual, lightly-worded slides that hold attention for 30–60 minutes. Describe your session and EXdeck builds a clean, visual deck with speaker notes you can present from.",
+    sections: [
+      {
+        h: "Built for a long session",
+        list: [
+          "Visual, low-text slides that keep attention",
+          "Real charts for data-heavy segments",
+          "AI speaker notes and a teleprompter for smooth delivery",
+          "Export a real .pptx or present full-screen in the browser",
+        ],
+      },
+    ],
+    faq: [
+      { q: "Can EXdeck make a webinar deck for free?", a: "Yes — generate and edit on the free plan, and present or export." },
+      { q: "Does it include speaker notes?", a: "Yes — one click writes spoken notes for every slide, with a teleprompter in Present mode." },
+    ],
+    related: ["ai-presentation-maker", "sales-deck-generator", "ai-presentation-for-business", "exdeck"],
+  },
+  {
+    slug: "business-plan-presentation",
+    keyword: "business plan presentation",
+    title: "AI Business Plan Presentation Maker (Free) — EXdeck",
+    description:
+      "Turn your business plan into a clear, investor-ready presentation with AI: market, model, financials, and roadmap — with real charts and PowerPoint export.",
+    h1: "AI business plan presentation maker",
+    lede:
+      "Condense a business plan into a presentation that decision-makers actually read. Describe your business and EXdeck structures the market, model, financials, and roadmap into an editable deck.",
+    sections: [
+      {
+        h: "Everything a business plan deck needs",
+        list: [
+          "Executive summary and problem/solution framing",
+          "Market size and business model, on clean charts",
+          "Financial projections and milestones",
+          "Export a real .pptx or PDF to share",
+        ],
+      },
+    ],
+    faq: [
+      { q: "Can AI build a business plan presentation?", a: "Yes — EXdeck drafts the full structure and charts from a brief; you add your real figures and export." },
+    ],
+    related: ["ai-presentation-for-business", "investor-update-presentation", "ai-pitch-deck-generator", "exdeck"],
+  },
+  {
+    slug: "thesis-defense-presentation",
+    keyword: "thesis defense presentation",
+    title: "AI Thesis Defense Presentation Maker (Free) — EXdeck",
+    description:
+      "Build a clear thesis defense deck with AI: research question, methods, results, and conclusions — with charts, a references slide, and PowerPoint export.",
+    h1: "AI thesis defense presentation maker",
+    lede:
+      "Present your research with clarity and confidence. Describe your thesis (or paste your abstract) and EXdeck structures the question, methods, results, and conclusions into a defense-ready deck.",
+    sections: [
+      {
+        h: "Made for academic defense",
+        list: [
+          "Research question, methods, results, and conclusions structured clearly",
+          "Real charts for your data and findings",
+          "An automatic references slide for citations",
+          "Export a real .pptx or PDF to present",
+        ],
+      },
+    ],
+    faq: [
+      { q: "Can I turn my abstract into slides?", a: "Yes. Paste your abstract or notes and EXdeck organizes them into a defense deck." },
+      { q: "Does it add a references slide?", a: "Yes — enable references and EXdeck includes a citations slide." },
+    ],
+    related: ["presentation-maker-for-students", "ai-presentation-from-research-paper", "ai-presentation-from-pdf", "exdeck"],
+  },
+  {
+    slug: "book-report-presentation",
+    keyword: "book report presentation",
+    title: "AI Book Report Presentation Maker (Free) — EXdeck",
+    description:
+      "Turn a book into a clean report presentation with AI: summary, themes, characters, and analysis — editable slides with a real PowerPoint export. Free.",
+    h1: "AI book report presentation maker",
+    lede:
+      "Summarize any book into a clear, presentable report. Name the book (or paste your notes) and EXdeck builds a structured deck covering summary, themes, characters, and your analysis.",
+    sections: [
+      {
+        h: "A complete book report, structured",
+        list: [
+          "Summary, themes, characters, and analysis",
+          "Clean, readable slides in seconds",
+          "Export a real .pptx or PDF to submit or present",
+        ],
+      },
+    ],
+    faq: [
+      { q: "Is EXdeck free for a book report?", a: "Yes — generate, edit, and export on the free plan." },
+    ],
+    related: ["presentation-maker-for-students", "ai-presentation-software-for-students", "free-ppt-maker", "exdeck"],
+  },
+);
+
 export function getLandingPage(slug: string): LandingPage | undefined {
   return LANDING_PAGES.find((p) => p.slug === slug);
 }

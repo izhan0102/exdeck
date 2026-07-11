@@ -16,7 +16,6 @@ import Logo from "./Logo";
 import ThemeToggle from "./ThemeToggle";
 import TrialDialog from "./TrialDialog";
 import ReportDialog from "./ReportDialog";
-import ExAiWidget from "./ExAiWidget";
 import { watchCredits, formatResetIn, type CreditView } from "@/lib/creditsClient";
 import { watchUserPlan, getUserPlan } from "@/lib/plan";
 import { watchMembership, type MemberPlan } from "@/lib/seats";
@@ -481,8 +480,6 @@ export default function Dashboard({
             </div>
           </section>
         </div>
-
-        <ExAiWidget />
 
       </main>
 
