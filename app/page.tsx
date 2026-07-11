@@ -197,21 +197,6 @@ export default function LandingPage() {
         />
 
         <div className="mx-auto flex w-full max-w-3xl flex-col items-center text-center">
-          {/* Eyebrow: What's new pill (live changelog) */}
-          <Reveal delay={20}>
-            <Link
-              href="/changelog"
-              className="group inline-flex max-w-full items-center gap-2 rounded-full border px-2 py-1 text-[12px] font-medium transition hover:opacity-90"
-              style={{ borderColor: "var(--ezd-hairline)", background: "var(--ezd-bg-card)", color: "var(--ezd-fg-muted)" }}
-            >
-              <span className="inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 text-[10.5px] font-semibold uppercase tracking-wide" style={{ background: "var(--ezd-button-strong)", color: "var(--ezd-button-strong-fg)" }}>
-                <Sparkles size={11} /> New
-              </span>
-              <span className="truncate">{latestChange || "Regenerate any slide with 7 AI models"}</span>
-              <ArrowRight size={13} className="shrink-0 transition group-hover:translate-x-0.5" />
-            </Link>
-          </Reveal>
-
           {/* Headline */}
           <Reveal delay={80}>
             <h1
