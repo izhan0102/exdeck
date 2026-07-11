@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import {
   ArrowRight, Check, Contact, MonitorPlay, Github, LogOut,
   Presentation, Sparkles, Star, FileText, X,
-  Table, ArrowLeftRight, Brain, GraduationCap, Mic,
+  Table, ArrowLeftRight, Brain, GraduationCap, Mic, BarChart3,
   type LucideIcon,
 } from "lucide-react";
 import Logo from "@/components/Logo";
@@ -57,6 +57,7 @@ export default function LandingPage() {
   const router = useRouter();
   const [user, setUser] = useState<AppUser | null>(null);
   const [scrolled, setScrolled] = useState(false);
+  const [latestChange, setLatestChange] = useState<string | null>(null);
 
   useEffect(() => {
     trackEvent({ kind: "page_view", path: "/", ts: Date.now() });
@@ -65,6 +66,12 @@ export default function LandingPage() {
     const onScroll = () => setScrolled(window.scrollY > 24);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
+
+    // Latest changelog entry for the hero "What's new" pill.
+    fetch("/api/changelog-latest")
+      .then((r) => r.json())
+      .then((d) => { if (d?.title) setLatestChange(String(d.title)); })
+      .catch(() => {});
 
     return () => {
       unsub();
@@ -124,6 +131,7 @@ export default function LandingPage() {
             <a href="#features" className="text-[12.5px] transition hover:text-white">Features</a>
             <a href="#how" className="text-[12.5px] transition hover:text-white">How it works</a>
             <a href="#pricing" className="text-[12.5px] transition hover:text-white">Pricing</a>
+            <Link href="/benchmarks" className="text-[12.5px] transition hover:text-white">Benchmarks</Link>
             <a href="#faq" className="text-[12.5px] transition hover:text-white">FAQ</a>
             <Link href="/about" className="text-[12.5px] transition hover:text-white">Dev&rsquo;s note</Link>
           </div>
@@ -177,9 +185,9 @@ export default function LandingPage() {
           style={{ background: "radial-gradient(60% 60% at 30% 0%, var(--ezd-bg-hover), transparent 70%)" }}
         />
 
-        <div className="mx-auto grid w-full max-w-[1200px] grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-10">
+        <div className="mx-auto flex w-full max-w-3xl flex-col items-center text-center">
           {/* ---------- Hero copy ---------- */}
-          <div className="w-full text-left">
+          <div className="w-full">
             <Reveal delay={60}>
               <h1
                 className="font-semibold"
@@ -202,7 +210,7 @@ export default function LandingPage() {
 
             <Reveal delay={120}>
               <p
-                className="mt-6 max-w-xl text-[16px] leading-relaxed sm:text-[18px]"
+                className="mx-auto mt-6 max-w-xl text-[16px] leading-relaxed sm:text-[18px]"
                 style={{ color: "var(--ezd-fg-muted)" }}
               >
                 EXdeck turns a short prompt into a fully designed PowerPoint deck with real charts and speaker notes. Also makes AI documents, spreadsheets, and resumes, plus free file converters.
@@ -210,7 +218,7 @@ export default function LandingPage() {
             </Reveal>
 
             <Reveal delay={180}>
-              <div className="mt-9 flex flex-wrap items-center gap-3">
+              <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
                 <button
                   onClick={onGetStarted}
                   className="group inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-[15px] font-semibold transition hover:opacity-90"
@@ -226,33 +234,27 @@ export default function LandingPage() {
                 >
                   See how it works
                 </a>
-                <span className="ml-1 text-[13px] font-medium" style={{ color: "var(--ezd-fg-muted)" }}>
-                  Free &middot; No card &middot; Real .pptx &amp; .pdf
-                </span>
+              </div>
+            </Reveal>
+
+            <Reveal delay={240}>
+              <div className="mt-5 flex justify-center">
+                <Link
+                  href="/changelog"
+                  className="group inline-flex max-w-full items-center gap-2 rounded-full border px-3.5 py-1.5 text-[12.5px] font-medium transition hover:opacity-90"
+                  style={{ borderColor: "var(--ezd-hairline)", background: "var(--ezd-bg-card)", color: "var(--ezd-fg-muted)" }}
+                >
+                  <span className="shrink-0 rounded-full px-2 py-0.5 text-[10.5px] font-semibold uppercase tracking-wide" style={{ background: "var(--ezd-button-strong)", color: "var(--ezd-button-strong-fg)" }}>
+                    What&rsquo;s new
+                  </span>
+                  <span className="truncate">
+                    {latestChange || "Regenerate any slide with 7 AI models"}
+                  </span>
+                  <ArrowRight size={13} className="shrink-0 transition group-hover:translate-x-0.5" />
+                </Link>
               </div>
             </Reveal>
           </div>
-
-          {/* ---------- Product demo (animated) ---------- */}
-          <Reveal delay={300} className="w-full">
-            <div className="relative w-full">
-              <div 
-                className="relative overflow-hidden rounded-2xl border shadow-2xl"
-                style={{
-                  borderColor: "var(--ezd-hairline)",
-                  background: "var(--ezd-bg-card)"
-                }}
-              >
-                <div className="flex items-center gap-2 border-b px-4 py-3" style={{ borderColor: "var(--ezd-hairline)", background: "var(--ezd-bg-hover)" }}>
-                  <span className="h-3 w-3 rounded-full" style={{ background: "#ff5f57" }} />
-                  <span className="h-3 w-3 rounded-full" style={{ background: "#febc2e" }} />
-                  <span className="h-3 w-3 rounded-full" style={{ background: "#28c840" }} />
-                  <span className="mx-auto pr-6 text-[12.5px] font-medium" style={{ color: "var(--ezd-fg-muted)" }}>EXdeck</span>
-                </div>
-                <HeroDemo />
-              </div>
-            </div>
-          </Reveal>
         </div>
       </section>
 
@@ -271,14 +273,14 @@ export default function LandingPage() {
                 EXdeck collaboration lets invited teammates open the same presentation, edit with the normal deck editor, and see a clear Changes history with each person&apos;s name and @username attached to the work.
               </p>
             </div>
-            <div className="grid gap-px overflow-hidden rounded-2xl border" style={{ borderColor: "var(--ezd-divider)", background: "var(--ezd-divider)" }}>
+            <div className="space-y-3 rounded-2xl border p-5" style={{ borderColor: "var(--ezd-hairline)", background: "var(--ezd-bg-card)" }}>
               {[
                 "Invite Exdeck users as owners, editors, or viewers",
                 "Track slide edits, text updates, regenerated slides, images, layouts, themes, and AI changes",
                 "Show chronological Changes with names, @usernames, avatars, timestamps, and undo-ready history",
                 "Keep the current EXdeck editor UI, theme controls, slide canvas, AI tools, and exports",
               ].map((item) => (
-                <div key={item} className="flex items-start gap-3 p-4" style={{ background: "var(--ezd-bg-card)" }}>
+                <div key={item} className="flex items-start gap-3">
                   <Check size={15} className="mt-0.5 shrink-0" style={{ color: "var(--ezd-fg-strong)" }} />
                   <span className="text-[13.5px] leading-relaxed" style={{ color: "var(--ezd-fg-muted)" }}>{item}</span>
                 </div>
@@ -665,6 +667,33 @@ export default function LandingPage() {
             </a>
           </div>
         </Reveal>
+      </section>
+
+      {/* ================== Model benchmarks CTA ================== */}
+      <section className="relative z-10 mx-auto max-w-5xl px-5 py-8 sm:px-6">
+        <Link
+          href="/benchmarks"
+          className="group flex flex-col items-start justify-between gap-4 rounded-2xl border p-6 transition hover:border-white/30 sm:flex-row sm:items-center"
+          style={{ borderColor: "var(--ezd-hairline)", background: "var(--ezd-bg-card, rgba(255,255,255,0.02))" }}
+        >
+          <div className="flex items-center gap-4">
+            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl border" style={{ borderColor: "var(--ezd-hairline)" }}>
+              <BarChart3 size={20} style={{ color: "var(--ezd-fg-strong)" }} />
+            </span>
+            <div>
+              <div className="text-[15px] font-semibold" style={{ color: "var(--ezd-fg-strong)" }}>
+                Pick the AI that fits — 7 models, benchmarked
+              </div>
+              <p className="mt-1 text-[13px]" style={{ color: "var(--ezd-fg-muted)" }}>
+                Regenerate any slide with Llama, Qwen, or GPT-OSS. See real speed, throughput, and reliability.
+              </p>
+            </div>
+          </div>
+          <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-[13px] font-semibold transition group-hover:opacity-90"
+            style={{ background: "var(--ezd-button-strong)", color: "var(--ezd-button-strong-fg)" }}>
+            View model benchmarks <ArrowRight size={13} />
+          </span>
+        </Link>
       </section>
 
       {/* ================== Pricing ================== */}
@@ -1809,6 +1838,7 @@ function Footer() {
             items={[
               { label: "About / Dev's note", href: "/about" },
               { label: "Meet the developer", href: "/developer" },
+              { label: "Model benchmarks", href: "/benchmarks" },
               { label: "Changelog", href: "/changelog" },
               { label: "Leave a review", href: "/feedback" },
               { label: "Contact", href: "/contact" },

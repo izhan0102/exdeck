@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import type { Deck, Slide, Annotation, Anchor, ElementId, TableData, Reference, UploadedImage } from "@/lib/types";
-import { withGroqClient } from "@/lib/groqClient";
 import { getDecoration, DECORATIONS } from "@/lib/decorations";
 import { searchIconify } from "@/lib/iconify";
 import { authenticateRequest, AuthError } from "@/lib/firebaseAdmin";
-import { requireCredits, deductCredits } from "@/lib/credits";
+import { requireCredits, deductCredits, deductCreditsAmount } from "@/lib/credits";
 import { PlanLimitError } from "@/lib/planServer";
 import { rateLimitResponse } from "@/lib/rateLimit";
 import { cleanChartSpec } from "@/lib/charts";
+import { normalizeModel, computeGenerationCredits } from "@/lib/models";
+import { robustJsonCompletion } from "@/lib/robustCompletion";
 
 export const runtime = "nodejs";
 export const maxDuration = 30;
@@ -124,7 +125,14 @@ Patch schema (all fields OPTIONAL):
         "sizeDelta": number,     // +1 to bump up one step, -1 to shrink one step
         "color":    string,      // hex
         "opacity":  number,      // 0..1
-        "x": number, "y": number, "w": number, "h": number   // raw inches if needed
+        "x": number, "y": number, "w": number, "h": number,  // raw inches if needed
+        // Replace a CHART element's data (kind="chart"). Provide the full new
+        // spec with REAL numbers. This swaps the rendered graph in place.
+        "chart": {
+          "type": "bar" | "line" | "area" | "pie" | "donut",
+          "title": string, "unit": string,
+          "data": [ { "label": string, "value": number, "color": string } ]
+        }
       }
     }
   ],
@@ -401,12 +409,43 @@ Return ONLY the JSON patch.`,
 /* --------------------------------- helpers -------------------------------- */
 
 function extractJson(raw: string): string {
-  let s = raw.trim();
+  let s = (raw || "").trim();
   if (s.startsWith("```")) s = s.replace(/^```(?:json)?\s*/i, "").replace(/```\s*$/i, "");
-  const first = s.indexOf("{");
+  // Balanced-brace scan: find the first complete top-level {...} object,
+  // ignoring braces that appear inside strings. Reasoning models often wrap
+  // the JSON in prose or emit trailing braces, which a naive first/last slice
+  // gets wrong — this returns exactly one valid object span.
+  const start = s.indexOf("{");
+  if (start === -1) return s;
+  let depth = 0, inStr = false, esc = false;
+  for (let i = start; i < s.length; i++) {
+    const c = s[i];
+    if (esc) { esc = false; continue; }
+    if (c === "\\") { esc = true; continue; }
+    if (c === '"') { inStr = !inStr; continue; }
+    if (inStr) continue;
+    if (c === "{") depth++;
+    else if (c === "}") { depth--; if (depth === 0) return s.slice(start, i + 1); }
+  }
+  // Unbalanced (truncated) — fall back to first-open .. last-close.
   const last = s.lastIndexOf("}");
-  if (first !== -1 && last !== -1) s = s.slice(first, last + 1);
-  return s;
+  return last > start ? s.slice(start, last + 1) : s.slice(start);
+}
+
+/** Parse a model JSON patch tolerantly: balanced extraction, then a trailing
+ *  comma repair, before giving up with a clear error. */
+function parsePatch(raw: string): any {
+  const cleaned = extractJson(raw);
+  try {
+    return JSON.parse(cleaned);
+  } catch {
+    try {
+      // Strip trailing commas before } or ] — the most common model slip.
+      return JSON.parse(cleaned.replace(/,\s*([}\]])/g, "$1"));
+    } catch {
+      throw new Error("The model returned malformed JSON. Try again, or use a different model.");
+    }
+  }
 }
 
 function cleanText(s: any): string {
@@ -708,6 +747,12 @@ async function applyPatch(slide: Slide, patch: any): Promise<Slide> {
       const cur = { ...images[idx] };
       const p = u.patch || {};
 
+      // Replace a chart element's data in place (swaps the rendered graph).
+      if (p.chart && cur.kind === "chart") {
+        const spec = cleanChartSpec(p.chart);
+        if (spec) cur.chartSpec = spec;
+      }
+
       // Color
       if (isHex(p.color)) {
         cur.colorOverrides = { ...(cur.colorOverrides || {}), accent: p.color };
@@ -798,23 +843,40 @@ export async function POST(req: NextRequest) {
   try {
     const uid = await authenticateRequest(req);
     await requireCredits(uid);
-    const { deck, theme, slideIndex, instruction, history } = (await req.json()) as {
+    const { deck, theme, slideIndex, instruction, history, model: rawModel, regenerate } = (await req.json()) as {
       deck: Deck;
       theme?: { bg?: string; fg?: string; accent?: string };
       slideIndex: number;
       instruction: string;
       /** Compact recent edits, oldest -> newest. Used by the model as memory. */
       history?: { user: string; explanation?: string; scope?: "slide" | "deck" }[];
+      /** Optional model override (from the per-slide "regenerate with model" menu). */
+      model?: string;
+      /** When true, rewrite the whole slide from scratch with the chosen model. */
+      regenerate?: boolean;
     };
 
-    if (!deck || typeof slideIndex !== "number" || !instruction) {
-      return NextResponse.json({ error: "deck + slideIndex + instruction required" }, { status: 400 });
+    // The chosen model (per-slide regenerate menu) or the default.
+    const model = normalizeModel(rawModel);
+    const isRegen = regenerate === true;
+
+    // A regenerate needs no user instruction; a normal edit does.
+    if (!deck || typeof slideIndex !== "number") {
+      return NextResponse.json({ error: "deck + slideIndex required" }, { status: 400 });
     }
-    if (instruction.length > 2000) {
+    if (!isRegen && !instruction) {
+      return NextResponse.json({ error: "instruction required" }, { status: 400 });
+    }
+    if (instruction && instruction.length > 2000) {
       return NextResponse.json({ error: "Instruction too long (max 2000 characters)" }, { status: 400 });
     }
+    // The effective instruction: a short full-rewrite directive for regenerate
+    // (the compact REGEN_SYSTEM carries the detailed rules), else the user's.
+    const effectiveInstruction = isRegen
+      ? `Regenerate this slide from scratch with fresh, specific, factual content for the deck topic. Rewrite the title and the main content for its layout. Keep it substantive; do not just rephrase the existing wording.`
+      : instruction;
     // Prevent breaking out of the quoted prompt or confusing the LLM's JSON parsing
-    const safeInstruction = instruction.replace(/\\/g, "\\\\").replace(/"/g, "\\\"");
+    const safeInstruction = effectiveInstruction.replace(/\\/g, "\\\\").replace(/"/g, "\\\"");
 
     const slide = deck.slides[slideIndex];
     if (!slide) return NextResponse.json({ error: "slide not found" }, { status: 400 });
@@ -859,6 +921,14 @@ export async function POST(req: NextRequest) {
         kind: img.kind,
         decorationId: img.decorationId,
         iconId: img.iconId,
+        // Expose the live chart's spec so the model can SEE and REPLACE its
+        // data (charts on a slide are chart elements rendered from chartSpec).
+        chart: img.kind === "chart" && img.chartSpec ? {
+          type: img.chartSpec.type,
+          title: img.chartSpec.title,
+          unit: img.chartSpec.unit,
+          data: img.chartSpec.data,
+        } : undefined,
         position: { x: round(img.x), y: round(img.y), w: round(img.w), h: round(img.h) },
         color: img.colorOverrides?.accent,
         opacity: img.opacity,
@@ -872,17 +942,42 @@ export async function POST(req: NextRequest) {
           .join("\n")}\n\n`
       : "";
 
-    const completion = await withGroqClient((client) =>
-      client.chat.completions.create({
-        model: "meta-llama/llama-4-scout-17b-16e-instruct",
-        temperature: 0.15,
-        max_tokens: 2000,
-        response_format: { type: "json_object" },
-        messages: [
-          { role: "system", content: SYSTEM_PROMPT },
+    // Regenerate uses a COMPACT prompt (no few-shot, trimmed context) so the
+    // request stays small — it fits low per-minute token budgets and runs
+    // faster. Normal edits keep the full instruction-tuned prompt + examples.
+    const REGEN_SYSTEM = `You rewrite ONE presentation slide's content. Output ONLY a JSON object, no prose or markdown.
+Include only the fields that fit the slide's current layout:
+{ "title": string, "subtitle": string, "bullets": string[], "body": string,
+  "table": { "headers": string[], "rows": [string[]], "source": string },
+  "chart": { "type":"bar|line|area|pie|donut", "title": string, "unit": string, "data":[{"label":string,"value":number,"color":string}] },
+  "updateElements": [ { "id": string, "patch": { "chart": { "type":"bar|line|area|pie|donut","title":string,"unit":string,"data":[{"label":string,"value":number,"color":string}] } } } ] }
+Rules:
+- Use ONLY real, factual data about the topic. Never invent statistics, names, dates, or figures.
+- bullets / two-column -> 4-6 concrete points in "bullets". quote -> "body" + "subtitle". table -> "table" with real rows.
+- If the slide context lists an element with kind "chart", the graph IS that element: replace its data via updateElements[].patch.chart with DIFFERENT but real numbers — do not only change the text.
+- If the layout is "chart", set "chart" with 2-7 real data points.
+- Never output empty arrays or placeholder values. Keep the same layout.`;
+
+    const messages = isRegen
+      ? [
+          { role: "system" as const, content: REGEN_SYSTEM },
+          {
+            role: "user" as const,
+            content: `Deck topic: "${deck.topic || deck.title}" · Audience: ${deck.audience || "general"} · Tone: ${deck.tone || "professional"}
+Current slide (index ${slideIndex}):
+${JSON.stringify(compactSlide)}
+
+Task:
+"${safeInstruction}"
+
+Return ONLY the JSON object.`,
+          },
+        ]
+      : [
+          { role: "system" as const, content: SYSTEM_PROMPT },
           ...FEW_SHOT,
           {
-            role: "user",
+            role: "user" as const,
             content: `Deck context:
 ${JSON.stringify(deckContext, null, 2)}
 
@@ -894,18 +989,28 @@ ${recentBlock}Instruction:
 
 Return ONLY the JSON patch.`,
           },
-        ],
-      }),
-    );
+        ];
 
-    const raw = completion.choices[0]?.message?.content || "{}";
-    const patch = JSON.parse(extractJson(raw));
+    const { content: raw, usage } = await robustJsonCompletion({
+      model,
+      temperature: isRegen ? 0.5 : 0.15,
+      desiredMaxTokens: isRegen ? 3000 : 2000,
+      messages,
+    });
+
+    const patch = parsePatch(raw || "{}");
     const updated = await applyPatch(slide, patch);
 
-    deductCredits(uid, "editSlide").catch(() => {});
+    // Regenerate is metered by tokens × the chosen model's rate (like deck
+    // generation). A normal edit keeps its fixed cost.
+    if (isRegen) {
+      deductCreditsAmount(uid, computeGenerationCredits(usage, model)).catch(() => {});
+    } else {
+      deductCredits(uid, "editSlide").catch(() => {});
+    }
     return NextResponse.json({
       slide: updated,
-      explanation: typeof patch.explanation === "string" ? patch.explanation : "Slide updated.",
+      explanation: typeof patch.explanation === "string" ? patch.explanation : (isRegen ? "Slide regenerated." : "Slide updated."),
     });
   } catch (err: any) {
     if (err instanceof PlanLimitError) {

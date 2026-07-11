@@ -148,6 +148,7 @@ The AI decides on its own whether a chart belongs and which type fits the data â
 ### Editing
 - Per-slide AI chat that knows the deck topic, theme, every slide title, and existing graphics
 - Deck-wide AI editing ("add three competitor slides", "tighten every bullet")
+- **Per-slide regenerate with your choice of model** â€” right-click a slide (or use the Regenerate button under the preview) and rewrite its text, tables, and **data charts** with any of seven models (Llama 3.3 70B, Llama 3.1 8B, Llama 4 Scout, Qwen 3, GPT-OSS 20B/120B). Metered by tokens Ã— the model's rate. Compare them on the [`/benchmarks`](https://exdeck.xyz/benchmarks) page.
 - Drag-and-drop text boxes, inline editing, click-to-recolor graphics, image upload
 - Slide reorder, duplicate, insert-between, and delete from the thumbnail rail
 - Undo, autosave to your account, and a guided one-time onboarding tour
@@ -171,7 +172,7 @@ The AI decides on its own whether a chart belongs and which type fits the data â
 
 - Next.js 14 with the App Router
 - TypeScript and Tailwind
-- Groq SDK (model `meta-llama/llama-4-scout-17b-16e-instruct`) with multi-key fallback
+- Groq SDK â€” default `llama-3.3-70b-versatile`, with per-slide model choice (Llama 3.1 8B, Llama 4 Scout, Qwen 3, GPT-OSS 20B/120B) and multi-key fallback
 - Iconify for icon search
 - pptxgenjs for PowerPoint export
 - jsPDF and html2canvas for PDF export

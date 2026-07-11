@@ -294,6 +294,7 @@ const retryGenerate = () => {
       let prevVar = "";
       const SEQ_RE = /(process|pipeline|timeline|roadmap|journey|work\s?flow|steps?|phases?|stages?|how it works|how to|life\s?cycle|sequence|procedure|funnel|milestones?|getting started|onboarding|order of|flow\b)/i;
       const ENUM_RE = /(features?|modules?|pillars?|principles?|types?|categories|kinds?|components?|benefits?|advantages?|reasons?|factors?|capabilities|use cases?|offerings?|differentiators?|elements?|options?|services?)/i;
+      const BENEFIT_RE = /(benefits?|advantages?|why\b|pros\b|highlights?|strengths?|perks?|value)/i;
       const isSequential = (s: any): boolean => {
         const bs: string[] = s.bullets || [];
         const joined = bs.join(" ").toLowerCase();
@@ -312,19 +313,24 @@ const retryGenerate = () => {
           // Steps / process / timeline content -> process arrows when the
           // labels are short, otherwise a vertical timeline.
           cand = (n <= 5 && avgLen <= 62 && !hasDetail) ? "chevron" : "timeline";
+        } else if (BENEFIT_RE.test(title) && n <= 6 && !hasDetail) {
+          // Benefits / advantages / why -> checklist look.
+          cand = "icon-check";
         } else if (ENUM_RE.test(title)) {
-          // Distinct named items -> concept cards (primary) or big-number cards.
-          cand = i % 3 === 1 ? "numbered-cards" : "concept-cards";
+          // Distinct named items -> rotate through the card styles for variety.
+          const rot = ["concept-cards", "numbered-cards", "cards"];
+          cand = rot[i % rot.length];
         } else if (n <= 6) {
-          // Concept cards are the workhorse look; sprinkle bands for variety.
-          cand = i % 3 === 2 ? "bands" : "concept-cards";
+          // General short lists -> rotate concept-cards / bands / cards.
+          const rot = ["concept-cards", "bands", "cards"];
+          cand = rot[i % rot.length];
         } else {
           cand = "concept-cards";
         }
         // Avoid two identical NON-sequential variants in a row (keep sequence
         // visuals as-is — a process should look like a process).
         if (cand === prevVar && cand !== "chevron" && cand !== "timeline") {
-          const alts = ["concept-cards", "numbered-cards", "bands"].filter((x) => x !== prevVar);
+          const alts = ["concept-cards", "numbered-cards", "bands", "cards", "icon-check"].filter((x) => x !== prevVar);
           cand = alts[i % alts.length];
         }
         return cand;

@@ -1,6 +1,7 @@
 import Groq from "groq-sdk";
 import type { Deck, Slide, SlideLayout, ContentDensity, Reference, TableData } from "./types";
 import { withGroqClient } from "./groqClient";
+import { type ModelId, DEFAULT_MODEL, normalizeModel, generationMaxTokens, MODELS, MIN_VIABLE_OUTPUT } from "./models";
 import { cleanChartSpec, type ChartType, type ChartSpec } from "./charts";
 import { searchStockImages } from "./pexelsServer";
 import { searchIconify } from "./iconify";
@@ -731,10 +732,95 @@ function isEmptySlide(s: Slide): boolean {
   return false;
 }
 
+/**
+ * Parse Groq's 413 "Request too large" message for the org's per-model
+ * per-minute token limit and how much this request asked for, e.g.
+ *   "... (TPM): Limit 6000, Requested 13360 ..."
+ * Returns null when the error isn't a parseable TPM limit.
+ */
+function parseTpmLimit(err: any): { limit: number; requested: number } | null {
+  const msg = String(
+    err?.error?.error?.message ||
+    err?.error?.message ||
+    err?.message ||
+    "",
+  );
+  const m = msg.match(/Limit\s+(\d+),\s*Requested\s+(\d+)/i);
+  if (!m) return null;
+  const limit = Number(m[1]);
+  const requested = Number(m[2]);
+  if (!isFinite(limit) || !isFinite(requested)) return null;
+  return { limit, requested };
+}
+
+/**
+ * Create a generation completion with a TPM-AWARE output-token budget.
+ *
+ * Groq counts (prompt_tokens + max_tokens) against the model's per-minute
+ * token limit (TPM), which on the free tier can be as low as 6,000. So we:
+ *   1. Estimate the prompt size (~chars/3.5, deliberately conservative).
+ *   2. Size max_tokens to fit: min(desired, model max, global cap,
+ *      tpm − promptEstimate − margin) — so the FIRST request fits and we
+ *      avoid a wasted 413 + key-rotation.
+ *   3. If that leaves no viable room, throw a clear, actionable error up front.
+ *   4. As a safety net, if Groq still returns a 413 with a parseable limit,
+ *      retry once with a max_tokens computed from the REAL numbers.
+ */
+const TPM_MARGIN = 256;
+function estimatePromptTokens(messages: { content: string }[]): number {
+  const chars = messages.reduce((n, m) => n + (m.content?.length || 0), 0);
+  // ~3.5 chars/token over-estimates slightly (safer than under-budgeting),
+  // plus a small per-message overhead.
+  return Math.ceil(chars / 3.5) + messages.length * 8;
+}
+
+async function generationCompletion(opts: {
+  model: ModelId;
+  temperature: number;
+  desiredMaxTokens: number;
+  messages: { role: "system" | "user"; content: string }[];
+}) {
+  const { model, temperature, messages } = opts;
+  const promptEst = estimatePromptTokens(messages);
+  const maxTokens = generationMaxTokens(model, opts.desiredMaxTokens, promptEst);
+
+  if (maxTokens < MIN_VIABLE_OUTPUT) {
+    const info = MODELS[model];
+    console.warn(`[generationCompletion] ${info.label} tpm=${info.tpm} promptEst=${promptEst} — too large`);
+    throw new Error(`Couldn't generate with this model. Please try again.`);
+  }
+
+  const run = (mt: number) =>
+    withGroqClient((client) =>
+      client.chat.completions.create({
+        model,
+        temperature,
+        max_tokens: mt,
+        response_format: { type: "json_object" },
+        messages,
+      }),
+    );
+  try {
+    return await run(maxTokens);
+  } catch (err: any) {
+    const info = parseTpmLimit(err);
+    if (!info) throw err;
+    // Requested = promptTokens + maxTokens  →  promptTokens = Requested − maxTokens
+    const promptTokens = Math.max(0, info.requested - maxTokens);
+    const fitted = info.limit - promptTokens - TPM_MARGIN;
+    if (fitted >= MIN_VIABLE_OUTPUT && fitted < maxTokens) {
+      return await run(fitted);
+    }
+    console.warn(`[generationCompletion] tpm limit ${info.limit} < prompt ${promptTokens}`);
+    throw new Error(`Couldn't generate with this model. Please try again.`);
+  }
+}
+
 async function fillEmptySlides(
   deck: Deck,
   emptyIndices: number[],
-): Promise<Slide[]> {
+  model: ModelId = DEFAULT_MODEL,
+): Promise<{ slides: Slide[]; tokens: number }> {
   // Ask the model for content for just these slide indices.
   const targets = emptyIndices.map((i) => ({
     index: i,
@@ -770,21 +856,18 @@ Rules per layout:
 
 Return ONLY the JSON.`;
 
-  const completion = await withGroqClient((client) =>
-    client.chat.completions.create({
-      model: "meta-llama/llama-4-scout-17b-16e-instruct",
-      temperature: 0.4,
-      // Same TPM constraint applies; fill pass usually only patches a
-      // handful of slides so 3000 is plenty.
-      max_tokens: 3000,
-      response_format: { type: "json_object" },
-      messages: [
-        { role: "system", content: sys },
-        { role: "user", content: user },
-      ],
-    }),
-  );
+  const completion = await generationCompletion({
+    model,
+    temperature: 0.4,
+    // Fill pass usually only patches a handful of slides so 3000 is plenty.
+    desiredMaxTokens: 3000,
+    messages: [
+      { role: "system", content: sys },
+      { role: "user", content: user },
+    ],
+  });
 
+  const tokens = completion.usage?.total_tokens || 0;
   const raw = completion.choices[0]?.message?.content || "{}";
   const parsed = JSON.parse(extractJson(raw));
   const fills: any[] = Array.isArray(parsed?.fills) ? parsed.fills : [];
@@ -801,7 +884,7 @@ Return ONLY the JSON.`;
     return updated;
   });
 
-  return next;
+  return { slides: next, tokens };
 }
 
 export async function generateDeck(opts: {
@@ -813,28 +896,28 @@ export async function generateDeck(opts: {
   includeReferences?: boolean;
   /** Hard user directives from the pre-generation clarify step. */
   directives?: string;
+  /** Groq model to generate with. Defaults to DEFAULT_MODEL. */
+  model?: ModelId;
 }): Promise<Deck> {
   const density: ContentDensity = opts.density || "balanced";
   const includeReferences = opts.includeReferences !== false;
+  const model = normalizeModel(opts.model);
+  let totalTokens = 0;
 
-  const completion = await withGroqClient((client) =>
-    client.chat.completions.create({
-      model: "meta-llama/llama-4-scout-17b-16e-instruct",
-      temperature: 0.55,
-      // Scout on the paid tier allows ~300k TPM / 1k RPM, so there's ample
-      // headroom. 8000 output tokens lets even a 20-slide deck return in one
-      // pass without truncation; the pad-and-fill-empty-slides net below
-      // stays only as a backstop.
-      max_tokens: 8000,
-      response_format: { type: "json_object" },
-      messages: [
-        { role: "system", content: SYSTEM_PROMPT },
-        { role: "user", content: buildUserMessage({ ...opts, density, includeReferences, directives: opts.directives }) },
-      ],
-    }),
-  );
+  const completion = await generationCompletion({
+    model,
+    temperature: 0.55,
+    // 8000 output tokens lets even a 20-slide deck return in one pass; the
+    // adaptive helper shrinks this to fit the model's free-tier TPM if needed.
+    desiredMaxTokens: 8000,
+    messages: [
+      { role: "system", content: SYSTEM_PROMPT },
+      { role: "user", content: buildUserMessage({ ...opts, density, includeReferences, directives: opts.directives }) },
+    ],
+  });
 
   const raw = completion.choices[0]?.message?.content || "";
+  totalTokens += completion.usage?.total_tokens || 0;
   const parsed = JSON.parse(extractJson(raw));
 
   if (!parsed || !Array.isArray(parsed.slides) || parsed.slides.length === 0) {
@@ -922,7 +1005,9 @@ export async function generateDeck(opts: {
   let filledSlides = slides;
   if (emptyIndices.length > 0) {
     try {
-      filledSlides = await fillEmptySlides(tentative, emptyIndices);
+      const filled = await fillEmptySlides(tentative, emptyIndices, model);
+      filledSlides = filled.slides;
+      totalTokens += filled.tokens;
     } catch (e) {
       console.warn("[generateDeck] fill pass failed:", e);
     }
@@ -958,6 +1043,9 @@ export async function generateDeck(opts: {
     includeReferences,
   };
 
+  // Non-persisted: total Groq tokens used, so the API route can charge
+  // token-based credits. Stripped before the deck is returned to the client.
+  (deck as any).__tokens = totalTokens;
   return deck;
 }
 
@@ -983,9 +1071,13 @@ export async function generateDeckFromContent(opts: {
   directives?: string;
   /** Optional cap so a huge paste doesn't run forever. 0 = let AI decide. */
   maxSlides?: number;
+  /** Groq model to generate with. Defaults to DEFAULT_MODEL. */
+  model?: ModelId;
 }): Promise<Deck> {
   const density: ContentDensity = opts.density || "balanced";
   const includeReferences = opts.includeReferences !== false;
+  const model = normalizeModel(opts.model);
+  let totalTokens = 0;
   // Guard the token budget: trim absurdly large pastes. ~24k chars is plenty
   // of source for a long deck and stays well within the model's context.
   const source = opts.sourceText.trim().slice(0, 24000);
@@ -1034,20 +1126,18 @@ ${source}
 
 Return ONLY the JSON object.`;
 
-  const completion = await withGroqClient((client) =>
-    client.chat.completions.create({
-      model: "meta-llama/llama-4-scout-17b-16e-instruct",
-      temperature: 0.4, // lower than the brief path: stay close to their words
-      max_tokens: 8000,
-      response_format: { type: "json_object" },
-      messages: [
-        { role: "system", content: buildImportSchemaPrompt() },
-        { role: "user", content: user },
-      ],
-    }),
-  );
+  const completion = await generationCompletion({
+    model,
+    temperature: 0.4, // lower than the brief path: stay close to their words
+    desiredMaxTokens: 8000,
+    messages: [
+      { role: "system", content: buildImportSchemaPrompt() },
+      { role: "user", content: user },
+    ],
+  });
 
   const raw = completion.choices[0]?.message?.content || "";
+  totalTokens += completion.usage?.total_tokens || 0;
   const parsed = JSON.parse(extractJson(raw));
 
   if (!parsed || !Array.isArray(parsed.slides) || parsed.slides.length === 0) {
@@ -1111,7 +1201,9 @@ Return ONLY the JSON object.`;
   let filledSlides = slides;
   if (emptyIndices.length > 0) {
     try {
-      filledSlides = await fillEmptySlides(tentative, emptyIndices);
+      const filled = await fillEmptySlides(tentative, emptyIndices, model);
+      filledSlides = filled.slides;
+      totalTokens += filled.tokens;
     } catch (e) {
       console.warn("[generateDeckFromContent] fill pass failed:", e);
     }
@@ -1138,13 +1230,15 @@ Return ONLY the JSON object.`;
   filledSlides = await finalizeImages(filledSlides, tentative.topic || tentative.title);
   filledSlides = await resolveBulletIcons(filledSlides);
 
-  return {
+  const deck: Deck = {
     title: tentative.title,
     subtitle: tentative.subtitle,
     slides: filledSlides,
     references: includeReferences ? references : [],
     includeReferences,
   };
+  (deck as any).__tokens = totalTokens;
+  return deck;
 }
 
 /* ----------------------------- speaker notes ------------------------------ */

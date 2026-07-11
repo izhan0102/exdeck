@@ -60,7 +60,37 @@ export const HOWTO_GUIDES: HowToGuide[] = [
     ],
     ctaHref: "/app",
     ctaLabel: "Make a presentation free",
-    related: ["make-a-spreadsheet-with-ai", "write-a-document-with-ai", "convert-pdf-to-ppt"],
+    related: ["regenerate-a-slide-with-ai", "make-a-spreadsheet-with-ai", "write-a-document-with-ai"],
+  },
+  {
+    slug: "regenerate-a-slide-with-ai",
+    kicker: "Editing",
+    title: "How to Regenerate a Slide with a Different AI Model — EXdeck",
+    description:
+      "Rewrite any single slide — text, tables, and charts — with the AI model of your choice. Compare Llama, Qwen, and GPT-OSS, and swap in fresh, real data in one click.",
+    h1: "How to regenerate a slide with a different AI model",
+    lede:
+      "Not happy with one slide? Regenerate just that slide with any of seven AI models — Llama 3.3 70B, Llama 3.1 8B, Llama 4 Scout, Qwen 3, or GPT-OSS 20B/120B. The whole slide (bullets, tables, and data charts) is rewritten with fresh, factual content, leaving the rest of your deck untouched.",
+    keywords: [
+      "regenerate slide ai", "rewrite slide with ai", "change ai model presentation",
+      "ai slide different model", "regenerate powerpoint slide", "llama qwen gpt-oss slides",
+    ],
+    steps: [
+      { name: "Open your deck in the editor", text: "Generate or open a deck. Each slide shows in the left thumbnail rail and in the main preview." },
+      { name: "Open the regenerate menu", text: "Right-click any slide in the left rail and choose “Regenerate with model”, or use the “Regenerate slide” button just below the slide preview." },
+      { name: "Pick a model", text: "Choose from the list — each shows its provider and credit rate. Llama 3.3 70B is the balanced default; Llama 4 Scout is fastest with the most headroom; GPT-OSS and Qwen offer higher-throughput alternatives." },
+      { name: "Review the result", text: "The slide's title, bullets, tables, and any data chart are rewritten with fresh, real data. If it's a chart slide, the graph itself is replaced — not just the text." },
+      { name: "Repeat per slide as needed", text: "Regenerate is per-slide, so you can mix models across a deck and keep the versions you like. Credits are charged by tokens used × the model's rate." },
+    ],
+    faq: [
+      { q: "Does regenerating change my whole deck?", a: "No — it only rewrites the one slide you choose. Your other slides, theme, and template stay exactly as they are." },
+      { q: "Which model should I use?", a: "Llama 3.3 70B (the default) is the most reliable all-rounder. Llama 4 Scout is fast with lots of token headroom. See the /benchmarks page for measured speed and reliability of every model." },
+      { q: "Does it change the charts too?", a: "Yes. On a slide with a data chart, regeneration replaces the chart's data with different, real figures — the rendered graph updates in place, not only the surrounding text." },
+      { q: "How much does it cost?", a: "Regeneration is metered by the tokens used multiplied by the chosen model's credit rate, so a longer slide or a pricier model costs more. Rates are shown in the model menu and on the benchmarks page." },
+    ],
+    ctaHref: "/app",
+    ctaLabel: "Open the editor",
+    related: ["make-a-presentation-with-ai", "write-a-document-with-ai", "convert-pdf-to-ppt"],
   },
   {
     slug: "make-a-spreadsheet-with-ai",

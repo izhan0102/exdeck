@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { generateDeck, generateDeckFromContent } from "@/lib/groq";
 import { authenticateRequest, AuthError } from "@/lib/firebaseAdmin";
 import { PlanLimitError } from "@/lib/planServer";
-import { requireCredits, deductCredits } from "@/lib/credits";
+import { requireCredits, deductCreditsAmount } from "@/lib/credits";
 import { rateLimitResponse } from "@/lib/rateLimit";
+import { normalizeModel, computeGenerationCredits } from "@/lib/models";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -18,6 +19,10 @@ export async function POST(req: NextRequest) {
     await requireCredits(uid);
     const body = await req.json();
     const { prompt, slideCount, audience, tone, density, includeReferences, directives, sourceText } = body || {};
+    // The model the user picked in the dashboard (validated against the
+    // allow-list). Determines both which Groq model runs and the credit
+    // multiplier applied to the token-based charge.
+    const model = normalizeModel(body?.model);
 
     // Import mode: the user pasted/uploaded their own content. Organize it
     // into slides rather than generating from a brief. A short prompt is
@@ -43,6 +48,7 @@ export async function POST(req: NextRequest) {
         includeReferences,
         directives: typeof directives === "string" ? directives : "",
         maxSlides,
+        model,
       });
       deck.topic = (typeof prompt === "string" && prompt.trim()) || deck.title;
     } else {
@@ -55,6 +61,7 @@ export async function POST(req: NextRequest) {
         density,
         includeReferences,
         directives: typeof directives === "string" ? directives : "",
+        model,
       });
       deck.topic = prompt.trim();
     }
@@ -63,10 +70,15 @@ export async function POST(req: NextRequest) {
     deck.tone = tone;
     deck.density = density;
 
-    // Charge the generation against the user's credit balance (server-side).
-    deductCredits(uid, "generateDeck").catch(() => {});
+    // Token-based credit charge: cost scales with how many tokens the model
+    // read + wrote (so a 20-slide deck costs more than a 10-slide one) and is
+    // multiplied by the chosen model's rate. Fixed-cost actions are unchanged.
+    const usedTokens = Number((deck as any).__tokens) || 0;
+    const charge = computeGenerationCredits(usedTokens, model);
+    delete (deck as any).__tokens;
+    deductCreditsAmount(uid, charge).catch(() => {});
 
-    return NextResponse.json({ deck });
+    return NextResponse.json({ deck, credits: { charged: charge, tokens: usedTokens, model } });
   } catch (err: any) {
     console.error("[/api/generate] error:", err);
     const status = Number(err?.status || err?.statusCode || 0);

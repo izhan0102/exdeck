@@ -6,8 +6,9 @@ import { PRESET_THEMES, getTheme } from "@/lib/themes";
 import {
   BarChart3, ChevronDown, ChevronLeft, ChevronRight, Eye, Grid3x3, Image as ImageIcon, LayoutGrid, Link as LinkIcon, List, Loader2, NotebookText, Play, RotateCcw, Smile, Star, Undo2, X,
   Type, Bold, Italic, Underline as UnderlineIcon, Trash2, AlignLeft, AlignCenter, AlignRight, PanelRightOpen,
-  Users, Plus, Minus, Languages, MessageCircleQuestion, Send, Lock, Check, SlidersHorizontal, LayoutTemplate, Copy, AudioLines,
+  Users, Plus, Minus, Languages, MessageCircleQuestion, Send, Lock, Check, SlidersHorizontal, LayoutTemplate, Copy, AudioLines, Sparkles,
 } from "lucide-react";
+import { MODELS, MODEL_ORDER } from "@/lib/models";
 import SlideCanvas, { type CanvasSelection } from "./SlideCanvas";
 import DesignerPanel from "./DesignerPanel";
 import Presenter from "./Presenter";
@@ -287,6 +288,12 @@ function applyChangeState(deck: Deck, theme: Theme, change: DeckChange, directio
 
 export default function DeckPreview({ deck, setDeck, theme, setTheme, onRestart, deckId, user, initialShareId, initialShareMode, collab }: Props) {
   const [active, setActive] = useState(0);
+  // Per-slide "regenerate with model" — index currently regenerating (or null).
+  const [regeneratingIdx, setRegeneratingIdx] = useState<number | null>(null);
+  // Whether the preview-area "Regenerate" model dropdown is open.
+  const [regenMenuOpen, setRegenMenuOpen] = useState(false);
+  // Open the dropdown upward when there isn't room below.
+  const [regenMenuUp, setRegenMenuUp] = useState(true);
   const [viewMode, setViewMode] = useState<"slides" | "outline">("slides");
   const [downloading, setDownloading] = useState(false);
   const [presenting, setPresenting] = useState(false);
@@ -1083,6 +1090,50 @@ export default function DeckPreview({ deck, setDeck, theme, setTheme, onRestart,
 
   const hasNotes = !!deck.speakerNotesGenerated;
 
+  // Regenerate a single slide's content with a chosen model (from the slide
+  // rail's right-click menu). Metered by tokens × the model's rate, and works
+  // for any layout — bullets, tables, and data charts included.
+  const regenerateSlide = async (index: number, model: string) => {
+    if (regeneratingIdx !== null) return;
+    setRegeneratingIdx(index);
+    const ctrl = new AbortController();
+    const timeout = window.setTimeout(() => ctrl.abort(), 90000);
+    try {
+      const token = await getIdToken();
+      const res = await fetch("/api/edit-slide", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ deck, theme, slideIndex: index, regenerate: true, model }),
+        signal: ctrl.signal,
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.status === 402) signalCreditsBlocked();
+      if (res.status === 403) {
+        window.location.href = `/verify-email?redirect=${encodeURIComponent("/app")}`;
+        return;
+      }
+      if (!res.ok) throw new Error(data?.error || "Couldn't regenerate this slide.");
+      if (data?.slide) {
+        pendingChangeRef.current = {
+          actionType: "AI_EDIT_APPLIED",
+          description: `regenerated slide ${index + 1}`,
+        };
+        setDeck({ ...deck, slides: deck.slides.map((s, i) => (i === index ? data.slide : s)) });
+      }
+    } catch (e: any) {
+      console.error("[regenerateSlide] failed:", e);
+      alert(e?.name === "AbortError"
+        ? "Regeneration timed out. Try a lighter model (e.g. Llama 3.3 70B) or try again."
+        : (e?.message || "Couldn't regenerate this slide."));
+    } finally {
+      window.clearTimeout(timeout);
+      setRegeneratingIdx(null);
+    }
+  };
+
   // Generate spoken speaker notes for every slide via the AI, then fold each
   // script into the matching slide's `notes`. Powers the presenter
   // teleprompter and the PPTX speaker-notes export. When `speakers` is passed
@@ -1436,36 +1487,25 @@ export default function DeckPreview({ deck, setDeck, theme, setTheme, onRestart,
       description: `applied the ${t.name} template`,
     };
     if (picked && setTheme) setTheme(picked);
-    const v = t.variants;
     setDeck({
       ...deck,
       graphic: t.graphicId,
       graphicAccent: t.graphicAccent,
       fontId: t.fontId,
-      slides: deck.slides.map((s) => {
-        // The intro's image cover and the image closing are deliberate photo
-        // slides — keep them intact across a template swap (their photos live
-        // in coverImages, which the spread preserves).
-        const keepTitle = s.layout === "title-hero" &&
-          (s.titleVariant === "image-cover" || s.titleVariant === "image-center" || s.titleVariant === "image-editorial");
-        const keepClosing = s.layout === "closing" && s.closingVariant === "image";
-        return {
-          ...s,
-          titleVariant: keepTitle ? s.titleVariant : (v.titleVariant ?? s.titleVariant),
-          bulletsVariant: v.bulletsVariant ?? s.bulletsVariant,
-          twoColumnVariant: v.twoColumnVariant ?? s.twoColumnVariant,
-          tableVariant: v.tableVariant ?? s.tableVariant,
-          quoteVariant: v.quoteVariant ?? s.quoteVariant,
-          sectionVariant: v.sectionVariant ?? s.sectionVariant,
-          closingVariant: keepClosing ? s.closingVariant : (v.closingVariant ?? s.closingVariant),
-          // Drop overrides a previous template applied so the new look shows.
-          textColorOverride: undefined,
-          accentColorOverride: undefined,
-          backgroundColorOverride: undefined,
-          templateFonts: undefined,
-          uploadedImages: (s.uploadedImages || []).filter((im) => im.kind !== "templateBg"),
-        };
-      }),
+      slides: deck.slides.map((s) => ({
+        ...s,
+        // A template switch changes ONLY theme / font / background graphic.
+        // The per-slide style variants (concept-cards, bands, chevron, timeline,
+        // etc.) generated for THIS deck are preserved exactly as-is — we no
+        // longer flatten every slide to the template's single default variant.
+        // Clear only per-slide colour/font overrides and the old template
+        // background so the new theme shows through.
+        textColorOverride: undefined,
+        accentColorOverride: undefined,
+        backgroundColorOverride: undefined,
+        templateFonts: undefined,
+        uploadedImages: (s.uploadedImages || []).filter((im) => im.kind !== "templateBg"),
+      })),
     });
     setTemplateGalleryOpen(false);
   };
@@ -1842,6 +1882,8 @@ export default function DeckPreview({ deck, setDeck, theme, setTheme, onRestart,
           onChange={(slides) => setDeck({ ...deck, slides })}
           canReorder={planHasFeature(plan, "reorder")}
           onLockedReorder={() => requireFeatureOrUpgrade("reorder", "Reordering slides is a Pro feature. Upgrade to rearrange your deck.", () => {})}
+          onRegenerate={regenerateSlide}
+          regeneratingIndex={regeneratingIdx}
         />
 
         <div className="min-w-0">
@@ -1922,6 +1964,61 @@ export default function DeckPreview({ deck, setDeck, theme, setTheme, onRestart,
             >
               Next <ChevronRight size={14} />
             </button>
+          </div>
+
+          {/* Regenerate this slide with a chosen model (matches the deck's B/W theme) */}
+          <div className="relative mt-2 flex justify-center">
+            <button
+              onClick={(e) => {
+                const r = (e.currentTarget as HTMLElement).getBoundingClientRect();
+                // Open upward unless there's clearly more room below.
+                setRegenMenuUp(window.innerHeight - r.bottom < 360);
+                setRegenMenuOpen((v) => !v);
+              }}
+              disabled={regeneratingIdx !== null}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-white/15 bg-white/5 px-3 py-1.5 text-sm text-white/80 transition hover:bg-white/10 disabled:opacity-50"
+              style={{ touchAction: "manipulation", minHeight: "40px" }}
+              title="Regenerate this slide's content with an AI model"
+            >
+              {regeneratingIdx === active
+                ? <><Loader2 size={14} className="animate-spin" /> Regenerating…</>
+                : <><Sparkles size={14} /> Regenerate slide <ChevronDown size={13} className="opacity-70" /></>}
+            </button>
+            {regenMenuOpen && regeneratingIdx === null && (
+              <>
+                <div className="fixed inset-0 z-40" onClick={() => setRegenMenuOpen(false)} />
+                <div
+                  style={{ background: "var(--ezd-bg-elev)", color: "var(--ezd-fg)", borderColor: "var(--ezd-hairline)" }}
+                  className={`absolute left-1/2 z-50 flex max-h-[min(340px,55vh)] w-[230px] -translate-x-1/2 flex-col rounded-xl border p-1 shadow-2xl backdrop-blur ${
+                    regenMenuUp ? "bottom-full mb-2" : "top-full mt-2"
+                  }`}
+                >
+                  <div className="px-2 pb-1 pt-1.5 text-[10px] font-semibold uppercase tracking-wide opacity-60">
+                    Regenerate slide {active + 1} with
+                  </div>
+                  <div className="min-h-0 flex-1 overflow-y-auto">
+                    {MODEL_ORDER.map((id) => {
+                      const m = MODELS[id];
+                      return (
+                        <button
+                          key={id}
+                          onClick={() => { setRegenMenuOpen(false); regenerateSlide(active, id); }}
+                          className="flex w-full items-center justify-between gap-2 rounded-lg px-2 py-1.5 text-left transition hover:bg-white/10"
+                        >
+                          <span className="min-w-0">
+                            <span className="block truncate text-[12px]">{m.label}</span>
+                            <span className="block truncate text-[9.5px] opacity-55">{m.provider}</span>
+                          </span>
+                          <span className="shrink-0 rounded px-1 py-0.5 text-[9.5px] font-semibold opacity-70" style={{ background: "var(--ezd-hairline)" }}>
+                            {m.multiplier}×
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </>
+            )}
           </div>
 
           {deck.slides[active]?.notes && (

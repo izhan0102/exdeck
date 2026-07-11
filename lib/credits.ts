@@ -102,7 +102,18 @@ export async function requireCredits(uid: string, min = 1): Promise<CreditState>
  * the user already received).
  */
 export async function deductCredits(uid: string, action: CreditAction): Promise<void> {
-  const cost = creditCost(action);
+  await deductCreditsAmount(uid, creditCost(action));
+}
+
+/**
+ * Deduct a VARIABLE credit amount (used by token-based charging, e.g. deck
+ * generation, where the cost depends on how many tokens the model used and
+ * which model was picked). Same atomic reconcile-then-subtract semantics as
+ * deductCredits; clamps at 0 and never throws.
+ */
+export async function deductCreditsAmount(uid: string, amount: number): Promise<void> {
+  const cost = Math.max(0, Math.ceil(Number(amount) || 0));
+  if (cost <= 0) return;
   try {
     const plan = await getUserPlanServer(uid);
     await creditRef(uid).transaction((node) => {

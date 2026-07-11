@@ -57,6 +57,7 @@ function build(): string {
   entries.push(urlEntry("/pdf-presenter", 1.0, "weekly", now));
 
   // Evergreen / legal.
+  entries.push(urlEntry("/benchmarks", 0.8, "weekly", now));
   entries.push(urlEntry("/pdf-to-ppt", 0.9, "monthly", now));
   entries.push(urlEntry("/spreadsheet", 0.9, "weekly", now));
   entries.push(urlEntry("/analyse", 1.0, "weekly", now));
