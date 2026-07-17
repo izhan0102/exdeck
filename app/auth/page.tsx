@@ -306,7 +306,7 @@ function AuthInner() {
               />
               <Bullet
                 title="Look professional without a designer"
-                body="36 designed templates and live style variants per layout. Edit anything inline once it's made."
+                body="45 designed themes, 28 fonts, and live style variants per layout. Edit anything inline once it's made."
               />
               <Bullet
                 title="Stay on brand, every slide"

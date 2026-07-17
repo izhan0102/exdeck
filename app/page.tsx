@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import { motion, useReducedMotion, type Variants } from "framer-motion";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -368,7 +369,7 @@ export default function LandingPage() {
           />
         </Reveal>
         <div className="mt-12 grid grid-cols-1 gap-10 sm:grid-cols-2 sm:gap-12">
-          <Reveal>
+          <Reveal variant="left">
             <div className="border-t pt-6" style={{ borderColor: "var(--ezd-fg-strong)" }}>
               <div className="text-[10.5px] font-semibold uppercase tracking-[0.24em]" style={{ color: "var(--ezd-fg-quiet)", fontFamily: MONO }}>
                 Document maker
@@ -391,7 +392,7 @@ export default function LandingPage() {
               </Link>
             </div>
           </Reveal>
-          <Reveal delay={80}>
+          <Reveal delay={80} variant="right">
             <div className="border-t pt-6" style={{ borderColor: "var(--ezd-fg-strong)" }}>
               <div className="text-[10.5px] font-semibold uppercase tracking-[0.24em]" style={{ color: "var(--ezd-fg-quiet)", fontFamily: MONO }}>
                 Spreadsheet maker
@@ -429,7 +430,7 @@ export default function LandingPage() {
         </Reveal>
 
         <div className="mt-12 grid grid-cols-1 gap-4 md:grid-cols-6">
-          <Reveal className="md:col-span-4">
+          <Reveal className="md:col-span-4" variant="scale">
             <FeatureCard
               wide
               title="Generate from a brief"
@@ -438,25 +439,25 @@ export default function LandingPage() {
               <MiniBrief />
             </FeatureCard>
           </Reveal>
-          <Reveal className="md:col-span-2" delay={60}>
+          <Reveal className="md:col-span-2" variant="scale" delay={60}>
             <FeatureCard
               title="Real data charts"
               body="Bar, line, area, pie, and donut - theme-colored and exported as vectors to both PPTX and PDF."
             />
           </Reveal>
-          <Reveal className="md:col-span-2" delay={60}>
+          <Reveal className="md:col-span-2" variant="scale" delay={60}>
             <FeatureCard
               title="Edit anything inline"
               body="Drag text boxes, recolor charts, drop in any of 200,000 icons, or rewrite a slide with plain-English chat."
             />
           </Reveal>
-          <Reveal className="md:col-span-2" delay={120}>
+          <Reveal className="md:col-span-2" variant="scale" delay={120}>
             <FeatureCard
               title="Premium templates"
               body="Canva/Gamma-grade designs with 45 themes, 28 fonts, and textured backgrounds. Switch the whole deck's look in one click."
             />
           </Reveal>
-          <Reveal className="md:col-span-2" delay={120}>
+          <Reveal className="md:col-span-2" variant="scale" delay={120}>
             <FeatureCard
               title="Export, no lock-in"
               body="A real .pptx that opens in PowerPoint, Keynote, or Slides - plus a high-res .pdf. Yours to keep."
@@ -506,7 +507,7 @@ export default function LandingPage() {
             />
           </Reveal>
           <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-3">
-            <Reveal>
+            <Reveal variant="scale">
               <DeckSpecimen
                 tag="Pitch"
                 theme={{ bg: "#0B1220", fg: "#F8FAFC", accent: "#38BDF8", muted: "#94A3B8" }}
@@ -516,7 +517,7 @@ export default function LandingPage() {
                 brief="Series A pitch for a logistics platform."
               />
             </Reveal>
-            <Reveal delay={80}>
+            <Reveal delay={80} variant="scale">
               <DeckSpecimen
                 tag="Lecture"
                 theme={{ bg: "#FBFBF7", fg: "#0A0A0A", accent: "#B45309", muted: "#57534E" }}
@@ -527,7 +528,7 @@ export default function LandingPage() {
                 serif
               />
             </Reveal>
-            <Reveal delay={160}>
+            <Reveal delay={160} variant="scale">
               <DeckSpecimen
                 tag="Report"
                 theme={{ bg: "#10241C", fg: "#ECFDF5", accent: "#34D399", muted: "#9CA3AF" }}
@@ -833,40 +834,63 @@ function Dot() {
   return <span aria-hidden style={{ color: "var(--ezd-fg-quiet)", opacity: 0.5 }}>-</span>;
 }
 
-/* ----------------------- Scroll reveal ----------------------- */
+/* ----------------------- Scroll reveal -----------------------
+ * Framer Motion, one-shot, GPU-only. Animates strictly opacity + x/y
+ * transforms so scrolling stays composited and smooth. Respects reduced
+ * motion. `variant` picks the entrance direction. */
+
+type RevealDirection = "up" | "left" | "right" | "scale";
+
+const REVEAL_OFFSET: Record<RevealDirection, { x?: number; y?: number; scale?: number }> = {
+  up: { y: 28 },
+  left: { x: -36 },
+  right: { x: 36 },
+  scale: { scale: 0.96, y: 18 },
+};
 
 function Reveal({
-  children, delay = 0, className = "",
-}: { children: React.ReactNode; delay?: number; className?: string }) {
-  const ref = useRef<HTMLDivElement | null>(null);
-  const [shown, setShown] = useState(false);
+  children,
+  delay = 0,
+  className = "",
+  variant = "up",
+  amount = 0.2,
+}: {
+  children: React.ReactNode;
+  delay?: number;
+  className?: string;
+  variant?: RevealDirection;
+  amount?: number;
+}) {
+  const reduce = useReducedMotion();
+  const offset = REVEAL_OFFSET[variant];
 
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    if (typeof IntersectionObserver === "undefined") { setShown(true); return; }
-    const io = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) { setShown(true); io.disconnect(); }
+  const variants: Variants = {
+    hidden: reduce
+      ? { opacity: 0, transition: { duration: 0.3, ease: "easeOut" } }
+      : { opacity: 0, ...offset, transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] } },
+    shown: {
+      opacity: 1,
+      x: 0,
+      y: 0,
+      scale: 1,
+      transition: {
+        duration: 0.55,
+        delay: Math.min(delay, 240) / 1000,
+        ease: [0.16, 1, 0.3, 1],
       },
-      { threshold: 0.12, rootMargin: "0px 0px -8% 0px" },
-    );
-    io.observe(el);
-    return () => io.disconnect();
-  }, []);
+    },
+  };
 
   return (
-    <div
-      ref={ref}
+    <motion.div
       className={className}
-      style={{
-        opacity: shown ? 1 : 0,
-        transform: shown ? "none" : "translateY(18px)",
-        transition: `opacity 0.6s ease ${delay}ms, transform 0.6s cubic-bezier(0.22,1,0.36,1) ${delay}ms`,
-      }}
+      variants={variants}
+      initial="hidden"
+      whileInView="shown"
+      viewport={{ once: false, amount, margin: "0px 0px -8% 0px" }}
     >
       {children}
-    </div>
+    </motion.div>
   );
 }
 

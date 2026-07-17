@@ -59,6 +59,13 @@
       }
     },
 
+    "profiles": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null && auth.uid === $uid"
+      }
+    },
+
     "credits": {
       "$uid": {
         ".read": "auth != null && auth.uid === $uid",
@@ -110,6 +117,21 @@
     },
 
     "guestTrials": {
+      ".read": false,
+      ".write": false
+    },
+
+    "emailUnsubscribes": {
+      ".read": false,
+      ".write": false
+    },
+
+    "emailCampaigns": {
+      ".read": false,
+      ".write": false
+    },
+
+    "welcomes": {
       ".read": false,
       ".write": false
     },

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { generateDeck, generateDeckFromContent } from "@/lib/groq";
-import { authenticateIdentity, AuthError } from "@/lib/firebaseAdmin";
+import { authenticateIdentity, AuthError, getAdminDatabase } from "@/lib/firebaseAdmin";
 import { PlanLimitError } from "@/lib/planServer";
 import { requireCredits, deductCreditsAmount } from "@/lib/credits";
 import { rateLimitResponse } from "@/lib/rateLimit";
@@ -9,6 +9,31 @@ import { claimGuestTrial, GuestTrialError } from "@/lib/guestTrial";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
+
+/**
+ * Personalization: map the user's saved occupation (from onboarding) to a
+ * short first-person phrase we prepend to their generation prompt so the AI
+ * writes for their context. Empty for guests or when unset.
+ */
+const OCCUPATION_PHRASE: Record<string, string> = {
+  student: "a student",
+  employee: "a working professional",
+  educator: "an educator",
+  founder: "a startup founder",
+  freelancer: "a freelance consultant",
+  researcher: "a researcher",
+  creator: "a content creator",
+};
+
+async function personaPrefix(uid: string): Promise<string> {
+  try {
+    const snap = await getAdminDatabase().ref(`profiles/${uid}/occupation`).get();
+    const phrase = OCCUPATION_PHRASE[String(snap.val() || "")];
+    return phrase ? `I am ${phrase}. ` : "";
+  } catch {
+    return "";
+  }
+}
 
 export async function POST(req: NextRequest) {
   const limited = rateLimitResponse("generate");
@@ -49,6 +74,9 @@ export async function POST(req: NextRequest) {
 
     if (identity.isAnonymous) guestTrial = await claimGuestTrial(req, uid);
 
+    // Personalize with the user's onboarding occupation (signed-in only).
+    const persona = identity.isAnonymous ? "" : await personaPrefix(uid);
+
     let deck;
     if (hasSource) {
       // Let the AI decide the count; cap it relative to the requested size so
@@ -57,7 +85,7 @@ export async function POST(req: NextRequest) {
       const maxSlides = requested ? Math.max(requested, identity.isAnonymous ? 8 : 12) : 0;
       deck = await generateDeckFromContent({
         sourceText: sourceText.trim(),
-        prompt: typeof prompt === "string" ? prompt.trim() : "",
+        prompt: persona + (typeof prompt === "string" ? prompt.trim() : ""),
         audience,
         tone,
         density,
@@ -70,7 +98,7 @@ export async function POST(req: NextRequest) {
     } else {
       const count = Math.min(identity.isAnonymous ? 8 : 20, Math.max(3, Number(slideCount) || 8));
       deck = await generateDeck({
-        prompt: prompt.trim(),
+        prompt: persona + prompt.trim(),
         slideCount: count,
         audience,
         tone,

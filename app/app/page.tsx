@@ -15,6 +15,7 @@ import ClarifyDialog from "@/components/ClarifyDialog";
 import TemplateGallery from "@/components/TemplateGallery";
 import Dashboard from "@/components/Dashboard";
 import DashboardMobile from "@/components/DashboardMobile";
+import OnboardingModal from "@/components/OnboardingModal";
 import { useDeviceMode } from "@/lib/deviceMode";
 import { PRESET_THEMES, getTheme, type Theme } from "@/lib/themes";
 import type { Deck, ContentDensity } from "@/lib/types";
@@ -26,6 +27,7 @@ import { createDeck, loadDeck, type ShareMode } from "@/lib/decks";
 import { ensureGuestSession, hasLoginHistory, isGuestUser, logout, onAuthStateChange, getIdToken, reloadUser, type AppUser } from "@/lib/auth";
 import { UNLIMITED_GUEST_TRIALS_FOR_TESTING } from "@/lib/guestTrialConfig";
 import { trackEvent } from "@/lib/stats";
+import { maybeSendWelcome } from "@/lib/welcomeClient";
 import { readCredits, formatResetIn } from "@/lib/creditsClient";
 import { ArrowLeft } from "lucide-react";
 import GuestSignInDialog from "@/components/GuestSignInDialog";
@@ -168,6 +170,14 @@ function PageInner() {
       }).catch(() => setError("Your guest deck is open, but could not be saved yet."));
     } catch { window.sessionStorage.removeItem("exdeck:guest-deck"); }
   }, [user, searchParams]);
+
+  // One-time welcome email for verified sign-ups (client-triggered, sent to
+  // just this user). Idempotent server-side + localStorage-guarded.
+  useEffect(() => {
+    if (user && !isGuestUser(user) && user.emailVerified) {
+      maybeSendWelcome();
+    }
+  }, [user]);
 
   // Load an existing deck via ?id=... so "Open" links from /app/decks work.
   useEffect(() => {
@@ -532,6 +542,7 @@ const retryGenerate = () => {
             onSignOut={async () => { await logout(); router.replace("/"); }}
             onSwitchToDesktop={() => { setDeviceMode("desktop"); try { window.location.reload(); } catch { /* ignore */ } }}
           />
+          <OnboardingModal user={user} />
         </main>
       );
     }
@@ -546,6 +557,7 @@ const retryGenerate = () => {
             onSignOut={async () => { await logout(); router.replace("/"); }}
           />
         </div>
+        <OnboardingModal user={user} />
       </main>
     );
   }
