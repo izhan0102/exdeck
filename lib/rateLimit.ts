@@ -22,9 +22,10 @@ const store = new Map<string, RateLimitEntry>();
 // Per-route limits. The editor fires an edit-slide call on every AI chat
 // edit and an export call per download, so those get more headroom than
 // full deck generation, which is heavy and rare.
-export type RateLimitRoute = "generate" | "edit-slide" | "export" | "speaker-notes" | "translate" | "qa-prep" | "clarify" | "redensify" | "visualize" | "pexels" | "analyse" | "exai";
+export type RateLimitRoute = "guest-session" | "generate" | "edit-slide" | "export" | "speaker-notes" | "translate" | "qa-prep" | "clarify" | "redensify" | "visualize" | "pexels" | "analyse" | "exai";
 
 const LIMITS: Record<RateLimitRoute, { windowMs: number; max: number }> = {
+  "guest-session": { windowMs: 60_000, max: 10 },
   generate:        { windowMs: 60_000, max: 8 },
   "edit-slide":    { windowMs: 60_000, max: 30 },
   export:          { windowMs: 60_000, max: 20 },

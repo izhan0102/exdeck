@@ -2,10 +2,10 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import {
-  ArrowRight, Clock, FileText, LayoutGrid, Loader2, LogOut, Monitor, MonitorPlay, Search,
+  ArrowRight, Clock, FileText, LayoutGrid, Loader2, LogIn, LogOut, Monitor, MonitorPlay, Search,
   Trash2, Wand2, X, Zap, Copy,
 } from "lucide-react";
-import { type AppUser } from "@/lib/auth";
+import { isGuestUser, type AppUser } from "@/lib/auth";
 import { deleteDeck, duplicateDeck, watchDeckList, type DeckListItem } from "@/lib/decks";
 import DeckThumbnail from "./DeckThumbnail";
 import Logo from "./Logo";
@@ -112,6 +112,15 @@ export default function DashboardMobile({
     }
   };
 
+  const guestAccount = isGuestUser(user);
+  const handleAccountAction = () => {
+    if (guestAccount) {
+      window.location.assign("/auth?redirect=/app");
+      return;
+    }
+    void onSignOut();
+  };
+
   return (
     <div className="min-h-screen" style={{ background: "var(--ezd-bg-page)" }}>
       {/* ---------- Top app bar ---------- */}
@@ -141,7 +150,7 @@ export default function DashboardMobile({
           >
             <div className="px-3 py-2">
               <div className="truncate text-sm font-medium text-white">{user.name || user.email?.split("@")[0]}</div>
-              <div className="truncate text-[11px] text-white/50">{user.email}</div>
+              <div className="truncate text-[11px] text-white/50">{guestAccount ? "Guest workspace" : user.email}</div>
             </div>
             <Link href="/app/decks" className="block rounded-lg px-3 py-2 text-sm text-white/85 hover:bg-white/10">My decks</Link>
             <Link href="/about" className="block rounded-lg px-3 py-2 text-sm text-white/85 hover:bg-white/10">About / Dev&rsquo;s note</Link>
@@ -160,10 +169,10 @@ export default function DashboardMobile({
               <Monitor size={14} /> Switch to desktop mode
             </button>
             <button
-              onClick={onSignOut}
-              className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-red-200 hover:bg-red-500/10"
+              onClick={handleAccountAction}
+              className={`flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm hover:bg-white/10 ${guestAccount ? "text-white/85" : "text-red-200"}`}
             >
-              <LogOut size={14} /> Sign out
+              {guestAccount ? <LogIn size={14} /> : <LogOut size={14} />} {guestAccount ? "Sign in" : "Sign out"}
             </button>
           </div>
         </div>

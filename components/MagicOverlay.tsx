@@ -1,40 +1,36 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Wand2 } from "lucide-react";
 
-/**
- * "EXdeck is doing the magic" overlay — played for ~5s after the outline is
- * confirmed, while the deck is designed. Deliberately distinct from the
- * generation overlay: a wand casts sparkles onto a stack of slide cards that
- * rise and fan into place, ending with a smooth fade-out that reveals the
- * finished deck underneath.
- *
- * Only transform/opacity are animated (compositor-only) so it stays smooth.
- */
-export default function MagicOverlay({ open }: { open: boolean }) {
-  // Keep mounted briefly after `open` flips false so we can fade out over the
-  // deck (which is already rendered beneath) for a seamless hand-off.
+const STEPS = ["Composing layouts", "Setting typography", "Balancing content", "Final review"];
+
+/** Minimal post-outline transition using the same monochrome system as EXdeck. */
+export default function MagicOverlay({ open, title, slideCount }: {
+  open: boolean;
+  title?: string;
+  slideCount?: number;
+}) {
   const [mounted, setMounted] = useState(open);
   const [visible, setVisible] = useState(false);
+  const [step, setStep] = useState(0);
 
   useEffect(() => {
     if (open) {
       setMounted(true);
-      // next frame -> trigger the fade/scale-in
-      const r = requestAnimationFrame(() => setVisible(true));
-      return () => cancelAnimationFrame(r);
+      setStep(0);
+      const frame = requestAnimationFrame(() => setVisible(true));
+      const timer = window.setInterval(() => setStep((value) => Math.min(STEPS.length - 1, value + 1)), 1100);
+      return () => { cancelAnimationFrame(frame); window.clearInterval(timer); };
     }
-    // closing: fade out, then unmount
     setVisible(false);
-    const t = window.setTimeout(() => setMounted(false), 560);
-    return () => window.clearTimeout(t);
+    const timer = window.setTimeout(() => setMounted(false), 480);
+    return () => window.clearTimeout(timer);
   }, [open]);
 
   useEffect(() => {
     if (!mounted) return;
-    const prev = document.body.style.overflow;
+    const previous = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    return () => { document.body.style.overflow = prev; };
+    return () => { document.body.style.overflow = previous; };
   }, [mounted]);
 
   if (!mounted) return null;
@@ -42,94 +38,79 @@ export default function MagicOverlay({ open }: { open: boolean }) {
   return (
     <div
       aria-live="polite"
-      className="fixed inset-0 z-[100] grid place-items-center"
+      aria-label="Designing your presentation"
+      className="fixed inset-0 z-[100] overflow-hidden"
       style={{
-        background: "radial-gradient(120% 120% at 50% 18%, var(--ezd-bg-hover) 0%, var(--ezd-bg-page) 60%)",
+        background: "var(--ezd-bg-page)",
         color: "var(--ezd-fg)",
         opacity: visible ? 1 : 0,
-        transform: visible ? "scale(1)" : "scale(1.04)",
-        transition: "opacity 520ms ease, transform 520ms ease",
+        transition: "opacity 460ms ease",
       }}
     >
-      <style>{magicCss}</style>
+      <style>{minimalCss}</style>
+      <div className="dm-grid" aria-hidden />
 
-      {/* Soft drifting glow */}
-      <div className="exm-glow" />
+      <header className="dm-header">
+        <span className="dm-wordmark">EXdeck</span>
+        <span>DESIGNING · {String((slideCount || 8)).padStart(2, "0")} SLIDES</span>
+      </header>
 
-      <div className="relative flex flex-col items-center">
-        {/* Slide stack that fans out */}
-        <div className="exm-stage">
-          <div className="exm-card exm-card-3" />
-          <div className="exm-card exm-card-2" />
-          <div className="exm-card exm-card-1">
-            <span className="exm-line exm-line-a" />
-            <span className="exm-line exm-line-b" />
-            <span className="exm-line exm-line-c" />
-            <span className="exm-chip" />
-          </div>
+      <main className="dm-main">
+        <div className="dm-copy">
+          <p>DESIGN PASS</p>
+          <h1>Designing your presentation</h1>
+          <span>{title?.trim() || "Untitled presentation"}</span>
+        </div>
 
-          {/* Sparkles cast by the wand */}
-          {SPARKLES.map((s, i) => (
-            <span
-              key={i}
-              className="exm-spark"
-              style={{ left: `${s.x}%`, top: `${s.y}%`, animationDelay: `${s.d}s`, width: s.r, height: s.r }}
-            />
-          ))}
-
-          {/* Wand */}
-          <div className="exm-wand">
-            <Wand2 size={26} />
+        <div className="dm-frame" aria-hidden>
+          <div className="dm-canvas">
+            <span className="dm-index">01</span>
+            <div className="dm-kicker" />
+            <div className="dm-title dm-title-a" />
+            <div className="dm-title dm-title-b" />
+            <div className="dm-rule" />
+            <div className="dm-columns">
+              <div><b /><i /><i /><i /></div>
+              <div><b /><i /><i /></div>
+            </div>
+            <div className="dm-scan" />
           </div>
         </div>
 
-        {/* Brand + status */}
-        <div className="mt-9 text-center">
-          <div className="exm-title text-[22px] font-extrabold tracking-tight" style={{ color: "var(--ezd-fg-strong)" }}>
-            EXdeck is doing the magic
+        <div className="dm-status">
+          <div className="dm-steps">
+            {STEPS.map((label, index) => (
+              <div key={label} className={index === step ? "is-active" : index < step ? "is-done" : ""}>
+                <i>{index < step ? "✓" : String(index + 1).padStart(2, "0")}</i>
+                <span>{label}</span>
+              </div>
+            ))}
           </div>
-          <div className="mt-1.5 text-[13px]" style={{ color: "var(--ezd-fg-muted)" }}>Designing your slides…</div>
-          <div className="exm-bar mt-4"><span /></div>
+          <div className="dm-progress"><i /></div>
+          <p>{STEPS[step]}</p>
         </div>
-      </div>
+      </main>
     </div>
   );
 }
 
-const SPARKLES = [
-  { x: 12, y: 18, d: 0.0, r: "7px" },
-  { x: 82, y: 26, d: 0.5, r: "5px" },
-  { x: 30, y: 70, d: 0.9, r: "6px" },
-  { x: 68, y: 64, d: 1.3, r: "8px" },
-  { x: 50, y: 8, d: 0.3, r: "5px" },
-  { x: 90, y: 54, d: 1.6, r: "6px" },
-  { x: 8, y: 48, d: 1.1, r: "5px" },
-];
-
-const magicCss = `
-.exm-glow{position:absolute;inset:0;background:radial-gradient(40% 50% at 50% 35%, color-mix(in srgb, var(--ezd-fg-strong) 10%, transparent), transparent 70%);filter:blur(12px);animation:exm-pulse 3.2s ease-in-out infinite}
-.exm-stage{position:relative;width:240px;height:150px}
-.exm-card{position:absolute;left:50%;top:50%;width:150px;height:96px;border-radius:14px;background:var(--ezd-bg-card);border:1px solid var(--ezd-hairline);box-shadow:0 24px 60px -20px rgba(0,0,0,0.45);transform:translate(-50%,-50%)}
-.exm-card-1{animation:exm-rise1 3.4s ease-in-out infinite;z-index:3;padding:16px}
-.exm-card-2{animation:exm-rise2 3.4s ease-in-out infinite;z-index:2;opacity:.85}
-.exm-card-3{animation:exm-rise3 3.4s ease-in-out infinite;z-index:1;opacity:.6}
-.exm-line{display:block;height:8px;border-radius:4px;margin-bottom:8px}
-.exm-line-a{width:64%;background:var(--ezd-fg-strong);animation:exm-grow 3.4s ease-in-out infinite}
-.exm-line-b{width:88%;background:var(--ezd-hairline);animation:exm-grow 3.4s ease-in-out .15s infinite}
-.exm-line-c{width:74%;background:var(--ezd-hairline);animation:exm-grow 3.4s ease-in-out .3s infinite}
-.exm-chip{position:absolute;right:14px;bottom:14px;width:34px;height:22px;border-radius:6px;background:var(--ezd-fg-strong);animation:exm-grow 3.4s ease-in-out .45s infinite}
-.exm-spark{position:absolute;border-radius:50%;background:var(--ezd-fg-strong);box-shadow:0 0 10px 2px color-mix(in srgb, var(--ezd-fg-strong) 45%, transparent);animation:exm-spark 1.8s ease-in-out infinite}
-.exm-wand{position:absolute;left:-6px;top:-14px;display:grid;place-items:center;width:46px;height:46px;border-radius:50%;color:var(--ezd-bg-page);background:var(--ezd-fg-strong);box-shadow:0 10px 30px -6px rgba(0,0,0,0.4);animation:exm-wave 2.6s ease-in-out infinite;transform-origin:60% 60%}
-.exm-bar{position:relative;height:4px;width:220px;border-radius:999px;overflow:hidden;background:var(--ezd-hairline)}
-.exm-bar>span{position:absolute;inset:0;width:40%;border-radius:999px;background:linear-gradient(90deg,transparent,var(--ezd-fg-strong),transparent);animation:exm-slide 1.4s ease-in-out infinite}
-@keyframes exm-pulse{0%,100%{opacity:.55}50%{opacity:1}}
-@keyframes exm-rise1{0%,100%{transform:translate(-50%,-46%) rotate(-2deg)}50%{transform:translate(-50%,-54%) rotate(2deg)}}
-@keyframes exm-rise2{0%,100%{transform:translate(-72%,-44%) rotate(-9deg)}50%{transform:translate(-78%,-50%) rotate(-13deg)}}
-@keyframes exm-rise3{0%,100%{transform:translate(-28%,-44%) rotate(9deg)}50%{transform:translate(-22%,-50%) rotate(13deg)}}
-@keyframes exm-grow{0%,100%{opacity:.5;transform:scaleX(.82)}50%{opacity:1;transform:scaleX(1)}}
-@keyframes exm-spark{0%{opacity:0;transform:scale(0)}40%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(.3) translateY(-10px)}}
-@keyframes exm-wave{0%,100%{transform:rotate(-14deg)}50%{transform:rotate(10deg)}}
-@keyframes exm-slide{0%{left:-40%}100%{left:100%}}
-.exm-stage,.exm-card,.exm-wand,.exm-spark,.exm-glow,.exm-bar>span,.exm-line,.exm-chip{will-change:transform,opacity}
-@media (prefers-reduced-motion: reduce){.exm-card,.exm-wand,.exm-spark,.exm-glow,.exm-line,.exm-chip,.exm-bar>span{animation:none!important}}
+const minimalCss = `
+.dm-grid{position:absolute;inset:0;opacity:.28;background-image:linear-gradient(var(--ezd-divider) 1px,transparent 1px),linear-gradient(90deg,var(--ezd-divider) 1px,transparent 1px);background-size:56px 56px;mask-image:radial-gradient(75% 75% at 50% 45%,black,transparent)}
+.dm-header{position:relative;z-index:2;height:62px;padding:0 26px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--ezd-divider);font:600 9px ui-monospace,SFMono-Regular,monospace;letter-spacing:.16em;color:var(--ezd-fg-quiet)}
+.dm-wordmark{font:700 13px ui-sans-serif,system-ui;letter-spacing:-.02em;color:var(--ezd-fg-strong)}
+.dm-main{position:relative;z-index:2;width:min(720px,calc(100% - 40px));height:calc(100vh - 62px);min-height:520px;margin:auto;display:flex;flex-direction:column;justify-content:center}
+.dm-copy{text-align:center}.dm-copy p{margin:0;font:700 9px ui-monospace,SFMono-Regular,monospace;letter-spacing:.2em;color:var(--ezd-fg-quiet)}.dm-copy h1{margin:10px 0 0;font-size:clamp(27px,4vw,42px);font-weight:650;line-height:1;letter-spacing:-.035em;color:var(--ezd-fg-strong)}.dm-copy>span{display:block;margin-top:9px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;color:var(--ezd-fg-muted)}
+.dm-frame{margin:30px auto 0;width:min(590px,100%);padding:10px;border:1px solid var(--ezd-divider);border-radius:16px;background:var(--ezd-bg-card);box-shadow:0 24px 70px rgba(0,0,0,.12)}
+.dm-canvas{position:relative;aspect-ratio:16/9;overflow:hidden;border:1px solid var(--ezd-hairline);border-radius:9px;background:var(--ezd-bg-page);animation:dm-enter .65s cubic-bezier(.2,.75,.2,1) both}
+.dm-index{position:absolute;right:7%;top:9%;font:600 8px ui-monospace,SFMono-Regular,monospace;color:var(--ezd-fg-quiet)}
+.dm-kicker,.dm-title,.dm-rule,.dm-columns b,.dm-columns i{position:absolute;display:block;border-radius:99px;background:var(--ezd-hairline)}
+.dm-kicker{left:8%;top:16%;width:15%;height:5px;background:var(--ezd-fg-muted);animation:dm-reveal .45s .18s both}
+.dm-title{left:8%;height:13px;background:var(--ezd-fg-strong);animation:dm-reveal .55s both}.dm-title-a{top:27%;width:47%;animation-delay:.28s}.dm-title-b{top:35%;width:34%;animation-delay:.38s}.dm-rule{left:8%;top:48%;width:84%;height:1px;animation:dm-rule .7s .55s both}
+.dm-columns{position:absolute;left:8%;right:8%;bottom:13%;height:27%;display:grid;grid-template-columns:1fr 1fr;gap:5%}.dm-columns>div{position:relative;border:1px solid var(--ezd-divider);border-radius:7px;animation:dm-reveal .55s .65s both}.dm-columns b{left:10%;top:18%;width:27%;height:6px;background:var(--ezd-fg-muted)}.dm-columns i{position:relative;left:10%;top:48%;width:76%;height:4px;margin-bottom:7px}.dm-columns i:nth-of-type(2){width:58%}.dm-columns i:nth-of-type(3){width:68%}
+.dm-scan{position:absolute;left:0;right:0;top:-10%;height:16%;border-bottom:1px solid color-mix(in srgb,var(--ezd-fg-strong) 28%,transparent);background:linear-gradient(to bottom,transparent,color-mix(in srgb,var(--ezd-fg-strong) 3%,transparent));animation:dm-scan 2.8s .8s ease-in-out infinite}
+.dm-status{width:min(590px,100%);margin:24px auto 0}.dm-steps{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.dm-steps>div{display:flex;align-items:center;gap:7px;min-width:0;opacity:.3;transition:opacity .3s ease}.dm-steps>div.is-active{opacity:1}.dm-steps>div.is-done{opacity:.58}.dm-steps i{display:grid;width:21px;height:21px;flex:0 0 21px;place-items:center;border:1px solid var(--ezd-divider);border-radius:50%;font:600 7px ui-monospace,SFMono-Regular,monospace;color:var(--ezd-fg-muted)}.dm-steps .is-active i{border-color:var(--ezd-fg-strong);background:var(--ezd-fg-strong);color:var(--ezd-bg-page)}.dm-steps span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:9.5px;color:var(--ezd-fg-muted)}
+.dm-progress{height:2px;margin-top:18px;overflow:hidden;border-radius:99px;background:var(--ezd-divider)}.dm-progress i{display:block;width:100%;height:100%;background:var(--ezd-fg-strong);transform-origin:left;animation:dm-progress 4.75s linear both}.dm-status>p{margin:8px 0 0;text-align:right;font:600 8px ui-monospace,SFMono-Regular,monospace;letter-spacing:.08em;color:var(--ezd-fg-quiet)}
+@keyframes dm-enter{from{opacity:0;transform:translateY(10px) scale(.985)}to{opacity:1;transform:none}}@keyframes dm-reveal{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}@keyframes dm-rule{from{transform:scaleX(0);transform-origin:left}to{transform:scaleX(1);transform-origin:left}}@keyframes dm-scan{0%{transform:translateY(0);opacity:0}18%{opacity:1}82%{opacity:1}100%{transform:translateY(680%);opacity:0}}@keyframes dm-progress{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@media(max-width:600px){.dm-header{height:54px;padding:0 16px}.dm-main{height:calc(100vh - 54px);width:calc(100% - 28px)}.dm-frame{margin-top:24px;padding:7px;border-radius:13px}.dm-steps{grid-template-columns:1fr 1fr;gap:9px 14px}.dm-steps span{font-size:9px}.dm-status{margin-top:18px}}
+@media(prefers-reduced-motion:reduce){.dm-canvas,.dm-kicker,.dm-title,.dm-rule,.dm-columns>div,.dm-scan,.dm-progress i{animation:none!important}}
 `;

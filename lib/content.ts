@@ -21,6 +21,9 @@ export type LandingPage = {
   description: string;
   h1: string;
   lede: string;
+  ctaLabel?: string;
+  ctaProof?: string;
+  ctaCopy?: string;
   sections: Section[];
   faq: QA[];
   related: string[];
@@ -2964,6 +2967,209 @@ LANDING_PAGES.push(
       { q: "Is EXdeck free for a book report?", a: "Yes — generate, edit, and export on the free plan." },
     ],
     related: ["presentation-maker-for-students", "ai-presentation-software-for-students", "free-ppt-maker", "exdeck"],
+  },
+);
+
+/* -------------------------------------------------------------------------- */
+/*  Guest / no-login presentation pages                                       */
+/* -------------------------------------------------------------------------- */
+
+LANDING_PAGES.push(
+  {
+    slug: "ai-presentation-maker-no-sign-up",
+    keyword: "AI presentation maker no sign up",
+    title: "AI Presentation Maker Without Sign Up — Create Slides Free",
+    description:
+      "Create an AI presentation without signing up. Enter a brief, generate up to 8 editable slides, and review the outline in guest mode. No card required.",
+    h1: "AI Presentation Maker — No Sign Up to Start",
+    lede:
+      "Open EXdeck, describe the presentation you need, and generate your first editable deck in guest mode. There is no account form before the prompt and no credit-card gate before you can review the result.",
+    ctaLabel: "Create slides without signing up",
+    ctaProof: "No login to generate · No card · Outline first",
+    ctaCopy:
+      "Start in guest mode and build the first deck before deciding whether EXdeck is useful. Sign in only when you want to export, save the deck to an account, or use advanced editing tools.",
+    sections: [
+      {
+        h: "What no-sign-up access means at EXdeck",
+        p: [
+          "Many presentation tools call themselves free but place registration before the first useful screen. EXdeck does the opposite: the brief, template choice, AI generation, and outline review are available first. You can judge the structure and content before sharing an email address.",
+          "We also state the boundary clearly. Guest mode is for creating and reviewing the first presentation. Exporting, cloud saving, and advanced AI actions ask you to sign in so the finished deck can be attached to an account.",
+        ],
+      },
+      {
+        h: "Create a presentation in three steps",
+        list: [
+          "Enter a topic, audience, and goal — or paste notes you already have.",
+          "Choose a professional template and let the AI draft up to eight slides.",
+          "Review and edit the outline before EXdeck applies the final slide design.",
+        ],
+      },
+      {
+        h: "Why outline-first is better than a blind one-click result",
+        p: [
+          "A fast generator is not useful when it produces the wrong story. EXdeck pauses at a text-first outline so you can rename slides, tighten points, reorder sections, and remove anything unnecessary before design work begins. That makes the no-login trial a real product evaluation rather than a polished screenshot.",
+        ],
+      },
+      {
+        h: "What the generated deck can include",
+        list: [
+          "A title slide, clear narrative flow, and a focused closing",
+          "Bullets, comparisons, tables, sections, and quotes chosen for the content",
+          "Bar, line, area, pie, or donut charts when your brief contains real data",
+          "A coherent theme, typography system, and varied slide layouts",
+          "Fully editable content once the deck opens in the EXdeck editor",
+        ],
+      },
+      {
+        h: "Built for work that cannot wait for onboarding",
+        list: [
+          "Students turning an assignment topic into a class presentation",
+          "Founders testing the flow of a pitch before an investor call",
+          "Teachers drafting a lesson deck from an outline",
+          "Teams converting meeting notes into a concise update",
+          "Consultants structuring a proposal before applying client branding",
+        ],
+      },
+      {
+        h: "No surprise at the finish line",
+        p: [
+          "EXdeck does not pretend every account feature works anonymously. You can generate and inspect the first deck without signing up. When you choose to export a real PPTX or PDF, save work across devices, or use more AI editing tools, EXdeck opens a sign-in prompt and carries the guest deck forward.",
+        ],
+      },
+    ],
+    faq: [
+      { q: "Can I use the AI presentation maker without signing up?", a: "Yes. A fresh visitor can open EXdeck in guest mode, enter a brief, generate a presentation, and review the outline without creating an account." },
+      { q: "How many slides can I create in guest mode?", a: "Guest generation creates a focused deck of up to eight slides, which is enough to evaluate the content, structure, templates, and design quality." },
+      { q: "Do I need a credit card?", a: "No. EXdeck does not ask for a credit card to open guest mode or generate the guest presentation." },
+      { q: "When does EXdeck ask me to sign in?", a: "Sign-in appears when you export, save the deck to an account, request another protected action, or use advanced editor tools. Your generated guest deck can be carried into the account flow." },
+      { q: "Can I edit the outline before the slides are designed?", a: "Yes. EXdeck deliberately shows the outline first so you can edit titles and points, add or remove slides, and reorder the story before design is applied." },
+    ],
+    related: ["ppt-maker-without-login", "create-powerpoint-without-account", "ai-presentation-maker", "free-ppt-maker"],
+  },
+  {
+    slug: "ppt-maker-without-login",
+    keyword: "PPT maker without login",
+    title: "PPT Maker Without Login — Generate a PowerPoint Online",
+    description:
+      "Use a PPT maker without logging in. Generate and review an editable AI presentation in guest mode, choose a template, and see the deck before signup.",
+    h1: "PPT Maker Without Login",
+    lede:
+      "EXdeck removes the login wall from the beginning of presentation creation. Type your idea, choose the look, generate the PPT structure, and inspect the designed result as a guest before you create an account.",
+    ctaLabel: "Make a PPT as a guest",
+    ctaProof: "Immediate guest mode · Up to 8 slides · No card",
+    ctaCopy:
+      "Go directly from a topic to an editable presentation draft. If the result is worth keeping, sign in to save it and export a real PowerPoint or PDF.",
+    sections: [
+      {
+        h: "From idea to PPT without an account form",
+        p: [
+          "The guest workflow starts where presentation work should start: with the message. Enter a class topic, business update, pitch idea, research summary, or training outline. EXdeck structures the material into a deck instead of asking you to configure a profile first.",
+        ],
+      },
+      {
+        h: "A practical guest workflow",
+        list: [
+          "Write a short brief or paste source notes",
+          "Set slide count, audience, tone, and content density",
+          "Pick a template instead of designing from a blank canvas",
+          "Review the AI-written outline and correct the story",
+          "Open the designed deck and decide whether to sign in for export",
+        ],
+      },
+      {
+        h: "More than text divided across slides",
+        p: [
+          "EXdeck selects layouts from the meaning of each slide. Sequential content can become a timeline, comparisons can use two columns, numeric material can become a real chart, and references can receive their own slide. The result is built as a presentation, not as paragraphs pasted into rectangles.",
+        ],
+      },
+      {
+        h: "Real PowerPoint output when you are ready",
+        p: [
+          "Guest mode lets you evaluate generation and design without login. Export is the point where EXdeck asks for an account. After sign-in, the deck can be saved and downloaded as a genuine .pptx or high-resolution PDF instead of a locked web-only link.",
+        ],
+        list: [
+          "Editable PPTX for Microsoft PowerPoint",
+          "Compatibility with Keynote and Google Slides import",
+          "PDF for submission, email, or handouts",
+          "Charts, text, theme, and layout preserved in the output",
+        ],
+      },
+      {
+        h: "Useful for school, work, and one-off presentations",
+        p: [
+          "No-login access is especially useful when you need to know whether a tool understands your topic before committing to it. Test a lecture, sales deck, project report, pitch, workshop, or thesis outline and judge the actual draft rather than a canned demo.",
+        ],
+      },
+    ],
+    faq: [
+      { q: "Can I make a PPT without logging in?", a: "Yes. EXdeck guest mode lets a fresh visitor generate and review the first PPT without logging in." },
+      { q: "Is the guest PPT editable?", a: "Yes. You can edit the outline before design and inspect the generated deck. Protected editor actions and export ask you to sign in." },
+      { q: "Does it work without installing PowerPoint?", a: "Yes. Generation and review happen in the browser. PowerPoint is only needed if you want to continue editing the exported PPTX locally." },
+      { q: "Can I upload my own notes?", a: "Yes. Switch to content mode to paste longer notes or source text and let EXdeck organize them into slides." },
+      { q: "Why is login required for export?", a: "Export and cloud saving are account actions. EXdeck keeps the beginning frictionless, then uses sign-in to attach the finished deck and downloads to the correct user." },
+    ],
+    related: ["ai-presentation-maker-no-sign-up", "create-powerpoint-without-account", "online-ppt-maker", "text-to-ppt"],
+  },
+  {
+    slug: "create-powerpoint-without-account",
+    keyword: "create PowerPoint without account",
+    title: "Create a PowerPoint Without an Account — Try AI Guest Mode",
+    description:
+      "Create a PowerPoint without an account first. Generate slides from text, review the outline, and preview the design in EXdeck guest mode with no card.",
+    h1: "Create a PowerPoint Without an Account",
+    lede:
+      "You should not have to register just to discover whether an AI presentation tool can handle your topic. EXdeck lets new visitors generate, review, and preview a complete first deck before account creation.",
+    ctaLabel: "Create your first deck now",
+    ctaProof: "No account to begin · Honest sign-in boundary",
+    ctaCopy:
+      "Test the real workflow, not a static demo. Build the outline and see the presentation design first; create an account only to keep, export, or continue advanced work.",
+    sections: [
+      {
+        h: "Try the product before creating the account",
+        p: [
+          "A screenshot cannot tell you whether AI understands your subject, chooses sensible slide titles, or keeps the story coherent. Guest mode uses your own brief and produces your own presentation, giving you evidence before registration.",
+        ],
+      },
+      {
+        h: "What you can do before account creation",
+        list: [
+          "Enter a topic or paste existing content",
+          "Choose audience, tone, density, slide count, and template",
+          "Generate a complete presentation outline with AI",
+          "Edit and reorder the outline before visual design",
+          "Preview the deck in EXdeck's real slide renderer",
+        ],
+      },
+      {
+        h: "What requires an account — stated upfront",
+        list: [
+          "Exporting the finished deck to PPTX or PDF",
+          "Saving decks for access on another device",
+          "Generating additional protected presentations after the guest allowance",
+          "Using advanced AI rewrites, speaker notes, translation, and sharing tools",
+        ],
+      },
+      {
+        h: "Why EXdeck separates creation from account features",
+        p: [
+          "The first question is whether the generated presentation is useful; guest mode answers that without friction. Accounts become valuable later, when work needs an owner, persistent storage, export history, usage controls, and paid features. This keeps onboarding fast without making misleading promises about anonymous cloud storage.",
+        ],
+      },
+      {
+        h: "A professional first draft, not a disposable sample",
+        p: [
+          "The same generation pipeline, outline review, templates, themes, chart layouts, and slide renderer power guest mode. If you sign in, EXdeck carries the current deck into the account workflow rather than making you repeat the prompt.",
+        ],
+      },
+    ],
+    faq: [
+      { q: "Can I create PowerPoint slides without an account?", a: "Yes. New visitors can use guest mode to generate the first presentation, edit its outline, and preview the designed deck without an account." },
+      { q: "Is guest mode only a sample presentation?", a: "No. It generates a new deck from your own topic or source text using the same presentation pipeline as signed-in generation." },
+      { q: "Will I lose the deck when I sign in?", a: "EXdeck stores the guest deck during the sign-in transition and restores it in the editor after authentication." },
+      { q: "Can returning users keep using guest mode after logout?", a: "No. Browsers that have already used a real EXdeck account are sent back to sign-in after logout. Fresh browsers and private/incognito sessions can access guest mode." },
+      { q: "Does starting without an account require payment details?", a: "No. Guest mode does not request a credit card or payment details." },
+    ],
+    related: ["ai-presentation-maker-no-sign-up", "ppt-maker-without-login", "free-ai-ppt-maker", "powerpoint-generator"],
   },
 );
 

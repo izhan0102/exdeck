@@ -5,13 +5,13 @@ import Logo from "@/components/Logo";
 import { softwareJsonLd } from "@/lib/seo";
 
 export const metadata: Metadata = {
-  title: "AI Presentation Maker | Create PowerPoint Slides in Seconds - EXdeck",
-  description: "Free AI presentation maker that turns your brief into fully designed PowerPoint slides. Real charts, speaker notes, 45 themes, and instant .pptx export. No design skills needed.",
-  keywords: ["ai presentation maker", "ai ppt maker", "powerpoint generator", "presentation creator", "slide maker", "free ppt maker", "ai slides"],
+  title: "AI Presentation Maker — Create PowerPoint Slides in Seconds",
+  description: "Free AI presentation maker that turns your brief into fully designed PowerPoint slides with real charts, speaker notes, professional themes, and PPTX export. Start the first deck without login.",
+  keywords: ["ai presentation maker", "ai ppt maker", "powerpoint generator", "presentation creator", "slide maker", "free ppt maker", "ai slides", "presentation maker without login", "ai presentation maker no sign up"],
   alternates: { canonical: "/presentations" },
   openGraph: {
     title: "AI Presentation Maker - Create Slides in Seconds",
-    description: "Turn a brief into a fully designed presentation with AI. Real charts, speaker notes, and instant PowerPoint export.",
+    description: "Turn a brief into a fully designed presentation with AI, real charts, speaker notes, and PowerPoint export. New visitors can start without login.",
   },
 };
 
@@ -33,7 +33,7 @@ export default function PresentationsPage() {
         </h1>
         
         <p className="mx-auto mt-6 max-w-2xl text-center text-[15px] leading-relaxed" style={{ color: "var(--ezd-fg-muted)" }}>
-          Type a brief and get a fully designed presentation with real charts, speaker notes, and professional layouts. Export to .pptx or .pdf instantly.
+          Type a brief and get a fully designed, editable presentation with real charts, speaker notes, professional layouts, and real PPTX or PDF export. New visitors can generate the first deck without logging in.
         </p>
 
         <div className="mt-8 flex justify-center gap-3">
@@ -44,6 +44,9 @@ export default function PresentationsPage() {
             See how it works
           </Link>
         </div>
+        <p className="mt-3 text-center text-[12.5px]" style={{ color: "var(--ezd-fg-quiet)" }}>
+          No login to generate your first deck · No credit card · Up to 8 guest slides
+        </p>
 
         <div className="mt-20 grid gap-12 sm:grid-cols-2 lg:grid-cols-3">
           <Feature icon={<Wand2 size={24} />} title="AI-Powered Generation" desc="Describe your topic in one line. AI picks the best layouts, writes content, and designs slides that fit your message." />
@@ -60,7 +63,8 @@ export default function PresentationsPage() {
             <p><strong style={{ color: "var(--ezd-fg-strong)" }}>Up to 10× cheaper than competitors:</strong> $1.99/month for unlimited presentations vs $15-20/month for Gamma, Tome, or Beautiful.ai.</p>
             <p><strong style={{ color: "var(--ezd-fg-strong)" }}>True PowerPoint export:</strong> Most AI presentation tools lock you into their web editor. We give you real .pptx files you can edit anywhere.</p>
             <p><strong style={{ color: "var(--ezd-fg-strong)" }}>No design skills needed:</strong> AI picks layouts based on your content type — title hero for intros, bullets for points, charts for data, two-column for comparisons.</p>
-            <p><strong style={{ color: "var(--ezd-fg-strong)" }}>Free plan available:</strong> 1 presentation per month, full AI generation, all themes and exports. No credit card required.</p>
+            <p><strong style={{ color: "var(--ezd-fg-strong)" }}>Free plan available:</strong> Generate and edit presentations with included monthly credits, then upgrade only when you need more volume and advanced finishing tools.</p>
+            <p><strong style={{ color: "var(--ezd-fg-strong)" }}>Try before signup:</strong> New visitors can generate and review the first deck without an account. Sign-in appears for saving, exporting, and protected advanced tools.</p>
           </div>
         </div>
 
@@ -81,6 +85,9 @@ export default function PresentationsPage() {
               "Working from files? Use PDF to PPT or the document analyser before turning notes into slides.",
             ]}
             links={[
+              ["AI presentation maker without signup", "/ai-presentation-maker-no-sign-up"],
+              ["PPT maker without login", "/ppt-maker-without-login"],
+              ["PowerPoint without an account", "/create-powerpoint-without-account"],
               ["AI presentation maker", "/ai-presentation-maker"],
               ["Presentations.ai alternative", "/presentations-ai-alternative"],
               ["PDF to PPT", "/pdf-to-ppt"],
@@ -92,7 +99,7 @@ export default function PresentationsPage() {
           <Link href="/app" className="inline-flex items-center gap-2 rounded-full px-8 py-3.5 text-[15px] font-semibold transition hover:opacity-90" style={{ background: "var(--ezd-button-strong)", color: "var(--ezd-button-strong-fg)" }}>
             Create your first presentation <ArrowRight size={16} />
           </Link>
-          <p className="mt-4 text-[13px]" style={{ color: "var(--ezd-fg-quiet)" }}>Free plan • No credit card • Export to PowerPoint</p>
+          <p className="mt-4 text-[13px]" style={{ color: "var(--ezd-fg-quiet)" }}>AI-generated in seconds • No login for the first deck • Real PowerPoint export after sign-in</p>
         </div>
       </section>
     </main>

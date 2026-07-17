@@ -1,6 +1,6 @@
 import { type NextRequest } from "next/server";
 import { cert, getApps, initializeApp, type App } from "firebase-admin/app";
-import { getAuth } from "firebase-admin/auth";
+import { getAuth, type DecodedIdToken } from "firebase-admin/auth";
 import { getDatabase, type Database } from "firebase-admin/database";
 
 let _app: App | undefined;
@@ -44,7 +44,14 @@ export function getAdminDatabase(): Database {
 }
 
 // Verifies Bearer token and returns the user's uid
-export async function authenticateRequest(req: NextRequest): Promise<string> {
+export type RequestIdentity = {
+  uid: string;
+  isAnonymous: boolean;
+  token: DecodedIdToken;
+};
+
+/** Verify a token and optionally accept Firebase Anonymous Auth. */
+export async function authenticateIdentity(req: NextRequest, allowAnonymous = false): Promise<RequestIdentity> {
   const header = req.headers.get("authorization");
   if (!header || !header.startsWith("Bearer ")) {
     throw new AuthError("Missing or malformed Authorization header", 401);
@@ -58,11 +65,16 @@ export async function authenticateRequest(req: NextRequest): Promise<string> {
   try {
     getAdminApp();
     const decoded = await getAuth().verifyIdToken(idToken);
+    const isAnonymous = decoded.firebase?.sign_in_provider === "anonymous" || decoded.guest === true;
+    if (isAnonymous) {
+      if (!allowAnonymous) throw new AuthError("Sign in to use this feature", 401);
+      return { uid: decoded.uid, isAnonymous: true, token: decoded };
+    }
     // Hard block unverified emails so they can't bypass the UI gate.
     if (!decoded.email_verified) {
       throw new AuthError("Email not verified", 403);
     }
-    return decoded.uid;
+    return { uid: decoded.uid, isAnonymous: false, token: decoded };
   } catch (err: any) {
     // Our own AuthError (e.g. the 403 above) is already well-formed —
     // re-throw it as-is so the caller sees the correct status. Only wrap
@@ -82,6 +94,11 @@ export async function authenticateRequest(req: NextRequest): Promise<string> {
     console.error("[firebaseAdmin] verifyIdToken failed:", err);
     throw new AuthError(`Token verification failed (${detail})`, 401);
   }
+}
+
+// Verified-account default used by all existing AI and billing routes.
+export async function authenticateRequest(req: NextRequest): Promise<string> {
+  return (await authenticateIdentity(req)).uid;
 }
 
 export class AuthError extends Error {

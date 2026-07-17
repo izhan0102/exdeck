@@ -3,9 +3,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import {
   AlertTriangle, ArrowRight, Clock, Copy, FileText, Home,
-  LogOut, MoreVertical, Pencil, Search, Share2, Sparkles, Trash2, Wand2, X, Zap, Contact, Settings,
+  LogIn, LogOut, MoreVertical, Pencil, Search, Share2, Sparkles, Trash2, Wand2, X, Zap, Contact, Settings,
 } from "lucide-react";
-import { type AppUser, getIdToken } from "@/lib/auth";
+import { type AppUser, getIdToken, isGuestUser } from "@/lib/auth";
 import {
   deleteDeck, duplicateDeck, renameDeck, watchDeckList, type DeckListItem,
 } from "@/lib/decks";
@@ -101,8 +101,9 @@ export default function Dashboard({
 
   // On load, materialize any Team/Org seat the user's email holds into their plan.
   useEffect(() => {
+    if (isGuestUser(user)) return;
     getIdToken().then((t) => fetch("/api/seats/sync", { method: "POST", headers: { Authorization: `Bearer ${t}` } })).catch(() => {});
-  }, [user.uid]);
+  }, [user]);
 
   useEffect(() => {
     const unsub = watchMembership(user.uid, setMembership);
@@ -190,6 +191,15 @@ export default function Dashboard({
     return list.slice(0, 8);
   }, [decks, visibleDecks, hasQuery, continueItem]);
 
+  const guestAccount = isGuestUser(user);
+  const handleAccountAction = () => {
+    if (guestAccount) {
+      window.location.assign("/auth?redirect=/app");
+      return;
+    }
+    void onSignOut();
+  };
+
   return (
     <div className="min-h-screen lg:pl-[264px]">
       {/* ============== Sidebar ============== */}
@@ -234,15 +244,15 @@ export default function Dashboard({
                 <div className="truncate text-sm font-medium" style={{ color: "var(--ezd-fg-strong)" }}>
                   {user.name || user.email?.split("@")[0]}
                 </div>
-                <div className="truncate text-[11px]" style={{ color: "var(--ezd-fg-quiet)" }}>{user.email}</div>
+                <div className="truncate text-[11px]" style={{ color: "var(--ezd-fg-quiet)" }}>{guestAccount ? "Guest workspace" : user.email}</div>
               </div>
             </div>
             <button
-              onClick={onSignOut}
+              onClick={handleAccountAction}
               className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-lg border px-3 py-1.5 text-[12px] transition hover:opacity-80"
               style={{ borderColor: "var(--ezd-hairline)", background: "var(--ezd-bg-hover)", color: "var(--ezd-fg-strong)" }}
             >
-              <LogOut size={12} /> Sign out
+              {guestAccount ? <LogIn size={12} /> : <LogOut size={12} />} {guestAccount ? "Sign in" : "Sign out"}
             </button>
           </div>
 
@@ -278,11 +288,11 @@ export default function Dashboard({
           <div className="flex items-center gap-2">
             <ThemeToggle variant="compact" />
             <button
-              onClick={onSignOut}
+              onClick={handleAccountAction}
               className="rounded-full border px-3 py-1 text-xs transition hover:opacity-80"
               style={{ borderColor: "var(--ezd-hairline)", background: "var(--ezd-bg-card)", color: "var(--ezd-fg-strong)" }}
             >
-              <LogOut size={11} className="mr-1 inline" /> Sign out
+              {guestAccount ? <LogIn size={11} className="mr-1 inline" /> : <LogOut size={11} className="mr-1 inline" />} {guestAccount ? "Sign in" : "Sign out"}
             </button>
           </div>
         </div>

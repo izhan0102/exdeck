@@ -8,6 +8,7 @@
  */
 
 import { getDatabase, push, ref, serverTimestamp, increment, update } from "firebase/database";
+import { getAuth } from "firebase/auth";
 import { getFirebaseApp } from "./firebase";
 
 export const LAUNCH_DATE_ISO = "2026-04-01"; // edit when you actually launch
@@ -51,6 +52,9 @@ export function trackEvent(ev: StatEvent) {
 
   const app = getFirebaseApp();
   if (!app || remoteDisabled) return;
+  const authUser = getAuth(app).currentUser;
+  const isGuest = !!authUser && (authUser.isAnonymous || (!authUser.email && authUser.providerData.length === 0));
+  if (!authUser || isGuest) return;
 
   try {
     const db = getDatabase(app);

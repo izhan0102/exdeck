@@ -109,6 +109,11 @@
       }
     },
 
+    "guestTrials": {
+      ".read": false,
+      ".write": false
+    },
+
     "collabChanges": {
       "$shareId": {
         ".read": "auth != null && (root.child('shared').child($shareId).child('ownerUid').val() === auth.uid || root.child('shared').child($shareId).child('collaborators').child(auth.uid).exists())",

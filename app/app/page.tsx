@@ -23,10 +23,12 @@ import { getStyleBundle, applyBundleToSlide, STYLE_BUNDLES } from "@/lib/styleBu
 import { watchCustomTemplates, deleteCustomTemplate, type CustomTemplate } from "@/lib/customTemplates";
 import { applyCustomTemplateToDeck } from "@/lib/applyCustomTemplate";
 import { createDeck, loadDeck, type ShareMode } from "@/lib/decks";
-import { logout, onAuthStateChange, getIdToken, reloadUser, type AppUser } from "@/lib/auth";
+import { ensureGuestSession, hasLoginHistory, isGuestUser, logout, onAuthStateChange, getIdToken, reloadUser, type AppUser } from "@/lib/auth";
+import { UNLIMITED_GUEST_TRIALS_FOR_TESTING } from "@/lib/guestTrialConfig";
 import { trackEvent } from "@/lib/stats";
 import { readCredits, formatResetIn } from "@/lib/creditsClient";
 import { ArrowLeft } from "lucide-react";
+import GuestSignInDialog from "@/components/GuestSignInDialog";
 
 type Step = "dashboard" | "prompt" | "theme" | "font" | "graphic" | "style" | "outline" | "deck";
 
@@ -54,16 +56,35 @@ function PageInner() {
   const { mode: deviceMode, setMode: setDeviceMode, ready: deviceReady } = useDeviceMode();
   const [authReady, setAuthReady] = useState(false);
   const [user, setUser] = useState<AppUser | null>(null);
+  const [guestSignInOpen, setGuestSignInOpen] = useState(false);
+  const [guestDeckGenerated, setGuestDeckGenerated] = useState(false);
+  const [guestSessionError, setGuestSessionError] = useState<string | null>(null);
+  const guestStartingRef = useRef(false);
 
-  // Gate: must be logged in. Otherwise bounce to /auth.
-  // Use onAuthStateChange so a freshly-restored Firebase session isn't
-  // mistaken for "logged out" during the first render.
+  // Visitors get a Firebase Anonymous Auth identity automatically. It can
+  // create one constrained deck; verified accounts retain the full editor.
   useEffect(() => {
     let cancelled = false;
     const unsubscribe = onAuthStateChange((u) => {
       if (cancelled) return;
       if (!u) {
-        router.replace("/auth?redirect=/app");
+        if (hasLoginHistory()) {
+          router.replace("/auth?redirect=/app");
+          return;
+        }
+        if (!guestStartingRef.current) {
+          guestStartingRef.current = true;
+          ensureGuestSession().catch((err) => {
+            console.error("[app] guest session bootstrap failed:", err);
+            if (cancelled) return;
+            setGuestSessionError(err instanceof Error ? err.message : "Guest mode is temporarily unavailable.");
+            setAuthReady(true);
+          });
+        }
+        return;
+      }
+      if (isGuestUser(u) && hasLoginHistory()) {
+        void logout().finally(() => router.replace("/auth?redirect=/app"));
         return;
       }
       if (!u.emailVerified) {
@@ -126,6 +147,28 @@ function PageInner() {
   // first bundle so generation always has a look even if the user rushes.
   const [styleBundleId, setStyleBundleId] = useState<string | null>(STYLE_BUNDLES[0].id);
 
+  // Keep a generated guest deck through the sign-in transition, then save it
+  // under the verified account as soon as the editor returns.
+  useEffect(() => {
+    if (!user || isGuestUser(user) || searchParams?.get("id")) return;
+    try {
+      const raw = window.sessionStorage.getItem("exdeck:guest-deck");
+      if (!raw) return;
+      const pending = JSON.parse(raw) as { deck?: Deck; theme?: Theme };
+      if (!pending.deck || !pending.theme) return;
+      window.sessionStorage.removeItem("exdeck:guest-deck");
+      setDeck(pending.deck);
+      setTheme(pending.theme);
+      setStep("deck");
+      createDeck(user.uid, pending.deck, pending.theme).then((id) => {
+        setDeckId(id);
+        const url = new URL(window.location.href);
+        url.searchParams.set("id", id);
+        window.history.replaceState({}, "", url.toString());
+      }).catch(() => setError("Your guest deck is open, but could not be saved yet."));
+    } catch { window.sessionStorage.removeItem("exdeck:guest-deck"); }
+  }, [user, searchParams]);
+
   // Load an existing deck via ?id=... so "Open" links from /app/decks work.
   useEffect(() => {
     if (!user) return;
@@ -166,7 +209,11 @@ function PageInner() {
   // we bother asking questions.
   const [lastDirectives, setLastDirectives] = useState("");
   const requestGenerate = async () => {
-    if (user) {
+    if (!UNLIMITED_GUEST_TRIALS_FOR_TESTING && isGuestUser(user) && guestDeckGenerated) {
+      setGuestSignInOpen(true);
+      return;
+    }
+    if (user && !isGuestUser(user)) {
       const c = await readCredits(user.uid);
       if (c.exhausted) {
         setQuotaResetIn(formatResetIn(c.resetAt));
@@ -184,6 +231,9 @@ function PageInner() {
       return;
     }
     setError(null);
+    // Guests spend their single trial on the deck itself, not on a separate
+    // clarification call. Signed-in users keep the tailored interview.
+    if (isGuestUser(user)) { generate(""); return; }
     setClarifyOpen(true);
   };
 const retryGenerate = () => {
@@ -203,7 +253,7 @@ const retryGenerate = () => {
     // Quota gate. Soft check on the client — Firebase rules + a server
     // round-trip after success keep the count honest, but a determined
     // user could still bypass via direct curl. Catches casual abuse.
-    if (user) {
+    if (user && !isGuestUser(user)) {
       const c = await readCredits(user.uid);
       if (c.exhausted) {
         setQuotaResetIn(formatResetIn(c.resetAt));
@@ -254,6 +304,9 @@ const retryGenerate = () => {
           const code = data?.code;
           if (code === "rate_limit") {
             throw new Error("High traffic right now — give it a few seconds and try again.");
+          }
+          if (code === "guest_limit") {
+            throw new Error("This guest trial has already been used. Sign in to create more presentations.");
           }
           if (code === "auth") {
             throw new Error("There's an issue with the AI key. Try again in a moment.");
@@ -368,6 +421,7 @@ const retryGenerate = () => {
         setTheme(applied.theme);
       }
       setDeck(deckWithExtras);
+      if (isGuestUser(user)) setGuestDeckGenerated(true);
       setStep("outline");
 
       // Persist a fresh row in Firebase so the deck survives a refresh.
@@ -438,6 +492,25 @@ const retryGenerate = () => {
       <main className="grid min-h-screen place-items-center text-sm"
             style={{ background: "var(--ezd-bg-page)", color: "var(--ezd-fg-muted)" }}>
         Loading…
+      </main>
+    );
+  }
+
+  if (!user) {
+    return (
+      <main className="grid min-h-screen place-items-center px-5 text-center"
+            style={{ background: "var(--ezd-bg-page)", color: "var(--ezd-fg-muted)" }}>
+        <section className="w-full max-w-md rounded-2xl border p-6"
+                 style={{ background: "var(--ezd-bg-card)", borderColor: "var(--ezd-divider)" }}>
+          <h1 className="text-lg font-semibold" style={{ color: "var(--ezd-fg-strong)" }}>Couldn&rsquo;t start guest mode</h1>
+          <p className="mt-2 text-sm leading-6">{guestSessionError || "Guest mode is temporarily unavailable."}</p>
+          <button onClick={() => window.location.reload()}
+                  className="mt-5 w-full rounded-xl px-4 py-3 text-sm font-semibold"
+                  style={{ background: "var(--ezd-button-strong)", color: "var(--ezd-button-strong-fg)" }}>
+            Retry guest mode
+          </button>
+          <Link href="/" className="mt-3 inline-block text-xs underline">Back to home</Link>
+        </section>
       </main>
     );
   }
@@ -607,6 +680,7 @@ const retryGenerate = () => {
           user={user}
           initialShareId={deckShareId}
           initialShareMode={deckShareMode}
+          onGuestRestricted={() => setGuestSignInOpen(true)}
         />
       )}
 
@@ -622,7 +696,7 @@ const retryGenerate = () => {
 />
 
       {/* 5s "EXdeck is doing the magic" reveal after the outline is confirmed. */}
-      <MagicOverlay open={designing} />
+      <MagicOverlay open={designing} title={deck?.title} slideCount={deck?.slides.length} />
 
       {/* Mandatory AI clarifying step before generation. Returns tap-only
           directives that get folded into the generation prompt. */}
@@ -673,6 +747,15 @@ const retryGenerate = () => {
           if (!prompt.trim()) setPrompt(t.samplePrompt);
           setTemplateVariants(t.variants);
           setTemplateName(t.name);
+        }}
+      />
+
+      <GuestSignInDialog
+        open={guestSignInOpen}
+        onClose={() => setGuestSignInOpen(false)}
+        onContinue={() => {
+          if (deck) window.sessionStorage.setItem("exdeck:guest-deck", JSON.stringify({ deck, theme }));
+          window.location.assign("/auth?redirect=/app");
         }}
       />
 

@@ -24,6 +24,7 @@ export function generateMetadata({ params }: { params: { slug: string } }): Meta
   return {
     title: page.title,
     description: page.description,
+    keywords: [page.keyword, page.h1, "EXdeck", "AI presentation maker", "PPT maker"],
     alternates: { canonical: url },
     openGraph: {
       title: page.title,
@@ -81,9 +82,9 @@ export default function LandingPage({ params }: { params: { slug: string } }) {
             href="/app"
             className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-[14px] font-semibold text-black transition hover:bg-white/90"
           >
-            Make a presentation free <ArrowRight size={15} />
+            {page.ctaLabel || "Make a presentation free"} <ArrowRight size={15} />
           </Link>
-          <span className="text-[12.5px] text-white/45">No card needed · Export to PPTX &amp; PDF</span>
+          <span className="text-[12.5px] text-white/45">{page.ctaProof || "No card needed · Export to PPTX & PDF"}</span>
         </div>
 
         <ContentSections sections={page.sections} />
@@ -91,12 +92,12 @@ export default function LandingPage({ params }: { params: { slug: string } }) {
         {/* Mid-page CTA */}
         <div className="mt-12 rounded-2xl border border-white/10 bg-gradient-to-br from-white/[0.06] to-transparent p-6">
           <h2 className="text-[18px] font-semibold text-white">Try it now</h2>
-          <p className="mt-2 text-[14px] leading-relaxed text-white/70">{CTA_NOTE}</p>
+          <p className="mt-2 text-[14px] leading-relaxed text-white/70">{page.ctaCopy || CTA_NOTE}</p>
           <Link
             href="/app"
             className="mt-4 inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-[14px] font-semibold text-black transition hover:bg-white/90"
           >
-            Open the editor <ArrowRight size={15} />
+            {page.ctaLabel || "Open the editor"} <ArrowRight size={15} />
           </Link>
         </div>
 

@@ -73,6 +73,22 @@ export default function KeywordsHub() {
         </div>
       </section>
 
+      <section className="mx-auto max-w-4xl px-5 pt-10">
+        <div className="rounded-2xl border p-5 sm:p-6" style={{ borderColor: "var(--ezd-divider)", background: "var(--ezd-bg-card)" }}>
+          <h2 className="text-[16px] font-semibold" style={{ color: "var(--ezd-fg-strong)" }}>Create a presentation before signing up</h2>
+          <p className="mt-2 text-[13.5px] leading-relaxed" style={{ color: "var(--ezd-fg-muted)" }}>New visitors can generate and review a real guest deck first. Explore the workflow that matches how you search.</p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            {[
+              ["AI presentation maker — no signup", "/ai-presentation-maker-no-sign-up"],
+              ["PPT maker without login", "/ppt-maker-without-login"],
+              ["PowerPoint without an account", "/create-powerpoint-without-account"],
+            ].map(([label, href]) => (
+              <Link key={href} href={href} className="rounded-full border px-3 py-1.5 text-[12.5px]" style={{ borderColor: "var(--ezd-hairline)", color: "var(--ezd-fg-strong)" }}>{label}</Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Browsable keyword/topic index (real internal links) */}
       <section className="mx-auto max-w-5xl px-5 py-14">
         <h2 className="text-[15px] font-semibold tracking-tight" style={{ color: "var(--ezd-fg-muted)" }}>Browse by topic &amp; tool</h2>

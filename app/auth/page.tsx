@@ -3,7 +3,7 @@ import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
-  loginWithEmail, signupWithEmail, loginWithGoogle, onAuthStateChange,
+  loginWithEmail, signupWithEmail, loginWithGoogle, logout, onAuthStateChange, isGuestUser,
   UnverifiedEmailError,
 } from "@/lib/auth";
 import { trackEvent } from "@/lib/stats";
@@ -48,6 +48,9 @@ function AuthInner() {
     trackEvent({ kind: "page_view", path: "/auth", ts: Date.now() });
     const unsubscribe = onAuthStateChange((u) => {
       if (!u) return;
+      // A guest is intentionally allowed to visit auth to upgrade. Do not
+      // bounce it back into the editor before they choose a real sign-in.
+      if (isGuestUser(u)) return;
       if (!u.emailVerified) {
         // Already signed in but unverified — bounce them to the
         // verification page rather than the gated route.
@@ -64,6 +67,10 @@ function AuthInner() {
     setLoading("email");
     setError(null);
     try {
+      // Email credentials cannot be attached to an anonymous session safely
+      // when they belong to an existing account. The deck itself is held in
+      // session storage by /app and restored after this sign-in.
+      await logout();
       const u = mode === "login"
         ? await loginWithEmail(email, password)
         : await signupWithEmail(name, email, password);
@@ -97,6 +104,7 @@ function AuthInner() {
     setLoading("google");
     setError(null);
     try {
+      await logout();
       const u = await loginWithGoogle();
       trackEvent({ kind: "auth", method: "google", ts: Date.now(), uid: u.uid });
       router.replace(redirect);

@@ -44,6 +44,12 @@ export const KEYWORDS = [
   "presentation maker",
   "free presentation maker",
   "ai presentation maker",
+  "ai presentation maker no sign up",
+  "presentation maker without login",
+  "ppt maker without login",
+  "ppt maker no sign up",
+  "create powerpoint without account",
+  "make ppt without login",
   "make ppt online",
   "create ppt from text",
   "ppt from text",
@@ -122,7 +128,7 @@ export const DEFAULT_TITLE =
 export const TITLE_TEMPLATE = "%s | EXdeck: AI PPT Maker";
 
 export const DEFAULT_DESCRIPTION =
-  "EXdeck is a free AI PPT maker. Type a topic and get an editable PowerPoint presentation in seconds with real charts, themes, and one-click PPTX and PDF export. Search EXdeck or Exdeck PPT to find the official app at exdeck.xyz.";
+  "EXdeck is a free AI PPT maker. Type a topic and get editable PowerPoint slides in seconds with real charts, professional themes, and PPTX or PDF export. New visitors can generate the first deck without signing up.";
 
 export const SHORT_DESCRIPTION =
   "Make PowerPoint presentations from text for free with AI. Editable slides in seconds, real PPTX & PDF export.";
@@ -133,6 +139,10 @@ export const FAQ: { q: string; a: string }[] = [
   {
     q: "Is EXdeck free to use?",
     a: "Yes, there's a free plan. You get 30 AI credits every month to generate and edit decks, documents, spreadsheets, and resumes, and you can preview, present, and export to PowerPoint (.pptx) and PDF (free exports carry a small watermark). Pro gives you 150 credits per day and unlocks every feature, with Team and Organisation plans for shared seats.",
+  },
+  {
+    q: "Can I make a presentation without signing up?",
+    a: "Yes. A fresh visitor can generate and review the first presentation in guest mode without an account or credit card. EXdeck asks you to sign in only when you export, save the deck, or use protected advanced tools.",
   },
   {
     q: "How do I make a PowerPoint presentation from text?",

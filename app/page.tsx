@@ -12,7 +12,7 @@ import Logo from "@/components/Logo";
 import ThemeToggle from "@/components/ThemeToggle";
 import SupportButton from "@/components/SupportDialog";
 import { trackEvent } from "@/lib/stats";
-import { isLoggedIn, logout, onAuthStateChange, type AppUser } from "@/lib/auth";
+import { logout, onAuthStateChange, type AppUser } from "@/lib/auth";
 import { FAQ, faqJsonLd } from "@/lib/seo";
 import PricingPlans from "@/components/PricingPlans";
 import SlideCanvas from "@/components/SlideCanvas";
@@ -80,8 +80,7 @@ export default function LandingPage() {
   }, []);
 
   const onGetStarted = () => {
-    if (isLoggedIn()) { router.push("/app"); return; }
-    router.push("/auth?redirect=/app");
+    router.push("/app");
   };
   const onSignOut = async () => { await logout(); setUser(null); };
 
@@ -270,6 +269,7 @@ export default function LandingPage() {
                 "3D data charts",
                 "45 themes · 200k icons",
                 "No card needed",
+                "No login for your first deck",
               ].map((f) => (
                 <span key={f} className="inline-flex items-center gap-1.5">
                   <Check size={14} style={{ color: "var(--ezd-fg-strong)" }} /> {f}
@@ -1873,6 +1873,9 @@ function Footer() {
               { label: "Free PPT maker", href: "/free-ppt-maker" },
               { label: "AI presentation maker", href: "/ai-presentation-maker" },
               { label: "AI PPT maker", href: "/ai-ppt-maker" },
+              { label: "No-signup AI presentation", href: "/ai-presentation-maker-no-sign-up" },
+              { label: "PPT maker without login", href: "/ppt-maker-without-login" },
+              { label: "PowerPoint without account", href: "/create-powerpoint-without-account" },
               { label: "Text to PPT", href: "/text-to-ppt" },
               { label: "PowerPoint generator", href: "/powerpoint-generator" },
               { label: "Blog", href: "/blog" },

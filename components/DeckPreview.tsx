@@ -84,6 +84,8 @@ type Props = {
   /** Present when this editor is a LINK COLLABORATOR (opened via /share/[id] in
    *  edit mode) rather than the owner. Binds persistence to the shared node. */
   collab?: { shareId: string; isOwner: boolean } | null;
+  /** Opens the account gate for the one-deck anonymous trial. */
+  onGuestRestricted?: () => void;
 };
 
 function slideLabel(index?: number) {
@@ -287,7 +289,7 @@ function applyChangeState(deck: Deck, theme: Theme, change: DeckChange, directio
   return null;
 }
 
-export default function DeckPreview({ deck, setDeck, theme, setTheme, onRestart, deckId, user, initialShareId, initialShareMode, collab }: Props) {
+export default function DeckPreview({ deck, setDeck, theme, setTheme, onRestart, deckId, user, initialShareId, initialShareMode, collab, onGuestRestricted }: Props) {
   const [active, setActive] = useState(0);
   // Per-slide "regenerate with model" — index currently regenerating (or null).
   const [regeneratingIdx, setRegeneratingIdx] = useState<number | null>(null);
@@ -350,6 +352,7 @@ export default function DeckPreview({ deck, setDeck, theme, setTheme, onRestart,
     reason: string,
     run: () => void,
   ) => {
+    if (guestBlocked()) return;
     if (planHasFeature(plan, feature)) { run(); return; }
     setUpgradeReason(reason);
     setUpgradeOpen(true);
@@ -409,6 +412,20 @@ export default function DeckPreview({ deck, setDeck, theme, setTheme, onRestart,
   const HISTORY_LIMIT = 30;
   const [canUndo, setCanUndo] = useState(false);
   const [canRedo, setCanRedo] = useState(false);
+  const guestBlocked = () => {
+    if (user?.provider !== "anonymous") return false;
+    onGuestRestricted?.();
+    return true;
+  };
+  const openVisuals = () => {
+    if (guestBlocked()) return;
+    setEditingChart(null);
+    setVisualsOpen(true);
+  };
+  const toggleAiPanel = () => {
+    if (guestBlocked()) return;
+    setAiPanelOpen((value) => !value);
+  };
 
   // Push current deck onto history stack whenever it changes — except for
   // changes that came from popping history itself.
@@ -1076,6 +1093,7 @@ export default function DeckPreview({ deck, setDeck, theme, setTheme, onRestart,
   };
 
   const editChartElement = (id: string) => {
+    if (guestBlocked()) return;
     const diag = (deck.slides[active]?.uploadedImages || []).find((im) => im.id === id);
     if (diag?.kind === "diagram") { editDiagramElement(id); return; }
     if (id === "__slide__chart") {
@@ -1095,6 +1113,7 @@ export default function DeckPreview({ deck, setDeck, theme, setTheme, onRestart,
   // rail's right-click menu). Metered by tokens × the model's rate, and works
   // for any layout — bullets, tables, and data charts included.
   const regenerateSlide = async (index: number, model: string) => {
+    if (guestBlocked()) return;
     if (regeneratingIdx !== null) return;
     setRegeneratingIdx(index);
     const ctrl = new AbortController();
@@ -1141,6 +1160,7 @@ export default function DeckPreview({ deck, setDeck, theme, setTheme, onRestart,
   // (group presentations) the script is divided per presenter and stored as
   // `noteSegments` for the Show-notes view.
   const generateNotes = async (speakers?: string[], setting?: string) => {
+    if (guestBlocked()) return;
     if (notesState === "loading") return;
     setNotesState("loading");
     try {
@@ -1196,6 +1216,7 @@ export default function DeckPreview({ deck, setDeck, theme, setTheme, onRestart,
   // speaker notes if present, otherwise generates them first, then opens the
   // narrated player.
   const ensureNotesForAuto = async (): Promise<boolean> => {
+    if (guestBlocked()) return false;
     if (deck.speakerNotesGenerated) return true;
     setAutoPreparing(true);
     try {
@@ -1244,6 +1265,7 @@ export default function DeckPreview({ deck, setDeck, theme, setTheme, onRestart,
   // Translate the whole deck in place into a target language. Only text
   // changes; layout/theme/charts stay put. Returns true on success.
   const translateDeckTo = async (language: string): Promise<boolean> => {
+    if (guestBlocked()) return false;
     if (translating || !language.trim()) return false;
     setTranslating(true);
     try {
@@ -1337,6 +1359,7 @@ export default function DeckPreview({ deck, setDeck, theme, setTheme, onRestart,
   };
 
   const onExport = async (format: ExportFormat) => {
+    if (guestBlocked()) return;
     // The notes handout is a Pro feature — gate it before anything else.
     if (format === "handout" && !planHasFeature(plan, "handout")) {
       setUpgradeReason("The notes handout PDF is a Pro feature. Upgrade to export slides with speaker notes.");
@@ -2144,7 +2167,7 @@ export default function DeckPreview({ deck, setDeck, theme, setTheme, onRestart,
         onQAPrep={() => requireFeatureOrUpgrade("qaPrep", "Q&A prep is a Pro feature. Upgrade to use it.", () => setQaOpen(true))}
         translateLocked={!planHasFeature(plan, "translate")}
         qaLocked={!planHasFeature(plan, "qaPrep")}
-        onAddVisuals={() => { setEditingChart(null); setVisualsOpen(true); }}
+        onAddVisuals={openVisuals}
         onGenerateNotes={() => {
           if (hasNotes) { setNotesViewOpen(true); return; }
           requireFeatureOrUpgrade("speakerNotes", "Speaker notes are a Pro feature. Upgrade to generate them.", () => setNotesMenuOpen(true));
@@ -2159,7 +2182,7 @@ export default function DeckPreview({ deck, setDeck, theme, setTheme, onRestart,
       <BottomBar
         placingText={placingText}
         aiActive={aiPanelOpen}
-        onToggleAi={() => setAiPanelOpen((v) => !v)}
+        onToggleAi={toggleAiPanel}
         notesLabel={notesState === "loading" ? "Writing notes…" : notesState === "error" ? "Try again" : hasNotes ? "Show notes" : "Generate notes"}
         notesLoading={notesState === "loading"}
         translating={translating}
@@ -2168,7 +2191,7 @@ export default function DeckPreview({ deck, setDeck, theme, setTheme, onRestart,
         onStartPlaceText={() => { setPlacingText(true); setSelectedTextId(null); setCanvasSelection(null); }}
         onAddImage={() => fileInputRef.current?.click()}
         onAddPhoto={openAddImages}
-        onAddVisuals={() => { setEditingChart(null); setVisualsOpen(true); }}
+        onAddVisuals={openVisuals}
         onAddDiagram={openDiagram}
         onGenerateNotes={() => { if (hasNotes) { setNotesViewOpen(true); return; } requireFeatureOrUpgrade("speakerNotes", "Speaker notes are a Pro feature. Upgrade to generate them.", () => setNotesMenuOpen(true)); }}
         onQAPrep={() => requireFeatureOrUpgrade("qaPrep", "Q&A prep is a Pro feature. Upgrade to use it.", () => setQaOpen(true))}

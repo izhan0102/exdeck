@@ -30,6 +30,8 @@ import {
   reload,
   sendEmailVerification,
   signInWithEmailAndPassword,
+  signInAnonymously,
+  signInWithCustomToken,
   signInWithPopup,
   signOut,
   updateProfile,
@@ -38,13 +40,15 @@ import {
 import { getFirebaseAuth, isFirebaseConfigured } from "./firebase";
 
 const USER_KEY = "deckflow_user";
+const LOGIN_HISTORY_KEY = "deckflow_login_history";
+const LEGACY_EVENT_QUEUE_KEY = "deckflow_event_queue";
 
 export type AppUser = {
   uid: string;
   email: string;
   name?: string;
   photoUrl?: string;
-  provider: "password" | "google" | "local";
+  provider: "password" | "google" | "anonymous" | "local";
   /** True when Firebase reports the email is verified. Google
    *  accounts are always true. Local-fallback users are always true.
    *  Password accounts are false until the user clicks the link. */
@@ -70,25 +74,63 @@ function readLocal(): AppUser | null {
     return raw ? (JSON.parse(raw) as AppUser) : null;
   } catch { return null; }
 }
+function markLoginHistory() {
+  if (typeof window === "undefined") return;
+  try { window.localStorage.setItem(LOGIN_HISTORY_KEY, "1"); } catch { /* ignore */ }
+}
+
+/**
+ * True once this browser has used a real account. The marker deliberately
+ * survives logout. Existing installations are migrated from locally queued
+ * auth analytics, while fresh/incognito storage remains eligible for guests.
+ */
+export function hasLoginHistory(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    if (window.localStorage.getItem(LOGIN_HISTORY_KEY) === "1") return true;
+    const raw = window.localStorage.getItem(LEGACY_EVENT_QUEUE_KEY);
+    const events = raw ? JSON.parse(raw) : [];
+    const hadAuthEvent = Array.isArray(events) && events.some((event) => event?.kind === "auth");
+    if (hadAuthEvent) markLoginHistory();
+    return hadAuthEvent;
+  } catch {
+    return false;
+  }
+}
+
 function writeLocal(u: AppUser | null) {
   if (typeof window === "undefined") return;
   try {
-    if (u) window.localStorage.setItem(USER_KEY, JSON.stringify(u));
-    else window.localStorage.removeItem(USER_KEY);
+    if (u) {
+      window.localStorage.setItem(USER_KEY, JSON.stringify(u));
+      if (u.provider !== "anonymous") markLoginHistory();
+    } else {
+      window.localStorage.removeItem(USER_KEY);
+    }
     window.dispatchEvent(new CustomEvent("deckflow:auth-change"));
   } catch { /* ignore */ }
 }
 
-function fbToApp(u: FBUser, provider: AppUser["provider"]): AppUser {
+function fbProvider(u: FBUser): AppUser["provider"] {
+  // Anonymous Firebase users normally have an empty providerData array.
+  // `isAnonymous` is the authoritative signal; looking for an "anonymous"
+  // provider id incorrectly reclassifies guests as unverified password users.
+  if (u.isAnonymous || (!u.email && u.providerData.length === 0)) return "anonymous";
+  return u.providerData.some((p) => p.providerId === "google.com") ? "google" : "password";
+}
+
+function fbToApp(u: FBUser, provider: AppUser["provider"] = fbProvider(u)): AppUser {
   return {
     uid: u.uid,
     email: u.email || "",
-    name: u.displayName || (u.email || "").split("@")[0],
+    name: provider === "anonymous" ? "Guest user" : (u.displayName || (u.email || "").split("@")[0]),
     photoUrl: u.photoURL || undefined,
     provider,
     // Google logins are always verified by Google. Password accounts
     // depend on Firebase's emailVerified flag.
-    emailVerified: provider === "google" ? true : !!u.emailVerified,
+    // Anonymous users are deliberately permitted into the one-deck guest
+    // experience. They are still rejected by all normal server AI routes.
+    emailVerified: provider === "google" || provider === "anonymous" ? true : !!u.emailVerified,
   };
 }
 
@@ -98,9 +140,7 @@ export function getCurrentUser(): AppUser | null {
   if (typeof window === "undefined") return null;
   const auth = getFirebaseAuth();
   if (auth?.currentUser) {
-    const provider: AppUser["provider"] =
-      auth.currentUser.providerData[0]?.providerId === "google.com" ? "google" : "password";
-    const u = fbToApp(auth.currentUser, provider);
+    const u = fbToApp(auth.currentUser);
     writeLocal(u);
     return u;
   }
@@ -135,9 +175,7 @@ export function onAuthStateChange(cb: (u: AppUser | null) => void): () => void {
       cb(null);
       return;
     }
-    const provider: AppUser["provider"] =
-      u.providerData[0]?.providerId === "google.com" ? "google" : "password";
-    const app = fbToApp(u, provider);
+    const app = fbToApp(u);
     writeLocal(app);
     cb(app);
   });
@@ -155,9 +193,7 @@ export async function reloadUser(): Promise<AppUser | null> {
   const u = auth.currentUser;
   if (!u) return null;
   try { await reload(u); } catch { /* network blip — return stale */ }
-  const provider: AppUser["provider"] =
-    u.providerData[0]?.providerId === "google.com" ? "google" : "password";
-  const app = fbToApp(u, provider);
+  const app = fbToApp(u);
   writeLocal(app);
   return app;
 }
@@ -273,7 +309,55 @@ export async function loginWithGoogle(): Promise<AppUser> {
   return app;
 }
 
+/**
+ * Create a Firebase Anonymous Auth session for the one-deck guest trial.
+ * Firebase owns the credential; the server still enforces the one-time trial.
+ */
+export async function ensureGuestSession(): Promise<AppUser> {
+  const existing = getCurrentUser();
+  if (existing && !isGuestUser(existing)) return existing;
+  if (hasLoginHistory()) {
+    throw new Error("Returning users must sign in.");
+  }
+  if (existing) return existing;
+  const auth = getFirebaseAuth();
+  if (!auth) {
+    throw new Error("Guest mode needs Firebase authentication to be configured.");
+  }
+
+  // Prefer the server-issued guest token. This project can keep Firebase's
+  // Anonymous provider disabled, avoiding its noisy accounts:signUp failure.
+  // Native anonymous auth remains a fallback if the token endpoint is down.
+  try {
+    const res = await fetch("/api/guest-session", { method: "POST" });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || typeof data?.token !== "string") {
+      throw new Error(data?.error || "Guest token unavailable.");
+    }
+    const cred = await signInWithCustomToken(auth, data.token);
+    const guest = fbToApp(cred.user, "anonymous");
+    writeLocal(guest);
+    return guest;
+  } catch (tokenError) {
+    try {
+      const cred = await signInAnonymously(auth);
+      const guest = fbToApp(cred.user, "anonymous");
+      writeLocal(guest);
+      return guest;
+    } catch (anonymousError) {
+      console.error("[auth] custom and anonymous guest sign-in failed", tokenError, anonymousError);
+      throw new Error("Guest mode is temporarily unavailable.");
+    }
+  }
+}
+
+export function isGuestUser(user: AppUser | null | undefined): boolean {
+  return user?.provider === "anonymous";
+}
+
 export async function logout(): Promise<void> {
+  const current = getCurrentUser();
+  if (current && !isGuestUser(current)) markLoginHistory();
   const auth = getFirebaseAuth();
   if (auth) {
     try { await signOut(auth); } catch { /* ignore */ }
