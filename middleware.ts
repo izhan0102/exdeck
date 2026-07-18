@@ -17,6 +17,13 @@ export function middleware(req: NextRequest) {
       return NextResponse.redirect(url, 308);
     }
 
+    // /reviews is a local-only owner utility — the production admin tab
+    // replaced it. Redirect the route to /admin on the canonical domain.
+    if (isCanonicalDomain && nextUrl.pathname === "/reviews") {
+      const url = new URL("/admin", `https://${CANONICAL_HOST}`);
+      return NextResponse.redirect(url, 307);
+    }
+
     return NextResponse.next();
   } catch {
     // A canonical-redirect helper must never take down the whole site.
