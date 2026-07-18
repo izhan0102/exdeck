@@ -49,6 +49,7 @@ function build(): string {
 
   // Feature landing pages (high SEO priority).
   entries.push(urlEntry("/presentations", 1.0, "weekly", now));
+  entries.push(urlEntry("/template-lab", 1.0, "weekly", now));
   entries.push(urlEntry("/collaboration", 0.9, "weekly", now));
   entries.push(urlEntry("/collaboration/how-it-works", 0.8, "monthly", now));
   entries.push(urlEntry("/collaboration/changes-undo-pin", 0.8, "monthly", now));

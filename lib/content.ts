@@ -1900,22 +1900,203 @@ LANDING_PAGES.push(
     related: ["chatpdf-alternative", "adobe-acrobat-ai-alternative", "ai-presentation-from-pdf"],
   },
   // Profession-specific pages
-  { slug: "ai-presentation-maker-for-doctors", keyword: "AI presentation maker for doctors", title: "AI Presentation Maker for Doctors — Medical Slides in Seconds", description: "AI presentation maker for doctors. Generate patient education slides, case presentations, and medical lectures from text. Export to .pptx. Free to start.", h1: "AI Presentation Maker for Doctors", lede: "Doctors need presentations for patient education, case studies, grand rounds, and conferences. EXdeck's AI generates medical slides from text prompts with proper structure, terminology, and visuals. Export to PowerPoint or PDF.", sections: [{ h: "Medical use cases", list: ["Patient education and discharge instructions", "Case presentations and grand rounds", "Medical conference talks", "CME and training materials", "Research poster presentations"] }, { h: "Built for medical professionals", list: ["AI understands medical terminology", "Professional medical themes", "HIPAA-compliant (client-side processing)", "Real .pptx export for conferences", "Free plan for residents and fellows"] }], faq: [{ q: "Can the AI handle medical terminology?", a: "Yes. The AI is trained on diverse content including medical topics and can generate appropriate clinical content." }, { q: "Is it HIPAA compliant?", a: "EXdeck processes content client-side in your browser. No patient data is stored. Always review content before sharing." }, { q: "Is it free for doctors?", a: "Yes. Free plan available to all users with no verification required." }], related: ["ai-presentation-for-teachers", "ai-presentation-maker-for-lawyers", "ai-presentation-from-research-paper"] },
-  { slug: "ai-presentation-maker-for-lawyers", keyword: "AI presentation maker for lawyers", title: "AI Presentation Maker for Lawyers — Legal Slides Fast", description: "AI presentation maker for lawyers. Generate case summaries, client presentations, and legal training slides. Export to .pptx. Free to start.", h1: "AI Presentation Maker for Lawyers", lede: "Lawyers need presentations for client meetings, case summaries, training, and court presentations. EXdeck's AI generates professional legal slides from text prompts. Export to PowerPoint or PDF.", sections: [{ h: "Legal use cases", list: ["Client case summaries and updates", "Legal training and CLE presentations", "Court presentations and exhibits", "Settlement negotiations", "Firm marketing and pitch decks"] }, { h: "Professional and confidential", list: ["Client-side processing (no data stored)", "Professional legal themes", "Real .pptx export", "Fast generation for tight deadlines", "Free plan available"] }], faq: [{ q: "Is it secure for confidential cases?", a: "EXdeck processes content in your browser. No case data is uploaded to servers. Always review content for privilege." }, { q: "Can it handle legal terminology?", a: "Yes. The AI generates appropriate legal content. Always review for accuracy." }, { q: "Is it free?", a: "Yes. Free plan covers AI generation and PowerPoint export within monthly limits." }], related: ["ai-presentation-maker-for-consultants", "ai-presentation-for-business", "ai-presentation-maker-for-doctors"] },
-  { slug: "ai-presentation-maker-for-consultants", keyword: "AI presentation maker for consultants", title: "AI Presentation Maker for Consultants — Client Decks Fast", description: "AI presentation maker for consultants. Generate client presentations, project proposals, and strategy decks. Export to .pptx. Free to start.", h1: "AI Presentation Maker for Consultants", lede: "Consultants live in PowerPoint. EXdeck's AI generates client-ready presentations from text prompts — strategy decks, project proposals, status updates. Edit everything, export to .pptx or PDF.", sections: [{ h: "Consulting use cases", list: ["Client proposals and SOWs", "Strategy and roadmap presentations", "Project status updates", "Workshop and training materials", "RFP responses"] }, { h: "Built for billable hours", list: ["Generate decks in minutes, not hours", "Professional consulting themes", "Real .pptx export for client branding", "AI charts from client data", "Free plan to test before buying"] }], faq: [{ q: "Can I customize for client brands?", a: "Yes. Change colors, fonts, logos, and themes after AI generation." }, { q: "Is it fast enough for tight deadlines?", a: "Yes. AI generates complete decks in ~10 seconds. Edit and export in minutes." }, { q: "Is there a team plan?", a: "Yes. Team plans offer shared seats and pooled usage for consulting firms." }], related: ["ai-presentation-for-business", "ai-presentation-maker-for-lawyers", "ai-pitch-deck-generator"] },
-  { slug: "ai-presentation-maker-for-engineers", keyword: "AI presentation maker for engineers", title: "AI Presentation Maker for Engineers — Technical Slides Fast", description: "AI presentation maker for engineers. Generate technical presentations, design reviews, and project updates. Export to .pptx. Free to start.", h1: "AI Presentation Maker for Engineers", lede: "Engineers need presentations for design reviews, project updates, technical talks, and documentation. EXdeck's AI generates technical slides from text prompts. Export to PowerPoint or PDF.", sections: [{ h: "Engineering use cases", list: ["Design reviews and architecture presentations", "Project status and sprint reviews", "Technical conference talks", "Documentation and onboarding", "RFCs and technical proposals"] }, { h: "Technical and precise", list: ["Handles technical terminology", "Blueprint and technical themes", "AI charts for performance data", "Real .pptx export", "Free plan for individual engineers"] }], faq: [{ q: "Can it handle technical content?", a: "Yes. The AI generates appropriate technical content. Always review for accuracy." }, { q: "Does it support code snippets?", a: "Yes. Use mono fonts and paste code blocks. The editor preserves formatting." }, { q: "Is it free?", a: "Yes. Free plan covers AI generation and PowerPoint export within monthly limits." }], related: ["ai-presentation-software-for-businesses", "ai-presentation-from-research-paper", "ai-presentation-maker-for-consultants"] },
+  { slug: "ai-presentation-maker-for-doctors", keyword: "AI presentation maker for doctors", title: "AI Presentation Maker for Doctors — Medical Slides in Seconds", description: "AI presentation maker for doctors. Build grand-rounds cases, patient education, and CME lectures from text. Export to .pptx. Free to start.", h1: "AI Presentation Maker for Doctors", lede: "A physician's slides shift register constantly — plain reassurance for a patient, tight clinical reasoning for grand rounds, evidence density for a conference. EXdeck takes a brief like \"discharge instructions after appendectomy\" or \"present a rare cardiology case\" and drafts the right structure for each: simple next-steps for patients, or history-exam-investigations-management for case work. Export a real .pptx.",
+    sections: [
+      { h: "The right structure for the setting", p: ["Patient education needs one instruction per slide and no jargon; a case presentation needs the clinical arc — presentation, findings, differential, management, outcome; a CME talk needs an evidence spine. EXdeck drafts to the setting you name, so you refine judgement, not layout."] },
+      { h: "Decks it builds well", list: ["Grand-rounds and morbidity-and-mortality case presentations", "Patient and family education / discharge instructions", "CME and resident-teaching lectures", "Conference talks and research posters", "Departmental updates and protocol briefings"] },
+      { h: "Privacy and accuracy first", p: ["Content is processed in your browser — nothing is uploaded or stored. Use de-identified data, and always verify clinical facts, doses, and guidelines before presenting; the AI gives a structured draft, not medical authority."] },
+      { h: "Conference-ready output", p: ["Export a genuine .pptx that opens on any conference machine, switch to a clean clinical theme, and add charts from study data (outcomes, trends) as editable vectors. Free plan for residents and fellows."] },
+    ],
+    faq: [
+      { q: "Can it handle medical terminology?", a: "Yes — it drafts appropriately structured clinical content and terminology. It's a first draft: verify all facts, doses, and guidelines before presenting." },
+      { q: "Is patient data safe?", a: "EXdeck processes content client-side and stores no data. Use de-identified information and review for privacy before sharing." },
+      { q: "Is it free for doctors?", a: "Yes. The free plan covers generation, editing, and PowerPoint/PDF export within a monthly limit, no verification required." },
+    ],
+    related: ["ai-presentation-maker-for-nursing", "ai-presentation-maker-for-lawyers", "ai-presentation-from-research-paper"] },
+  { slug: "ai-presentation-maker-for-lawyers", keyword: "AI presentation maker for lawyers", title: "AI Presentation Maker for Lawyers — Legal Slides Fast", description: "AI presentation maker for lawyers. Build case summaries, client updates, CLE decks, and trial exhibits from text. Export to .pptx. Free to start.", h1: "AI Presentation Maker for Lawyers", lede: "Legal presentations have to be precise and persuasive at once — a client wants clarity, a judge wants the argument, a CLE audience wants the doctrine. EXdeck takes a brief like \"case status update for a client\" or \"summary judgment argument outline\" and drafts a structured deck: facts, issue, argument, and ask — leaving you to sharpen the advocacy. Export a real .pptx.",
+    sections: [
+      { h: "Structure the argument, keep the nuance", p: ["Strong legal decks follow issue → rule → application → conclusion, or facts → argument → relief. EXdeck drafts that spine so a case summary reads as reasoning, not a document dump — then you add the citations, caveats, and privilege review only a lawyer can."] },
+      { h: "Decks it builds well", list: ["Client case summaries and matter updates", "CLE and internal training presentations", "Argument outlines and hearing prep", "Trial and mediation exhibits", "Firm pitches, RFP responses, and BD decks"] },
+      { h: "Confidentiality by design", p: ["Content is processed in your browser — no matter data is uploaded or stored. Use non-privileged or redacted material for drafts, and always review output for accuracy and privilege before sharing with a client or court."] },
+      { h: "Client-ready output", p: ["Export a genuine .pptx on brand — your firm colours, fonts, and logo — or a high-res PDF for a leave-behind. Everything's editable in PowerPoint, so a partner can mark it up the usual way."] },
+    ],
+    faq: [
+      { q: "Is it secure for confidential matters?", a: "EXdeck processes content client-side and stores nothing on servers. Use redacted/non-privileged material for drafting and review everything for privilege before sharing." },
+      { q: "Can it handle legal terminology?", a: "Yes — it drafts appropriately structured legal content, but always verify authorities, citations, and accuracy before use." },
+      { q: "Is it free?", a: "Yes. The free plan covers generation, editing, and PowerPoint/PDF export within a monthly limit." },
+    ],
+    related: ["ai-presentation-maker-for-consultants", "ai-presentation-for-business", "ai-presentation-maker-for-doctors"] },
+  { slug: "ai-presentation-maker-for-consultants", keyword: "AI presentation maker for consultants", title: "AI Presentation Maker for Consultants — Client Decks Fast", description: "AI presentation maker for consultants. Build proposals, strategy decks, and status updates with charts — fast enough for billable deadlines. Export to .pptx. Free to start.", h1: "AI Presentation Maker for Consultants", lede: "Consultants bill by the hour, and too much of that hour goes into formatting slides. EXdeck takes a brief like \"strategy readout for a retail client\" or \"project kickoff deck\" and drafts a structured, answer-first deck — recommendation up top, evidence beneath — with editable charts from client data. Put your firm's brand on it and export a real .pptx.",
+    sections: [
+      { h: "Answer-first, like a real consulting deck", p: ["Consulting decks lead with the recommendation and support it with a pyramid of evidence. EXdeck drafts that structure — key message, supporting points, data — so your readout argues a conclusion from slide one instead of building to it, and you spend your time on the thinking, not the layout."] },
+      { h: "Decks it builds well", list: ["Client proposals and statements of work", "Strategy readouts and roadmaps", "Project kickoffs and weekly status updates", "Workshop and training materials", "RFP responses and capability decks"] },
+      { h: "Charts from client data", p: ["Paste the client's figures — revenue, cost breakdowns, benchmark comparisons — and EXdeck builds editable, theme-coloured charts that export as vectors in the .pptx, ready to reskin in the client's palette."] },
+      { h: "On the client's brand in minutes", p: ["Generate first, then apply the client's colours, fonts, and logo and switch the whole deck's theme in one click. Export a genuine PowerPoint the client's team can keep editing — no lock-in. Team plans add shared seats for the practice."] },
+    ],
+    faq: [
+      { q: "Can I match a client's brand?", a: "Yes. After generation, apply the client's colours, fonts, and logo and switch themes across the whole deck instantly." },
+      { q: "Is it fast enough for tight deadlines?", a: "Yes — a full structured draft generates in about ten seconds; you edit and export a client-ready .pptx in minutes." },
+      { q: "Is there a plan for firms?", a: "Yes. Team plans offer shared seats and pooled usage; a free plan lets you test the workflow first." },
+    ],
+    related: ["ai-presentation-for-business", "ai-presentation-maker-for-lawyers", "ai-pitch-deck-generator"] },
+  { slug: "ai-presentation-maker-for-engineers", keyword: "AI presentation maker for engineers", title: "AI Presentation Maker for Engineers — Technical Slides Fast", description: "AI presentation maker for engineers. Build design reviews, architecture decks, and sprint updates from text — with charts and code. Export to .pptx. Free to start.", h1: "AI Presentation Maker for Engineers", lede: "Engineers present to convince — a design review needs the problem, options, trade-offs, and a recommendation; a sprint review needs progress against goals. EXdeck takes a brief like \"architecture review for a payments service\" or \"RFC: migrate to event-driven\" and drafts a technical deck that reasons through trade-offs instead of listing features. Export a real, editable .pptx.",
+    sections: [
+      { h: "Trade-offs, not just features", p: ["The best engineering decks compare options honestly: here's the problem, here are the approaches, here's what each costs and buys, here's the call. EXdeck drafts that structure so a design review reads as a decision with rationale — the thing reviewers actually want."] },
+      { h: "Decks it builds well", list: ["Design and architecture reviews with options and trade-offs", "Sprint / project status and demo decks", "Technical conference and brown-bag talks", "RFCs and technical proposals", "Onboarding and system-documentation decks"] },
+      { h: "Diagrams, data, and code", p: ["Add architecture or sequence diagrams, paste performance data (latency, throughput, error rate) for editable charts, and use mono fonts for code blocks that survive export. Charts export as vectors in the .pptx so reviewers can inspect the numbers."] },
+      { h: "Fast, and yours to keep", p: ["Draft in about ten seconds, then edit inline and export a genuine PowerPoint that opens anywhere — no lock-in. Free plan for individual engineers; team plans for the whole squad."] },
+    ],
+    faq: [
+      { q: "Can it handle technical content?", a: "Yes — it drafts appropriately structured technical content and terminology. Always review specifics and numbers for accuracy before presenting." },
+      { q: "Does it support code and diagrams?", a: "Yes. Use mono fonts for code blocks, add architecture/sequence diagrams as images, and generate charts from performance data." },
+      { q: "Is it free?", a: "Yes. The free plan covers generation, editing, and PowerPoint/PDF export within a monthly limit." },
+    ],
+    related: ["ai-presentation-software-for-businesses", "ai-presentation-from-research-paper", "ai-presentation-maker-for-consultants"] },
   // Subject-specific pages
-  { slug: "ai-presentation-maker-for-biology", keyword: "AI presentation maker for biology", title: "AI Presentation Maker for Biology — Science Slides Fast", description: "AI presentation maker for biology. Generate biology presentations, lab reports, and science lectures. Export to .pptx. Free for students and teachers.", h1: "AI Presentation Maker for Biology", lede: "Biology students and teachers need presentations for labs, lectures, research talks, and class projects. EXdeck's AI generates biology slides from text prompts with proper scientific structure. Export to PowerPoint or PDF.", sections: [{ h: "Biology presentation use cases", list: ["Lab reports and experiment presentations", "Biology lectures and class notes", "Science fair projects", "Research posters and conference talks", "Student group presentations"] }, { h: "Built for science education", list: ["AI understands biology terminology", "Science-friendly themes and layouts", "AI charts for experimental data", "Real .pptx export for school submissions", "Free plan for students and teachers"] }], faq: [{ q: "Can it handle biology terminology?", a: "Yes. The AI generates appropriate scientific content for biology topics." }, { q: "Is it free for students?", a: "Yes. Free plan available to all users including students and teachers." }, { q: "Can I add diagrams?", a: "Yes. Upload images, add icons from 200k+ library, or generate charts from data." }], related: ["ai-presentation-maker-for-chemistry", "ai-presentation-for-students", "ai-presentation-for-teachers"] },
-  { slug: "ai-presentation-maker-for-chemistry", keyword: "AI presentation maker for chemistry", title: "AI Presentation Maker for Chemistry — Science Slides in Seconds", description: "AI presentation maker for chemistry. Generate chemistry presentations, lab reports, and science lectures. Export to .pptx. Free for students.", h1: "AI Presentation Maker for Chemistry", lede: "Chemistry students and teachers need presentations for labs, lectures, and research. EXdeck's AI generates chemistry slides from text prompts with scientific structure and terminology. Export to PowerPoint or PDF.", sections: [{ h: "Chemistry presentation use cases", list: ["Lab reports and procedure presentations", "Chemistry lectures and review slides", "Science project presentations", "Research talks and posters", "Chemical reaction explanations"] }, { h: "Science-ready features", list: ["Handles chemistry terminology and formulas", "Professional science themes", "Charts for experimental data", "Real .pptx export", "Free plan for education"] }], faq: [{ q: "Can it format chemical formulas?", a: "You can add chemical formulas as text. For complex formulas, use superscript/subscript in PowerPoint after export." }, { q: "Is it free for chemistry students?", a: "Yes. Free plan covers AI generation and PowerPoint export for all users." }], related: ["ai-presentation-maker-for-biology", "ai-presentation-maker-for-physics", "ai-presentation-for-students"] },
-  { slug: "ai-presentation-maker-for-physics", keyword: "AI presentation maker for physics", title: "AI Presentation Maker for Physics — Science Slides Fast", description: "AI presentation maker for physics. Generate physics presentations, lab reports, and lectures. Export to .pptx. Free for students and teachers.", h1: "AI Presentation Maker for Physics", lede: "Physics students and teachers need presentations for experiments, lectures, and research. EXdeck's AI generates physics slides from text prompts with scientific structure. Export to PowerPoint or PDF.", sections: [{ h: "Physics presentation use cases", list: ["Lab experiment presentations", "Physics lectures and problem-solving", "Science project presentations", "Research conference talks", "Concept explanation slides"] }], faq: [{ q: "Can it handle physics equations?", a: "You can add equations as text. For complex equations, use equation editors in PowerPoint after export." }, { q: "Is it free?", a: "Yes. Free plan for all users including students and teachers." }], related: ["ai-presentation-maker-for-chemistry", "ai-presentation-maker-for-mathematics", "ai-presentation-for-students"] },
-  { slug: "ai-presentation-maker-for-mathematics", keyword: "AI presentation maker for mathematics", title: "AI Presentation Maker for Mathematics — Math Slides Fast", description: "AI presentation maker for mathematics. Generate math presentations, lectures, and problem-solving slides. Export to .pptx. Free for students.", h1: "AI Presentation Maker for Mathematics", lede: "Math students and teachers need presentations for lessons, problem-solving, and proofs. EXdeck's AI generates math slides from text prompts. Export to PowerPoint or PDF.", sections: [{ h: "Math presentation use cases", list: ["Math lectures and lessons", "Problem-solving walkthroughs", "Theorem proofs and explanations", "Student project presentations", "Math competition prep"] }], faq: [{ q: "Can it format math equations?", a: "You can add equations as text. For complex equations, use PowerPoint's equation editor after export." }, { q: "Is it free for math students?", a: "Yes. Free plan available to all users." }], related: ["ai-presentation-maker-for-physics", "ai-presentation-maker-for-statistics", "ai-presentation-for-students"] },
-  { slug: "ai-presentation-maker-for-history", keyword: "AI presentation maker for history", title: "AI Presentation Maker for History — History Slides Fast", description: "AI presentation maker for history. Generate history presentations, timelines, and lectures. Export to .pptx. Free for students and teachers.", h1: "AI Presentation Maker for History", lede: "History students and teachers need presentations for lessons, projects, and reports. EXdeck's AI generates history slides from text prompts with timelines and structure. Export to PowerPoint or PDF.", sections: [{ h: "History presentation use cases", list: ["History lectures and lessons", "Timeline presentations", "Historical event analysis", "Biography presentations", "Research project presentations"] }], faq: [{ q: "Can it create timelines?", a: "Yes. The AI can generate timeline-style slides. Use the timeline bullets variant for visual timelines." }, { q: "Is it free for history students?", a: "Yes. Free plan for all users including students and teachers." }], related: ["ai-presentation-maker-for-english", "ai-presentation-for-students", "ai-presentation-for-teachers"] },
-  { slug: "ai-presentation-maker-for-economics", keyword: "AI presentation maker for economics", title: "AI Presentation Maker for Economics — Econ Slides Fast", description: "AI presentation maker for economics. Generate economics presentations, data analysis, and lectures. Export to .pptx. Free for students.", h1: "AI Presentation Maker for Economics", lede: "Economics students and professionals need presentations for analysis, lectures, and reports. EXdeck's AI generates economics slides from text prompts with charts and data. Export to PowerPoint or PDF.", sections: [{ h: "Economics presentation use cases", list: ["Economic analysis presentations", "Data and statistics slides", "Market research presentations", "Economics lectures", "Policy analysis presentations"] }, { h: "Data-driven features", list: ["AI charts from economic data", "Professional business themes", "Real .pptx export", "Free plan for students"] }], faq: [{ q: "Can it generate economic charts?", a: "Yes. The AI creates bar, line, pie, and area charts from economic data in your prompt." }, { q: "Is it free for economics students?", a: "Yes. Free plan covers AI generation and PowerPoint export." }], related: ["ai-presentation-maker-for-business-studies", "ai-presentation-for-business", "ai-presentation-for-students"] },
-  { slug: "ai-presentation-maker-for-marketing", keyword: "AI presentation maker for marketing", title: "AI Presentation Maker for Marketing — Marketing Slides Fast", description: "AI presentation maker for marketing. Generate marketing presentations, campaign decks, and strategy slides. Export to .pptx. Free to start.", h1: "AI Presentation Maker for Marketing", lede: "Marketers need presentations for campaigns, strategy, reporting, and pitches. EXdeck's AI generates marketing slides from text prompts with charts and visuals. Export to PowerPoint or PDF.", sections: [{ h: "Marketing presentation use cases", list: ["Campaign briefs and proposals", "Marketing strategy presentations", "Performance reports and analytics", "Brand presentations", "Social media strategy decks"] }, { h: "Marketing-ready features", list: ["AI charts for marketing metrics", "Bold, branded themes", "Real .pptx export for client sharing", "Fast generation for tight deadlines", "Free plan to test"] }], faq: [{ q: "Can I customize for my brand?", a: "Yes. Change colors, fonts, logos, and upload brand assets after AI generation." }, { q: "Does it create charts from campaign data?", a: "Yes. The AI generates charts from data you include in your prompt." }], related: ["ai-presentation-for-business", "ai-presentation-maker-for-consultants", "ai-pitch-deck-generator"] },
-  { slug: "ai-presentation-maker-for-nursing", keyword: "AI presentation maker for nursing", title: "AI Presentation Maker for Nursing — Medical Slides Fast", description: "AI presentation maker for nursing. Generate nursing presentations, patient education, and case studies. Export to .pptx. Free for students.", h1: "AI Presentation Maker for Nursing", lede: "Nurses and nursing students need presentations for patient education, case studies, training, and school projects. EXdeck's AI generates nursing slides from text prompts. Export to PowerPoint or PDF.", sections: [{ h: "Nursing presentation use cases", list: ["Patient education materials", "Nursing case studies", "Clinical training presentations", "Nursing school projects", "In-service training"] }, { h: "Healthcare-ready", list: ["Understands medical and nursing terminology", "Professional medical themes", "HIPAA-compliant client-side processing", "Real .pptx export", "Free plan for nursing students"] }], faq: [{ q: "Is it free for nursing students?", a: "Yes. Free plan available to all users including nursing students." }, { q: "Is it HIPAA compliant?", a: "EXdeck processes content client-side. No patient data is stored. Always review content before sharing." }], related: ["ai-presentation-maker-for-doctors", "ai-presentation-for-students", "ai-presentation-for-teachers"] },
-  { slug: "ai-presentation-maker-for-english", keyword: "AI presentation maker for English", title: "AI Presentation Maker for English — Literature Slides Fast", description: "AI presentation maker for English. Generate literature presentations, book reports, and analysis slides. Export to .pptx. Free for students.", h1: "AI Presentation Maker for English", lede: "English students and teachers need presentations for literature analysis, book reports, and writing workshops. EXdeck's AI generates English slides from text prompts. Export to PowerPoint or PDF.", sections: [{ h: "English presentation use cases", list: ["Literature analysis and themes", "Book reports and reviews", "Poetry analysis presentations", "Writing workshop slides", "Author biography presentations"] }], faq: [{ q: "Can it analyze literature?", a: "The AI generates structured content for literature topics. Always add your own analysis and insights." }, { q: "Is it free for English students?", a: "Yes. Free plan for all users including students." }], related: ["ai-presentation-maker-for-history", "ai-presentation-for-students", "ai-presentation-for-teachers"] },
-  { slug: "ai-presentation-maker-for-business-studies", keyword: "AI presentation maker for business studies", title: "AI Presentation Maker for Business Studies — Business Slides Fast", description: "AI presentation maker for business studies. Generate business presentations, case studies, and analysis slides. Export to .pptx. Free for students.", h1: "AI Presentation Maker for Business Studies", lede: "Business students need presentations for case studies, projects, and assignments. EXdeck's AI generates business slides from text prompts with charts and analysis. Export to PowerPoint or PDF.", sections: [{ h: "Business studies use cases", list: ["Case study presentations", "Business plan presentations", "Market analysis slides", "Financial analysis presentations", "Group project presentations"] }], faq: [{ q: "Can it create business charts?", a: "Yes. The AI generates charts from business data in your prompt." }, { q: "Is it free for business students?", a: "Yes. Free plan covers AI generation and PowerPoint export." }], related: ["ai-presentation-maker-for-economics", "ai-presentation-for-students", "ai-presentation-for-business"] },
-  { slug: "ai-presentation-maker-for-statistics", keyword: "AI presentation maker for statistics", title: "AI Presentation Maker for Statistics — Data Slides Fast", description: "AI presentation maker for statistics. Generate statistics presentations, data analysis, and charts. Export to .pptx. Free for students.", h1: "AI Presentation Maker for Statistics", lede: "Statistics students and analysts need presentations for data analysis, reports, and findings. EXdeck's AI generates statistics slides from text prompts with charts. Export to PowerPoint or PDF.", sections: [{ h: "Statistics presentation use cases", list: ["Statistical analysis presentations", "Data visualization slides", "Research findings presentations", "Survey results presentations", "A/B test reports"] }, { h: "Data visualization features", list: ["AI charts from statistical data", "Bar, line, pie, area charts", "Professional data themes", "Real .pptx export"] }], faq: [{ q: "Can it create statistical charts?", a: "Yes. The AI generates charts from data you provide in your prompt." }, { q: "Is it free?", a: "Yes. Free plan for all users." }], related: ["ai-presentation-maker-for-mathematics", "ai-presentation-maker-for-economics", "ai-presentation-for-students"] },
+  { slug: "ai-presentation-maker-for-biology", keyword: "AI presentation maker for biology", title: "AI Presentation Maker for Biology — Science Slides Fast", description: "AI presentation maker for biology. Generate biology presentations, lab reports, and science lectures from text with proper scientific structure. Export to .pptx. Free for students and teachers.", h1: "AI Presentation Maker for Biology", lede: "Biology moves between scales — molecules, cells, organisms, ecosystems — and a good deck has to carry the audience across them without losing the thread. EXdeck turns a one-line brief like \"photosynthesis for a 10th-grade class\" or \"CRISPR gene editing, journal-club depth\" into a structured biology deck: a clear hypothesis or question up front, labelled process steps, and a closing that ties back to the mechanism. Export a real .pptx or PDF you can keep editing.",
+    sections: [
+      { h: "Where biology decks usually go wrong", p: ["Most biology slides fail in one of two ways: a wall of textbook text that no one reads, or a single diagram with no narrative around it. The fix is structure — one idea per slide, a stated question or hypothesis, then evidence, then the takeaway.", "EXdeck drafts that structure automatically, so a cell-respiration lecture reads as a sequence (inputs → glycolysis → Krebs → electron transport → ATP yield) instead of one crowded slide."] },
+      { h: "Decks it builds well", list: ["Lab reports — aim, method, results table, and a chart from your measurements", "Lectures on processes (mitosis, transcription, natural selection) as step sequences", "Journal-club / paper reviews — background, methods, key figure, critique", "Ecology and field-study summaries with comparison tables", "Science-fair and capstone projects with a clear question-and-conclusion arc"] },
+      { h: "Turn lab numbers into real charts", p: ["Enzyme-rate curves, growth over time, population counts, allele frequencies — paste the numbers and EXdeck picks the right chart (line for trends, bar for comparisons) and colours it to your theme. Charts export as editable vectors in the .pptx, so your supervisor can inspect the data, not a screenshot."] },
+      { h: "Students vs. educators", p: ["Students get a fast, submission-ready deck (real .pptx for the school portal, free plan, watermark removed on upgrade). Educators can generate a full lesson, then adjust density per class — a lighter version for revision, a denser one for exam prep — without rebuilding the slides."] },
+    ],
+    faq: [
+      { q: "Will it get the biology right?", a: "The AI drafts scientifically-structured content and terminology for topics like cell biology, genetics, ecology, and physiology. It's a strong first draft — always review facts and figures before presenting, especially exact values." },
+      { q: "Can I show diagrams and cycles?", a: "Yes. Add your own images (a labelled cell, a pathway diagram), pull icons from the 200,000+ library, or generate charts from real data. You can also lay out cycles as numbered step slides." },
+      { q: "Is it free for biology students and teachers?", a: "Yes — the free plan covers AI generation, editing, and real PowerPoint/PDF export within a monthly limit. No card required to start." },
+      { q: "Can I match my institution's format?", a: "Yes. Change theme, fonts, and colours after generation, add your department logo, and export a .pptx that opens cleanly in PowerPoint, Keynote, or Google Slides." },
+    ],
+    related: ["ai-presentation-maker-for-chemistry", "ai-presentation-for-students", "ai-presentation-for-teachers"] },
+  { slug: "ai-presentation-maker-for-chemistry", keyword: "AI presentation maker for chemistry", title: "AI Presentation Maker for Chemistry — Science Slides in Seconds", description: "AI presentation maker for chemistry. Generate reaction mechanisms, lab reports, and lecture slides from text — with charts from your data. Export to .pptx. Free for students.", h1: "AI Presentation Maker for Chemistry", lede: "Chemistry presentations live and die on clarity: a reaction has reactants, conditions, a mechanism, and products, and each deserves its own beat. EXdeck takes a brief like \"SN1 vs SN2 substitution\" or \"titration lab: HCl with NaOH\" and drafts a deck that walks through the chemistry step by step, with space for structures, conditions, and a results chart — then exports a real .pptx you can refine.",
+    sections: [
+      { h: "Structure a reaction the way it's taught", p: ["A good mechanism slide isn't one dense image — it's a sequence: starting materials and conditions, the rate-determining step, intermediates, then products and yield. EXdeck lays that out as ordered slides so your audience follows the electron flow instead of decoding a wall of arrows."] },
+      { h: "Decks it builds well", list: ["Titration and kinetics lab reports with a data table and a rate curve", "Reaction-mechanism walkthroughs (substitution, elimination, addition)", "Periodic-trends and bonding lectures with comparison tables", "Organic synthesis routes as step-by-step slides", "Research posters and conference talks"] },
+      { h: "Formulas, structures, and data", p: ["Add chemical formulas as text and refine sub/superscripts after export, or drop in structure images and mechanism diagrams. For quantitative labs — concentration vs. time, absorbance, temperature curves — paste your numbers and EXdeck builds an editable, theme-coloured chart that exports as vectors in the .pptx."] },
+      { h: "Fast enough for a lab-report deadline", p: ["The first draft lands in about ten seconds, so a post-lab write-up becomes edit-and-export rather than build-from-scratch. Free plan for students; switch themes and add your school's branding before you submit."] },
+    ],
+    faq: [
+      { q: "Can it format chemical formulas and equations?", a: "You can add formulas as text in the editor. For complex sub/superscripts and structures, refine them in PowerPoint after export, or insert a structure image directly." },
+      { q: "Will the chemistry be accurate?", a: "The AI produces a well-structured first draft with correct terminology and flow. Always verify exact values, conditions, and mechanisms before presenting." },
+      { q: "Is it free for chemistry students?", a: "Yes. The free plan covers AI generation, editing, and PowerPoint/PDF export within a monthly limit." },
+    ],
+    related: ["ai-presentation-maker-for-biology", "ai-presentation-maker-for-physics", "ai-presentation-for-students"] },
+  { slug: "ai-presentation-maker-for-physics", keyword: "AI presentation maker for physics", title: "AI Presentation Maker for Physics — Science Slides Fast", description: "AI presentation maker for physics. Generate concept explanations, lab reports, and lecture slides from text — with charts from your measurements. Export to .pptx. Free for students and teachers.", h1: "AI Presentation Maker for Physics", lede: "Physics rewards presentations that separate the principle from the maths and the maths from the result. EXdeck takes a brief like \"projectile motion for grade 11\" or \"photoelectric effect lab\" and drafts a deck that states the concept, shows the governing relationship, and ends with the measured or derived result — with room for diagrams and a chart from your data. Export a real, editable .pptx.",
+    sections: [
+      { h: "Concept, then equation, then evidence", p: ["The clearest physics slides move in that order: what's happening physically, the relationship that describes it, and the data or worked answer that confirms it. EXdeck drafts that arc automatically, so a lesson on Newton's second law isn't one crowded slide but a build the class can follow."] },
+      { h: "Decks it builds well", list: ["Lab reports — apparatus, method, results table, and a graph of your data", "Concept lectures (kinematics, fields, waves, thermodynamics)", "Problem-solving walkthroughs with the setup and steps separated", "Research and project talks with real charts", "Revision decks that compress a topic into key relationships"] },
+      { h: "Turn measurements into graphs", p: ["Velocity vs. time, current vs. voltage, intensity vs. distance — paste your readings and EXdeck plots an editable, theme-coloured chart (line for trends, bar for comparisons) that exports as vectors in the .pptx, so the data stays inspectable, not a screenshot."] },
+      { h: "Equations and diagrams", p: ["Add equations as text and refine complex notation in PowerPoint after export; drop in free-body diagrams, circuit sketches, or ray diagrams as images. The exported deck is fully editable in PowerPoint, Keynote, or Google Slides."] },
+    ],
+    faq: [
+      { q: "Can it handle physics equations?", a: "Add equations as text in the editor; for complex notation use PowerPoint's equation editor after export. The .pptx stays fully editable." },
+      { q: "Can I chart my experiment data?", a: "Yes — paste your measurements and EXdeck builds an editable, theme-coloured chart that exports as vectors in the PowerPoint file." },
+      { q: "Is it free?", a: "Yes. The free plan covers generation, editing, and PowerPoint/PDF export within a monthly limit for students and teachers." },
+    ],
+    related: ["ai-presentation-maker-for-chemistry", "ai-presentation-maker-for-mathematics", "ai-presentation-for-students"] },
+  { slug: "ai-presentation-maker-for-mathematics", keyword: "AI presentation maker for mathematics", title: "AI Presentation Maker for Mathematics — Math Slides Fast", description: "AI presentation maker for mathematics. Generate lesson slides, proof walkthroughs, and problem sets from text. Export to .pptx. Free for students.", h1: "AI Presentation Maker for Mathematics", lede: "Maths is the hardest subject to present because the audience has to follow reasoning, not just read facts. A proof needs one step per slide; a worked problem needs the setup, the move, and the result separated. EXdeck takes a brief like \"prove the sum of the first n integers\" or \"introduction to derivatives for A-level\" and drafts slides that build the argument line by line — then exports a real .pptx you can drop equations into.",
+    sections: [
+      { h: "Pace the reasoning, one step per slide", p: ["The most common maths-slide mistake is cramming a full derivation onto one slide. EXdeck breaks it into beats — statement, assumption, each transformation, conclusion — so students can follow (and screenshot) each step. It's the difference between a proof people understand and one they copy without learning."] },
+      { h: "Decks it builds well", list: ["Lesson intros (functions, limits, vectors, probability) with clear definitions", "Step-by-step proof walkthroughs", "Worked-example sets — setup, method, answer per slide", "Competition / olympiad prep decks", "Project and coursework presentations"] },
+      { h: "Equations and diagrams", p: ["Add equations as text in the editor, then refine complex notation with PowerPoint's equation editor after export — the .pptx is fully editable. For geometry and graphs, drop in an image or generate a chart from data (e.g. a function's values or a probability distribution)."] },
+      { h: "For teachers and tutors", p: ["Generate a lesson, then produce a lighter revision version and a denser exam-prep version from the same brief by changing content density — no rebuilding. Add your school theme and export a clean .pptx for the smartboard."] },
+    ],
+    faq: [
+      { q: "Can it format math equations?", a: "You can add equations as text; for complex notation use PowerPoint's built-in equation editor after export. The exported .pptx is fully editable." },
+      { q: "Will the maths be correct?", a: "The AI structures lessons and proofs clearly, but always check every step and result — treat it as a first draft to refine, not a solver." },
+      { q: "Is it free for math students?", a: "Yes. The free plan covers generation, editing, and PowerPoint/PDF export within a monthly limit." },
+    ],
+    related: ["ai-presentation-maker-for-physics", "ai-presentation-maker-for-statistics", "ai-presentation-for-students"] },
+  { slug: "ai-presentation-maker-for-history", keyword: "AI presentation maker for history", title: "AI Presentation Maker for History — History Slides Fast", description: "AI presentation maker for history. Generate timelines, cause-and-effect analyses, and lecture slides from text. Export to .pptx. Free for students and teachers.", h1: "AI Presentation Maker for History", lede: "History presentations aren't just dates — they're arguments about cause, change, and significance. EXdeck takes a brief like \"causes of World War I\" or \"the Industrial Revolution's social impact\" and drafts a deck with a clear timeline, the key actors, and a cause-and-effect thread that leads to a conclusion, not just a list of events. Export a real .pptx to keep editing.",
+    sections: [
+      { h: "Tell a story, not a date list", p: ["Strong history decks answer \"so what?\" — why an event mattered and what it changed. EXdeck structures slides around context → event → consequence → significance, so a lesson on the French Revolution reads as an argument with evidence, not a Wikipedia dump."] },
+      { h: "Decks it builds well", list: ["Timeline slides for an era, war, or movement", "Cause-and-effect analyses (what led to what, and why)", "Figure and biography profiles with context", "Source-based and document-analysis presentations", "Coursework, National History Day, and revision decks"] },
+      { h: "Timelines and visuals", p: ["Use the timeline layout for a clean visual sequence of events, add period maps or portraits as images, and pull icons from the 200,000+ library. Comparison tables work well for contrasting perspectives, empires, or before/after change."] },
+      { h: "For students and teachers", p: ["Students get a submission-ready .pptx fast; teachers can generate a full lesson and adjust depth per class. Everything stays editable — swap the theme to match a period's mood, tighten a section, or add a primary-source quote."] },
+    ],
+    faq: [
+      { q: "Can it create timelines?", a: "Yes. Use the timeline layout for visual event sequences; the AI can also structure a period as a chronological set of slides." },
+      { q: "Will the history be accurate?", a: "The AI drafts well-structured, on-topic content, but always verify dates, names, and claims against your sources before presenting." },
+      { q: "Is it free for history students?", a: "Yes. The free plan covers generation, editing, and PowerPoint/PDF export within a monthly limit." },
+    ],
+    related: ["ai-presentation-maker-for-english", "ai-presentation-for-students", "ai-presentation-for-teachers"] },
+  { slug: "ai-presentation-maker-for-economics", keyword: "AI presentation maker for economics", title: "AI Presentation Maker for Economics — Econ Slides Fast", description: "AI presentation maker for economics. Turn models, data, and policy analysis into clear slides with charts. Export to .pptx. Free for students.", h1: "AI Presentation Maker for Economics", lede: "Economics presentations juggle models, data, and judgement — a supply-and-demand shift, a dataset, a policy trade-off. EXdeck takes a brief like \"impact of a minimum-wage increase\" or \"explain inflation for an intro class\" and drafts a deck that states the model, shows the evidence, and weighs the trade-offs, with editable charts from your data. Export a real .pptx.",
+    sections: [
+      { h: "Model, evidence, trade-off", p: ["Good economics slides don't just define terms — they reason: here's the model, here's what the data shows, here's the trade-off or policy implication. EXdeck structures decks that way so an analysis argues a position instead of listing definitions."] },
+      { h: "Decks it builds well", list: ["Micro/macro concept lectures (elasticity, GDP, monetary policy)", "Policy analysis with costs, benefits, and trade-offs", "Data-led market and sector research", "Econometrics and dataset findings with charts", "Coursework, dissertations, and seminar talks"] },
+      { h: "Charts from economic data", p: ["Paste time series (GDP, CPI, unemployment) or cross-section figures and EXdeck builds editable line/bar charts coloured to your theme, exported as vectors in the .pptx — clean enough for a seminar, inspectable by a marker."] },
+      { h: "For students and analysts", p: ["Generate a structured draft in seconds, then refine the argument and verify figures. Switch to a professional theme, add your institution's branding, and export a genuine PowerPoint or PDF. Free plan for students."] },
+    ],
+    faq: [
+      { q: "Can it generate economic charts?", a: "Yes — include your data in the brief and EXdeck creates editable bar, line, pie, or area charts that export as vectors in the .pptx." },
+      { q: "Will the economics be accurate?", a: "It drafts well-structured, on-topic content, but always verify data, models, and claims before presenting — treat it as a first draft." },
+      { q: "Is it free for economics students?", a: "Yes. The free plan covers generation, editing, and PowerPoint/PDF export within a monthly limit." },
+    ],
+    related: ["ai-presentation-maker-for-business-studies", "ai-presentation-for-business", "ai-presentation-for-students"] },
+  { slug: "ai-presentation-maker-for-marketing", keyword: "AI presentation maker for marketing", title: "AI Presentation Maker for Marketing — Marketing Slides Fast", description: "AI presentation maker for marketing. Turn a brief into campaign decks, strategy slides, and performance reports with real charts. Export to .pptx. Free to start.", h1: "AI Presentation Maker for Marketing", lede: "Marketing decks have to sell an idea and prove a result at the same time. EXdeck takes a brief like \"Q3 campaign wrap-up\" or \"go-to-market plan for a new app\" and drafts a deck with a clear narrative — the insight, the plan, the numbers — plus editable charts built from your metrics. Export a real .pptx you can put your brand on.",
+    sections: [
+      { h: "Lead with the insight, back it with numbers", p: ["The strongest marketing slides open with a claim and immediately support it (\"CAC dropped 22% after the creative refresh\" → the chart). EXdeck structures decks that way instead of burying the point under a bullet list, whether it's a campaign recap, a channel strategy, or a quarterly review."] },
+      { h: "Decks it builds well", list: ["Campaign briefs and creative proposals", "Go-to-market and channel strategy decks", "Performance reports (funnel, CAC/LTV, ROAS) with charts", "Brand and positioning presentations", "Client pitches and QBRs"] },
+      { h: "Charts from your metrics", p: ["Paste funnel numbers, spend-vs-return, or month-over-month growth and EXdeck picks the right chart and colours it to your palette. Charts export as editable vectors in the .pptx, so clients can dig into the data — not squint at a screenshot."] },
+      { h: "On-brand in one click", p: ["Generate first, then apply your colours, fonts, and logo, and switch the whole deck's theme instantly. Export a genuine PowerPoint for client hand-off or a high-res PDF for a leave-behind."] },
+    ],
+    faq: [
+      { q: "Can I customize for my brand?", a: "Yes. After generation, change colours, fonts, and logo, and switch themes across the whole deck in one click." },
+      { q: "Does it build charts from campaign data?", a: "Yes — include your numbers in the brief and EXdeck generates editable, theme-coloured charts that export as vectors in the .pptx." },
+      { q: "Is there a plan for teams?", a: "Yes. Team plans add shared seats and pooled usage for marketing teams and agencies; a free plan lets you test first." },
+    ],
+    related: ["ai-presentation-for-business", "ai-presentation-maker-for-consultants", "ai-pitch-deck-generator"] },
+  { slug: "ai-presentation-maker-for-nursing", keyword: "AI presentation maker for nursing", title: "AI Presentation Maker for Nursing — Medical Slides Fast", description: "AI presentation maker for nursing. Build patient-education, case-study, and in-service training slides from text. Export to .pptx. Free for students.", h1: "AI Presentation Maker for Nursing", lede: "Nursing presentations span two very different audiences — patients who need plain language, and colleagues who need clinical precision. EXdeck takes a brief like \"diabetes self-management for patients\" or \"sepsis case study for clinical rounds\" and drafts the right register for each: simple, reassuring steps for education, or assessment-intervention-evaluation structure for case work. Export a real .pptx.",
+    sections: [
+      { h: "Match the register to the audience", p: ["Patient education needs short sentences, one action per slide, and no jargon; a case study needs the nursing process — assessment, diagnosis, plan, intervention, evaluation. EXdeck drafts to the audience you name, so you're editing tone, not rebuilding structure."] },
+      { h: "Decks it builds well", list: ["Patient and family education handouts", "Case studies structured around the nursing process", "Clinical / in-service training and competency reviews", "Care-plan and pathophysiology explainers", "Nursing-school projects and journal presentations"] },
+      { h: "Privacy by design", p: ["Content is processed in your browser — no patient data is uploaded or stored. Use de-identified information and always review clinical content against current guidelines before you present or share."] },
+      { h: "Submission-ready and editable", p: ["Export a genuine .pptx for the school portal or unit screen, switch to a clean clinical theme, and add your institution's logo. Everything stays editable in PowerPoint, Keynote, or Google Slides."] },
+    ],
+    faq: [
+      { q: "Is it safe for patient information?", a: "EXdeck processes content client-side and stores no patient data. Use de-identified information and review everything for accuracy and privilege before sharing." },
+      { q: "Will it use correct clinical terminology?", a: "The AI drafts appropriate nursing and medical terminology, but it's a first draft — always verify against current evidence and guidelines." },
+      { q: "Is it free for nursing students?", a: "Yes. The free plan covers generation, editing, and PowerPoint/PDF export within a monthly limit." },
+    ],
+    related: ["ai-presentation-maker-for-doctors", "ai-presentation-for-students", "ai-presentation-for-teachers"] },
+  { slug: "ai-presentation-maker-for-english", keyword: "AI presentation maker for English", title: "AI Presentation Maker for English — Literature Slides Fast", description: "AI presentation maker for English literature. Build theme analyses, book reports, and close-reading slides from text. Export to .pptx. Free for students.", h1: "AI Presentation Maker for English", lede: "A strong literature presentation makes an argument about a text and supports it with evidence — theme, technique, quotation, effect. EXdeck takes a brief like \"symbolism in The Great Gatsby\" or \"analyse the opening of Macbeth\" and drafts slides that state a reading, then back it with specific devices and lines, instead of just summarising the plot. Export a real, editable .pptx.",
+    sections: [
+      { h: "Analysis, not plot summary", p: ["The difference between a top and a middling English deck is argument: a claim about meaning, then evidence. EXdeck structures slides around thesis → device/quotation → effect → significance, so a poetry analysis reads as interpretation rather than paraphrase."] },
+      { h: "Decks it builds well", list: ["Theme and motif analyses across a text", "Book reports and novel study presentations", "Close reading of a passage or poem", "Character and relationship studies with evidence", "Author context and literary-movement overviews"] },
+      { h: "Bring in quotations and context", p: ["Add key quotations, drop in a portrait of the author or a period image, and use comparison layouts to contrast characters or interpretations. The deck stays fully editable so your own analysis leads — the AI just gives you the scaffold."] },
+      { h: "For students and teachers", p: ["Students get a submission-ready .pptx quickly; teachers can generate a lesson and adjust depth for different classes. Swap themes to match a text's tone and export a clean PowerPoint or PDF."] },
+    ],
+    faq: [
+      { q: "Can it analyse literature?", a: "It drafts structured analysis (themes, devices, context) as a strong starting point — always add your own close reading and insight, and verify quotations." },
+      { q: "Can I include quotations and images?", a: "Yes. Add quotations as text, insert author/period images, and use comparison layouts for characters or interpretations." },
+      { q: "Is it free for English students?", a: "Yes. The free plan covers generation, editing, and PowerPoint/PDF export within a monthly limit." },
+    ],
+    related: ["ai-presentation-maker-for-history", "ai-presentation-for-students", "ai-presentation-for-teachers"] },
+  { slug: "ai-presentation-maker-for-business-studies", keyword: "AI presentation maker for business studies", title: "AI Presentation Maker for Business Studies — Business Slides Fast", description: "AI presentation maker for business studies. Build case-study analyses, business plans, and market-analysis slides with charts. Export to .pptx. Free for students.", h1: "AI Presentation Maker for Business Studies", lede: "Business-studies presentations reward frameworks and evidence — a SWOT that leads somewhere, a case study with a recommendation, a market analysis backed by numbers. EXdeck takes a brief like \"Tesla case study: competitive strategy\" or \"marketing mix for a startup\" and drafts a deck that applies the right framework and ends with a decision. Export a real .pptx with editable charts.",
+    sections: [
+      { h: "Apply the framework, reach a recommendation", p: ["Markers look for structured thinking: situation → analysis (SWOT, PESTLE, Porter's, 4Ps) → recommendation. EXdeck drafts that arc so your case study argues a conclusion instead of just describing a company, leaving you to sharpen the judgement."] },
+      { h: "Decks it builds well", list: ["Case-study analyses with a clear recommendation", "Business plans and startup pitches", "Market and competitor analysis with charts", "Financial-analysis and ratio presentations", "Group projects and coursework"] },
+      { h: "Charts from business data", p: ["Paste revenue, market-share, or cost figures and EXdeck builds editable bar/line/pie charts coloured to your theme, exported as vectors in the .pptx — the kind of evidence that lifts a coursework grade."] },
+      { h: "Present and hand in", p: ["Export a genuine PowerPoint for a class presentation or a PDF for submission, switch themes for a professional look, and edit any slide inline. Free plan for students."] },
+    ],
+    faq: [
+      { q: "Can it build business charts?", a: "Yes — include your figures in the brief and EXdeck generates editable, theme-coloured charts that export as vectors in the .pptx." },
+      { q: "Will it apply frameworks like SWOT?", a: "Yes, it drafts common business frameworks as a structured starting point — always review the analysis and add your own judgement." },
+      { q: "Is it free for business students?", a: "Yes. The free plan covers generation, editing, and PowerPoint/PDF export within a monthly limit." },
+    ],
+    related: ["ai-presentation-maker-for-economics", "ai-presentation-for-students", "ai-presentation-for-business"] },
+  { slug: "ai-presentation-maker-for-statistics", keyword: "AI presentation maker for statistics", title: "AI Presentation Maker for Statistics — Data Slides Fast", description: "AI presentation maker for statistics. Turn analyses and results into clear slides with the right charts. Export to .pptx. Free for students.", h1: "AI Presentation Maker for Statistics", lede: "A statistics presentation succeeds when the audience trusts the result — which means showing the question, the method, the right chart, and an honest interpretation. EXdeck takes a brief like \"A/B test results for a landing page\" or \"regression analysis of housing prices\" and drafts a deck that frames the hypothesis, presents the data cleanly, and states what it does and doesn't prove. Export a real .pptx with editable charts.",
+    sections: [
+      { h: "Pick the chart that fits the claim", p: ["Half of statistics communication is choosing the right visual: distributions as histograms, trends as lines, group differences as bars, composition as pie. EXdeck builds the appropriate chart from your numbers and keeps it editable, so the emphasis matches the finding."] },
+      { h: "Decks it builds well", list: ["Analysis write-ups (hypothesis, method, results, conclusion)", "A/B test and experiment reports", "Survey-results presentations", "Regression and correlation findings", "Research and coursework projects"] },
+      { h: "From dataset summary to slide", p: ["Paste summary statistics or grouped values and EXdeck generates a clean, theme-coloured chart that exports as vectors in the .pptx — inspectable by a reviewer, not a flat image. Add a table for exact figures alongside the visual."] },
+      { h: "Interpret honestly", p: ["The AI drafts an interpretation section you can refine — significance, effect size, and caveats. It's a structure for communicating results clearly; you supply the rigour and verify every number before presenting."] },
+    ],
+    faq: [
+      { q: "Can it create statistical charts?", a: "Yes — provide your data or summary figures in the brief and EXdeck builds editable bar, line, pie, or area charts that export as vectors in the .pptx." },
+      { q: "Does it do the analysis for me?", a: "No — it structures and communicates results. Run your analysis in your stats tool, then let EXdeck turn the findings into clear slides. Always verify values." },
+      { q: "Is it free?", a: "Yes. The free plan covers generation, editing, and PowerPoint/PDF export within a monthly limit." },
+    ],
+    related: ["ai-presentation-maker-for-mathematics", "ai-presentation-maker-for-economics", "ai-presentation-for-students"] },
 );
 
 LANDING_PAGES.push(
@@ -2405,28 +2586,35 @@ LANDING_PAGES.push(
       "Looking for a Tome alternative? EXdeck is a free AI presentation maker with real PowerPoint & PDF export, a full slide editor, and data charts. Start free.",
     h1: "The free Tome alternative",
     lede:
-      "If you liked generating decks with Tome but need real, exportable PowerPoint files and a familiar slide editor, EXdeck is a practical alternative — free to start.",
+      "Tome pioneered the scrolling, web-native 'tome' format — great for interactive storytelling, less so when someone asks for the file as a PowerPoint. If you want AI generation but a classic slide deck you can export as a real .pptx and edit anywhere, EXdeck is the practical alternative — free to start.",
     sections: [
       {
-        h: "Why switch to EXdeck",
-        list: [
-          "Real editable .pptx and PDF export, not just a web page",
-          "A full slide editor — drag, recolor, restyle every element",
-          "AI data charts built from your real numbers",
-          "Per-slide regenerate with your choice of AI model",
-          "Free plan; Pro from $1.99/mo",
+        h: "Where EXdeck differs from Tome",
+        p: [
+          "Tome leans into an interactive, web-page style presentation. EXdeck is deliberately presentation-first: it produces standard 16:9 slides that export as a genuine Microsoft PowerPoint (.pptx) and a high-resolution PDF, so your deck opens and edits normally in PowerPoint, Keynote, and Google Slides — no 'view it on our site' step.",
         ],
       },
       {
-        h: "Made for real presentations",
+        h: "What you get instead",
+        list: [
+          "Real editable .pptx + PDF export, not a shared web link",
+          "A full slide editor — drag, recolor, and restyle every element",
+          "AI data charts built from your real numbers, exported as vectors",
+          "Per-slide regenerate with your choice of AI model",
+          "A genuinely usable free plan; Pro from $1.99/mo",
+        ],
+      },
+      {
+        h: "When Tome is still the better pick",
         p: [
-          "EXdeck outputs classic slides you can hand off as a PowerPoint file — ideal for class, clients, and boardrooms where a .pptx or PDF is expected.",
+          "If your end goal is an interactive, scrollable web experience rather than a file to hand off, Tome's native format fits that better. EXdeck is for the common case where the deliverable is a slide deck someone expects as PowerPoint or PDF.",
         ],
       },
     ],
     faq: [
-      { q: "Is EXdeck a free Tome alternative?", a: "Yes. EXdeck has a free plan and exports real PowerPoint and PDF files." },
-      { q: "Can I edit slides fully in EXdeck?", a: "Yes — it's a complete inline editor, not a one-shot generator." },
+      { q: "Is EXdeck a free Tome alternative?", a: "Yes. EXdeck has a free plan and exports real PowerPoint and PDF files you own — no web-only lock-in." },
+      { q: "Can I export a real PowerPoint, unlike a web tome?", a: "Yes — EXdeck's core output is a genuine .pptx plus a PDF, editable in PowerPoint, Keynote, and Google Slides." },
+      { q: "Can I edit slides fully in EXdeck?", a: "Yes — it's a complete inline editor, not a one-shot generator; change text, layout, charts, and themes." },
     ],
     related: ["exdeck-vs-tome", "gamma-alternative", "best-ai-presentation-maker", "exdeck"],
   },
@@ -2503,21 +2691,35 @@ LANDING_PAGES.push(
       "A free Decktopus alternative: EXdeck generates editable presentations from text with real charts and exports genuine PowerPoint & PDF. Start free, no card.",
     h1: "The free Decktopus alternative",
     lede:
-      "Want Decktopus-style quick decks but with real PowerPoint export and a fuller editor? EXdeck generates and designs your slides and hands you a genuine .pptx — free to start.",
+      "Decktopus is known for fast, form-driven decks with built-in extras like forms and voiceovers. If your priority is a genuine, editable PowerPoint you fully control — plus real data charts and a proper slide editor — EXdeck is a focused alternative, free to start.",
     sections: [
       {
-        h: "Why EXdeck",
+        h: "Where EXdeck differs from Decktopus",
+        p: [
+          "Decktopus optimizes for speed and web-hosted decks with add-ons. EXdeck optimizes for ownership: it generates classic slides and exports a real .pptx and PDF you can edit forever in PowerPoint, Keynote, or Google Slides — no hosted-only format, no per-feature gating.",
+        ],
+      },
+      {
+        h: "What you get instead",
         list: [
-          "Real editable .pptx and PDF export",
-          "Full slide editor with per-element control",
-          "AI data charts and 200,000+ icons",
-          "Free plan; Pro from $1.99/mo",
+          "Real editable .pptx and high-resolution PDF export — yours to keep",
+          "A full slide editor with per-element control, not just a form",
+          "AI data charts built from your real numbers, plus 200,000+ icons",
+          "Per-slide regenerate with your choice of AI model",
+          "A usable free plan; Pro from $1.99/mo",
+        ],
+      },
+      {
+        h: "Best for hand-off decks",
+        p: [
+          "If you need something to present and hand over as a PowerPoint — class projects, pitches, internal reviews — EXdeck gets you a finished, editable file fast, without a subscription to unlock export.",
         ],
       },
     ],
     faq: [
-      { q: "Is EXdeck free?", a: "Yes — a free plan with monthly credits, plus Pro from $1.99/mo." },
-      { q: "Does EXdeck export PowerPoint?", a: "Yes, a real editable .pptx plus a high-resolution PDF." },
+      { q: "Is EXdeck free?", a: "Yes — a free plan with monthly credits, plus Pro from $1.99/mo. Export to real PowerPoint is included, not paywalled." },
+      { q: "Does EXdeck export PowerPoint?", a: "Yes — a genuine editable .pptx plus a high-resolution PDF that open in PowerPoint, Keynote, and Google Slides." },
+      { q: "Can I edit everything, not just a form?", a: "Yes. EXdeck is a full inline editor — drag, recolor, rewrite, swap themes, and build charts, beyond form-driven generation." },
     ],
     related: ["gamma-alternative", "best-ai-presentation-maker", "ai-ppt-maker", "exdeck"],
   },
@@ -2719,21 +2921,35 @@ LANDING_PAGES.push(
       "A free Genially alternative: EXdeck generates editable presentations from text with real charts and exports genuine PowerPoint & PDF. Start free.",
     h1: "The free Genially alternative",
     lede:
-      "Want a simpler path to a real, editable presentation than Genially's interactive builder? EXdeck writes and designs the deck for you and exports a true PowerPoint — free to start.",
+      "Genially shines at interactive, animated, click-to-explore content — but that's a different job from producing a clean slide deck you hand off as a file. If you want AI to write and design a standard presentation and give you a real, editable PowerPoint, EXdeck is the focused alternative — free to start.",
     sections: [
       {
-        h: "Why EXdeck",
+        h: "Where EXdeck differs from Genially",
+        p: [
+          "Genially is built for interactive experiences — hotspots, animations, embeds — that live on the web. EXdeck is presentation-first: it drafts the content and lays out standard 16:9 slides, then exports a genuine .pptx and PDF you can present offline and edit in PowerPoint, Keynote, or Google Slides.",
+        ],
+      },
+      {
+        h: "What you get instead",
         list: [
           "AI drafts the whole deck from a one-line brief",
-          "Real editable .pptx and PDF export",
-          "Real data charts and 200,000+ icons",
-          "Free plan; Pro from $1.99/mo",
+          "Real editable .pptx and PDF export — not a web-only interactive",
+          "Data charts built from your real numbers, plus 200,000+ icons",
+          "A full slide editor and per-slide AI regenerate",
+          "A usable free plan; Pro from $1.99/mo",
+        ],
+      },
+      {
+        h: "When Genially is the better pick",
+        p: [
+          "If you specifically need interactive, gamified, or animated web content, Genially is designed for that. EXdeck is for the common case where the deliverable is a slide deck someone expects as a PowerPoint or PDF.",
         ],
       },
     ],
     faq: [
-      { q: "Is EXdeck free?", a: "Yes — a free plan plus Pro from $1.99/mo." },
-      { q: "Does it export PowerPoint?", a: "Yes, a real editable .pptx and PDF." },
+      { q: "Is EXdeck a free Genially alternative?", a: "Yes — a free plan plus Pro from $1.99/mo, with real PowerPoint and PDF export included." },
+      { q: "Does it export a real PowerPoint?", a: "Yes — a genuine .pptx and PDF, unlike a web-only interactive presentation." },
+      { q: "Can I present offline?", a: "Yes — export the .pptx/PDF and present anywhere, no internet or hosted link required." },
     ],
     related: ["exdeck-vs-genially", "gamma-alternative", "best-ai-presentation-maker", "exdeck"],
   },
@@ -2745,19 +2961,35 @@ LANDING_PAGES.push(
       "A free Pitch (pitch.com) alternative: EXdeck drafts decks from text with AI, exports real PowerPoint & PDF, and starts free. Compare and switch.",
     h1: "The free Pitch alternative",
     lede:
-      "If you like Pitch's polish but want AI to draft the deck and a real PowerPoint export, EXdeck is a practical, free-to-start alternative.",
+      "Pitch (pitch.com) is a polished, team-oriented deck tool — strong on collaboration and templates, but you still build most of the deck yourself, and pricing is per-seat. EXdeck lets AI draft the whole deck first and exports a real PowerPoint, free to start.",
     sections: [
       {
-        h: "Why EXdeck",
+        h: "Where EXdeck differs from Pitch",
+        p: [
+          "Pitch gives you a slick editor and templates to fill in. EXdeck starts a step earlier — describe the deck and AI writes and designs it in about ten seconds — then you refine. And your output is a genuine .pptx/PDF you own, not a link tied to a workspace seat.",
+        ],
+      },
+      {
+        h: "What you get instead",
         list: [
-          "AI writes and designs the deck from a prompt",
-          "Real editable .pptx and PDF export",
-          "Free plan; Pro from $1.99/mo",
+          "AI writes and designs the deck from a one-line brief",
+          "Real editable .pptx and PDF export — no per-seat lock-in",
+          "Data charts from your real numbers and 200,000+ icons",
+          "Per-slide regenerate with your choice of AI model",
+          "Free plan; Pro from $1.99/mo instead of per-seat pricing",
+        ],
+      },
+      {
+        h: "When Pitch is the better pick",
+        p: [
+          "If your team lives inside one workspace and wants real-time multiplayer editing and analytics as the core workflow, Pitch is built for that. EXdeck is for getting from an idea to a finished, exportable deck fast and cheaply.",
         ],
       },
     ],
     faq: [
-      { q: "Is EXdeck a free Pitch alternative?", a: "Yes — with AI drafting and real PowerPoint export." },
+      { q: "Is EXdeck a free Pitch alternative?", a: "Yes — AI drafting plus real PowerPoint/PDF export, free to start, Pro from $1.99/mo." },
+      { q: "Do I pay per seat?", a: "No — EXdeck's free and Pro plans aren't per-seat; team plans exist if you want shared seats." },
+      { q: "Can I export a real PowerPoint?", a: "Yes — a genuine .pptx and PDF you fully own and can edit anywhere." },
     ],
     related: ["exdeck-vs-pitch", "gamma-alternative", "sales-deck-generator", "exdeck"],
   },
@@ -2769,20 +3001,35 @@ LANDING_PAGES.push(
       "A free Slidebean alternative for pitch decks: EXdeck generates and designs decks from text, exports real PowerPoint & PDF, and starts free.",
     h1: "The free Slidebean alternative",
     lede:
-      "EXdeck is a free-to-start Slidebean alternative that drafts your pitch deck from a one-line brief and hands you a real, editable PowerPoint.",
+      "Slidebean is pitch-deck focused with a template-and-arrange workflow and paid export. EXdeck drafts the full pitch narrative from a one-line brief — problem, solution, market, traction, ask — and hands you a real, editable PowerPoint, free to start.",
     sections: [
       {
-        h: "Why EXdeck",
+        h: "Where EXdeck differs from Slidebean",
+        p: [
+          "Slidebean guides you through arranging content into its templates. EXdeck writes the pitch structure and the words for you first, then lets you edit every slide freely — and real .pptx/PDF export is included, not gated behind a paid tier.",
+        ],
+      },
+      {
+        h: "What you get instead",
         list: [
-          "Full pitch-deck structure generated for you",
-          "Real data charts for traction and market size",
-          "Real editable .pptx and PDF export",
+          "A full pitch-deck arc generated from your brief",
+          "Real data charts for traction, market size, and financials",
+          "Real editable .pptx and PDF export — no export paywall",
+          "45 themes and a full inline editor to make it yours",
           "Free plan; Pro from $1.99/mo",
+        ],
+      },
+      {
+        h: "Best for founders in a hurry",
+        p: [
+          "If you need an investor-ready first draft tonight, EXdeck gets you a complete, editable deck in minutes — then export a PowerPoint your co-founders can refine.",
         ],
       },
     ],
     faq: [
-      { q: "Is EXdeck free?", a: "Yes — a free plan plus Pro from $1.99/mo." },
+      { q: "Is EXdeck free?", a: "Yes — a free plan plus Pro from $1.99/mo, with real PowerPoint export included (not paywalled)." },
+      { q: "Does it structure a pitch deck?", a: "Yes — it drafts the standard problem/solution/market/traction/ask arc, which you then edit." },
+      { q: "Can I export to PowerPoint?", a: "Yes — a genuine .pptx and PDF you own and can edit anywhere." },
     ],
     related: ["exdeck-vs-slidebean", "ai-pitch-deck-generator", "sales-deck-generator", "exdeck"],
   },
@@ -2794,20 +3041,35 @@ LANDING_PAGES.push(
       "A free Slidesgo alternative: instead of hunting templates, EXdeck writes and designs your slides with AI and exports real PowerPoint & PDF. Start free.",
     h1: "The free Slidesgo alternative",
     lede:
-      "Slidesgo gives you templates to fill in; EXdeck writes and designs the whole deck from a prompt, so you skip the blank-template stage entirely. Free to start.",
+      "Slidesgo gives you a huge library of templates to download and fill in — but you still write every word and arrange every slide. EXdeck writes and designs the whole deck from a one-line brief, so you skip the blank-template stage entirely. Free to start.",
     sections: [
       {
-        h: "Why EXdeck",
+        h: "Where EXdeck differs from Slidesgo",
+        p: [
+          "Slidesgo's value is the template catalog; the work of writing and structuring the content is still yours. EXdeck flips that: describe the topic and it drafts the headlines, points, and layout automatically, then you refine — and it exports a real .pptx and PDF.",
+        ],
+      },
+      {
+        h: "What you get instead",
         list: [
-          "AI drafts content and design — no template hunting",
-          "Real data charts, 45 themes, 200,000+ icons",
+          "AI drafts content AND design — no template hunting or filling-in",
+          "45 built-in themes, 28 fonts, and 200,000+ icons",
+          "Real data charts built from your numbers",
           "Real editable .pptx and PDF export",
           "Free plan; Pro from $1.99/mo",
         ],
       },
+      {
+        h: "When Slidesgo is the better pick",
+        p: [
+          "If you already know exactly what you'll say and just want a specific decorative template to drop it into, Slidesgo's catalog is great. EXdeck is for when you want the content written and designed for you, fast.",
+        ],
+      },
     ],
     faq: [
-      { q: "Is EXdeck a free Slidesgo alternative?", a: "Yes — and it writes the deck for you instead of giving you an empty template." },
+      { q: "Is EXdeck a free Slidesgo alternative?", a: "Yes — and it writes the deck for you instead of handing you an empty template to fill in." },
+      { q: "Do I still get themes and design?", a: "Yes — 45 themes, 28 fonts, textured backgrounds, and one-click theme switching after generation." },
+      { q: "Does it export PowerPoint?", a: "Yes — a real editable .pptx and PDF." },
     ],
     related: ["gamma-alternative", "free-ppt-maker", "ai-slide-maker", "exdeck"],
   },
@@ -2819,20 +3081,35 @@ LANDING_PAGES.push(
       "A free MagicSlides alternative: EXdeck generates full editable presentations from text with real charts and exports genuine PowerPoint & PDF. Start free.",
     h1: "The free MagicSlides alternative",
     lede:
-      "MagicSlides works as an add-on; EXdeck is a standalone AI presentation maker that writes and designs the whole deck and exports a real PowerPoint. Free to start.",
+      "MagicSlides runs as a Google Slides / browser add-on — handy, but tied to that host and its limits. EXdeck is a standalone AI presentation maker that writes and designs the whole deck and exports a genuine PowerPoint, free to start.",
     sections: [
       {
-        h: "Why EXdeck",
+        h: "Where EXdeck differs from MagicSlides",
+        p: [
+          "MagicSlides plugs into Google Slides to generate slides from text. EXdeck is its own full editor — so you get per-element control, data charts, 45 themes, and per-slide AI regenerate — and it exports a real .pptx and PDF you can open in PowerPoint, Keynote, or Slides.",
+        ],
+      },
+      {
+        h: "What you get instead",
         list: [
-          "Standalone app — no add-on required",
-          "Full slide editor with per-element control",
+          "Standalone app — no add-on or host account required",
+          "A full slide editor with per-element control",
+          "Real data charts and 200,000+ icons",
           "Real editable .pptx and PDF export",
           "Free plan; Pro from $1.99/mo",
         ],
       },
+      {
+        h: "When MagicSlides is the better pick",
+        p: [
+          "If your whole workflow lives inside Google Slides and you just want a quick in-app generator, the add-on is convenient. EXdeck is for a fuller editor and real PowerPoint output outside any single host.",
+        ],
+      },
     ],
     faq: [
-      { q: "Is EXdeck a MagicSlides alternative?", a: "Yes — a standalone, free-to-start app with real PowerPoint export." },
+      { q: "Is EXdeck a MagicSlides alternative?", a: "Yes — a standalone, free-to-start app with a full editor and real PowerPoint export." },
+      { q: "Do I need Google Slides or an add-on?", a: "No — EXdeck runs on its own in the browser; export to .pptx and import into Slides if you like." },
+      { q: "Is it free?", a: "Yes — a free plan plus Pro from $1.99/mo." },
     ],
     related: ["slidesai-alternative", "ai-ppt-maker", "text-to-ppt", "exdeck"],
   },

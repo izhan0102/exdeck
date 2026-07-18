@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import {
   ArrowRight, Check, Contact, MonitorPlay, Github, LogOut,
   Presentation, Sparkles, Star, FileText, X,
-  Table, ArrowLeftRight, Brain, GraduationCap, Mic, BarChart3,
+  Table, ArrowLeftRight, Brain, GraduationCap, BarChart3, LayoutTemplate,
   type LucideIcon,
 } from "lucide-react";
 import Logo from "@/components/Logo";
@@ -43,6 +43,7 @@ const HERO = '"Bitcount Single", "Fontdiner Swanky", ui-sans-serif, system-ui, s
  *  tiles). Icons stay small, inline, and muted - wayfinding, not decoration. */
 const TOOLS: { name: string; sub: string; href: string; icon: LucideIcon }[] = [
   { name: "Ask EX-AI", sub: "Your AI guide", href: "/ex-ai", icon: Sparkles },
+  { name: "Template Lab", sub: "Edit your template with AI", href: "/template-lab", icon: LayoutTemplate },
   { name: "Presentations", sub: "AI slide maker", href: "/presentations", icon: Presentation },
   { name: "Documents", sub: "AI doc writer", href: "/documents", icon: FileText },
   { name: "Resumes", sub: "CV builder", href: "/resumes", icon: Contact },
@@ -51,7 +52,6 @@ const TOOLS: { name: string; sub: string; href: string; icon: LucideIcon }[] = [
   { name: "Analyser", sub: "Analyse any file", href: "/analyse", icon: Brain },
   { name: "Converters", sub: "Free file tools", href: "/converter", icon: ArrowLeftRight },
   { name: "Flashcards", sub: "Study & quiz", href: "/flashcards", icon: GraduationCap },
-  { name: "Mock Interview", sub: "Practice & feedback", href: "/interview", icon: Mic },
 ];
 
 export default function LandingPage() {
@@ -612,6 +612,14 @@ export default function LandingPage() {
                   <td className="px-3 py-4 text-center" style={{ color: "var(--ezd-fg-muted)" }}>Decks only</td>
                   <td className="px-3 py-4 text-center"><Check size={18} style={{ color: "#34D399" }} className="mx-auto" /></td>
                   <td className="px-3 py-4 text-center" style={{ color: "var(--ezd-fg-muted)" }}>Decks only</td>
+                </tr>
+                <tr style={{ borderBottom: "1px solid var(--ezd-divider)" }}>
+                  <td className="py-4 pr-4 font-medium" style={{ color: "var(--ezd-fg-strong)" }}>Reuse your own template</td>
+                  <td className="px-3 py-4 text-center"><Check size={18} style={{ color: "#34D399" }} className="mx-auto" /></td>
+                  <td className="px-3 py-4 text-center"><X size={18} style={{ color: "var(--ezd-fg-quiet)", opacity: 0.4 }} className="mx-auto" /></td>
+                  <td className="px-3 py-4 text-center"><X size={18} style={{ color: "var(--ezd-fg-quiet)", opacity: 0.4 }} className="mx-auto" /></td>
+                  <td className="px-3 py-4 text-center"><X size={18} style={{ color: "var(--ezd-fg-quiet)", opacity: 0.4 }} className="mx-auto" /></td>
+                  <td className="px-3 py-4 text-center"><X size={18} style={{ color: "var(--ezd-fg-quiet)", opacity: 0.4 }} className="mx-auto" /></td>
                 </tr>
                 <tr>
                   <td className="py-4 pr-4 font-medium" style={{ color: "var(--ezd-fg-strong)" }}>No lock-in</td>
@@ -1871,6 +1879,7 @@ function Footer() {
               { label: "Features", href: "#features" },
               { label: "Ask EX-AI", href: "/ex-ai" },
               { label: "How it works", href: "#how" },
+              { label: "Template Lab (beta)", href: "/template-lab" },
               { label: "Examples", href: "#examples" },
               { label: "Pricing", href: "#pricing" },
               { label: "How-to guides", href: "/how-to" },

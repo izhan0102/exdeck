@@ -3,7 +3,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import {
   AlertTriangle, ArrowRight, Clock, Copy, FileText, Home,
-  LogIn, LogOut, MoreVertical, Pencil, Search, Share2, Sparkles, Trash2, Wand2, X, Zap, Contact, Settings,
+  LogIn, LogOut, MoreVertical, Pencil, Search, Share2, Sparkles, Trash2, Wand2, X, Zap, Contact, Settings, LayoutTemplate,
 } from "lucide-react";
 import { type AppUser, getIdToken, isGuestUser } from "@/lib/auth";
 import {
@@ -218,6 +218,7 @@ export default function Dashboard({
           <NavItem icon={<FileText size={15} />} label="My decks" href="/app/decks" count={decks.length || undefined} />
           <NavItem icon={<FileText size={15} />} label="My docs" href="/app/docs" />
           <NavItem icon={<Contact size={15} />} label="My resumes" href="/app/resumes" />
+          <NavItem icon={<LayoutTemplate size={15} />} label="Template Lab" href="/template-lab" />
           <NavItem icon={<Settings size={15} />} label="Settings" href="/app/settings" />
         </nav>
 
@@ -345,7 +346,7 @@ export default function Dashboard({
                     layouts, speaker notes, and one-click export to PPTX &amp; PDF.
                   </p>
                 </div>
-                <div className="mt-6 flex flex-wrap items-center gap-3">
+                <div className="mt-6 flex flex-wrap items-start gap-3">
                   <button
                     onClick={onNewDeck}
                     disabled={limitReached}
@@ -356,13 +357,18 @@ export default function Dashboard({
                     {!limitReached && <ArrowRight size={15} className="transition-transform group-hover:translate-x-0.5" />}
                   </button>
                   {onStartFromTemplate && (
-                    <button
-                      onClick={onStartFromTemplate}
-                      className="inline-flex items-center rounded-xl border px-5 py-3 text-[14px] font-semibold transition hover:opacity-80"
-                      style={{ borderColor: "var(--ezd-hairline)", background: "var(--ezd-bg-hover)", color: "var(--ezd-fg-strong)" }}
-                    >
-                      Start from a template
-                    </button>
+                    <div className="flex flex-col gap-1">
+                      <button
+                        onClick={onStartFromTemplate}
+                        className="inline-flex items-center gap-2 rounded-xl border px-5 py-3 text-[14px] font-semibold transition hover:opacity-80"
+                        style={{ borderColor: "var(--ezd-hairline)", background: "var(--ezd-bg-hover)", color: "var(--ezd-fg-strong)" }}
+                      >
+                        <LayoutTemplate size={15} /> Start from a template
+                      </button>
+                      <p className="max-w-[280px] text-[11.5px] leading-snug" style={{ color: "var(--ezd-fg-quiet)" }}>
+                        Upload your own PowerPoint and edit it with AI — keep the exact design, and let AI write your content.
+                      </p>
+                    </div>
                   )}
                 </div>
               </div>

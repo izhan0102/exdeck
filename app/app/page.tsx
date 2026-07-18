@@ -538,7 +538,7 @@ const retryGenerate = () => {
           <DashboardMobile
             user={user}
             onStartFromScratch={() => setStep("prompt")}
-            onStartFromTemplate={() => { setStep("prompt"); setGalleryOpen(true); }}
+            onStartFromTemplate={() => router.push("/template-lab")}
             onSignOut={async () => { await logout(); router.replace("/"); }}
             onSwitchToDesktop={() => { setDeviceMode("desktop"); try { window.location.reload(); } catch { /* ignore */ } }}
           />
@@ -553,7 +553,7 @@ const retryGenerate = () => {
           <Dashboard
             user={user}
             onStartFromScratch={() => setStep("prompt")}
-            onStartFromTemplate={() => { setStep("prompt"); setGalleryOpen(true); }}
+            onStartFromTemplate={() => router.push("/template-lab")}
             onSignOut={async () => { await logout(); router.replace("/"); }}
           />
         </div>
