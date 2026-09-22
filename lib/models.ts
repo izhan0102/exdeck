@@ -14,14 +14,7 @@
  * here, so a model change happens in exactly one place.
  */
 
-export type ModelId =
-  | "llama-3.3-70b-versatile"
-  | "llama-3.1-8b-instant"
-  | "meta-llama/llama-4-scout-17b-16e-instruct"
-  | "qwen/qwen3-32b"
-  | "qwen/qwen3.6-27b"
-  | "openai/gpt-oss-20b"
-  | "openai/gpt-oss-120b";
+export type ModelId = "llama-3.1-8b-instant";
 
 export type ModelInfo = {
   id: ModelId;
@@ -54,16 +47,6 @@ export type ModelInfo = {
  * (it would always return a 413 "payload too large").
  */
 export const MODELS: Record<ModelId, ModelInfo> = {
-  "llama-3.3-70b-versatile": {
-    id: "llama-3.3-70b-versatile",
-    label: "Llama 3.3 70B",
-    provider: "Meta",
-    multiplier: 1.1,
-    blurb: "Balanced default — strong quality at a fair rate.",
-    contextWindow: 131072,
-    maxOutput: 32768,
-    tpm: 12000,
-  },
   "llama-3.1-8b-instant": {
     id: "llama-3.1-8b-instant",
     label: "Llama 3.1 8B Instant",
@@ -74,71 +57,13 @@ export const MODELS: Record<ModelId, ModelInfo> = {
     maxOutput: 131072,
     tpm: 6000,
   },
-  "meta-llama/llama-4-scout-17b-16e-instruct": {
-    id: "meta-llama/llama-4-scout-17b-16e-instruct",
-    label: "Llama 4 Scout 17B",
-    provider: "Meta",
-    multiplier: 1.2,
-    blurb: "Fast multimodal-class model, roomy context.",
-    contextWindow: 131072,
-    maxOutput: 8192,
-    tpm: 30000,
-  },
-  "qwen/qwen3-32b": {
-    id: "qwen/qwen3-32b",
-    label: "Qwen 3 32B",
-    provider: "Qwen",
-    multiplier: 2,
-    blurb: "Strong reasoning — higher cost.",
-    contextWindow: 131072,
-    maxOutput: 40960,
-    tpm: 6000,
-  },
-  "qwen/qwen3.6-27b": {
-    id: "qwen/qwen3.6-27b",
-    label: "Qwen 3.6 27B",
-    provider: "Qwen",
-    multiplier: 2,
-    blurb: "Newer Qwen — strong multilingual output.",
-    contextWindow: 131072,
-    maxOutput: 32768,
-    tpm: 8000,
-  },
-  "openai/gpt-oss-20b": {
-    id: "openai/gpt-oss-20b",
-    label: "GPT-OSS 20B",
-    provider: "OpenAI",
-    multiplier: 2.2,
-    blurb: "Open-weight GPT — premium quality.",
-    contextWindow: 131072,
-    maxOutput: 65536,
-    tpm: 8000,
-  },
-  "openai/gpt-oss-120b": {
-    id: "openai/gpt-oss-120b",
-    label: "GPT-OSS 120B",
-    provider: "OpenAI",
-    multiplier: 2.5,
-    blurb: "Largest open-weight GPT — top quality, top cost.",
-    contextWindow: 131072,
-    maxOutput: 65536,
-    tpm: 8000,
-  },
 };
 
 /** Default model used everywhere unless the user picks another. */
-export const DEFAULT_MODEL: ModelId = "llama-3.3-70b-versatile";
+export const DEFAULT_MODEL: ModelId = "llama-3.1-8b-instant";
 
 /** Display order for the picker (default first, then by ascending cost). */
-export const MODEL_ORDER: ModelId[] = [
-  "llama-3.3-70b-versatile",
-  "llama-3.1-8b-instant",
-  "meta-llama/llama-4-scout-17b-16e-instruct",
-  "qwen/qwen3-32b",
-  "qwen/qwen3.6-27b",
-  "openai/gpt-oss-20b",
-  "openai/gpt-oss-120b",
-];
+export const MODEL_ORDER: ModelId[] = ["llama-3.1-8b-instant"];
 
 /** Coerce any value into a valid ModelId, defaulting to DEFAULT_MODEL. */
 export function normalizeModel(value: unknown): ModelId {
