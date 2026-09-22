@@ -14,7 +14,7 @@
  * here, so a model change happens in exactly one place.
  */
 
-export type ModelId = "llama-3.1-8b-instant";
+export type ModelId = "openai/gpt-oss-20b";
 
 export type ModelInfo = {
   id: ModelId;
@@ -47,9 +47,9 @@ export type ModelInfo = {
  * (it would always return a 413 "payload too large").
  */
 export const MODELS: Record<ModelId, ModelInfo> = {
-  "llama-3.1-8b-instant": {
-    id: "llama-3.1-8b-instant",
-    label: "Llama 3.1 8B Instant",
+  "openai/gpt-oss-20b": {
+    id: "openai/gpt-oss-20b",
+    label: "openai/gpt-oss-20b",
     provider: "Meta",
     multiplier: 0.5,
     blurb: "Fastest & cheapest — great for quick drafts.",
@@ -60,10 +60,10 @@ export const MODELS: Record<ModelId, ModelInfo> = {
 };
 
 /** Default model used everywhere unless the user picks another. */
-export const DEFAULT_MODEL: ModelId = "llama-3.1-8b-instant";
+export const DEFAULT_MODEL: ModelId = "openai/gpt-oss-20b";
 
 /** Display order for the picker (default first, then by ascending cost). */
-export const MODEL_ORDER: ModelId[] = ["llama-3.1-8b-instant"];
+export const MODEL_ORDER: ModelId[] = ["openai/gpt-oss-20b"];
 
 /** Coerce any value into a valid ModelId, defaulting to DEFAULT_MODEL. */
 export function normalizeModel(value: unknown): ModelId {
